@@ -155,7 +155,7 @@
             z-index: -1;
         }
 
-        /* --- Siri Screen Edge Liquid Stream (修正版：全屏环绕) --- */
+        /* --- Siri Screen Edge Liquid Stream (修正版：方框静止，颜色流动) --- */
         #siri-screen-glow {
             position: fixed;
             inset: 0;
@@ -170,15 +170,14 @@
             position: absolute;
             inset: 0;
             padding: 4px; /* 边框厚度 */
-            /* 全角度渐变，确保四边都有颜色 */
-            background: conic-gradient(
-                from 0deg, 
-                #00f3ff, 
-                #a259ff, 
-                #00f3ff, 
-                #a259ff, 
-                #00f3ff
+            
+            /* 使用线性渐变，并拉大尺寸以便滚动实现“流光”效果 */
+            background: linear-gradient(
+                90deg, 
+                #00f3ff, #a259ff, #ff2d55, #ff9d00, #00f3ff, #a259ff
             );
+            background-size: 300% 100%;
+            
             -webkit-mask:
                 linear-gradient(#fff 0 0) content-box,
                 linear-gradient(#fff 0 0);
@@ -187,6 +186,7 @@
                 linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
+            
             filter: blur(8px);
         }
 
@@ -197,12 +197,17 @@
 
         .bottom-nav:hover ~ #siri-screen-glow::before,
         #siri-screen-glow.active::before {
-            animation: siri-rotate 4s linear infinite;
+            /* 只有背景位置移动和色相旋转，没有 transform rotate */
+            animation: siri-flow 3s linear infinite;
         }
         
-        @keyframes siri-rotate {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        @keyframes siri-flow {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 100% 50%;
+            }
         }
 
         .bottom-nav:hover .circle-btn {
@@ -467,7 +472,7 @@
             requestAnimationFrame(animate);
         }
 
-        // JS 交互逻辑：除了 CSS hover，JS 也辅助触发 active
+        // JS 交互逻辑
         const bottomNav = document.querySelector('.bottom-nav');
         const siriGlow = document.getElementById('siri-screen-glow');
 
