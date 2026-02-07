@@ -155,7 +155,7 @@
             z-index: -1;
         }
 
-        /* --- Siri Screen Edge Liquid Stream (修正版：方框静止，颜色流动) --- */
+        /* --- Siri Screen Edge Liquid Stream (高清流光版) --- */
         #siri-screen-glow {
             position: fixed;
             inset: 0;
@@ -165,18 +165,24 @@
             transition: opacity 1.2s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
+        .bottom-nav:hover ~ #siri-screen-glow,
+        #siri-screen-glow.active {
+            opacity: 1;
+        }
+
+        /* 层级1：清晰的“灯管”核心 - 不再糊成一团 */
         #siri-screen-glow::before {
             content: '';
             position: absolute;
             inset: 0;
-            padding: 4px; /* 边框厚度 */
+            padding: 3px; /* 线条更细，显得更精致 */
             
-            /* 使用线性渐变，并拉大尺寸以便滚动实现“流光”效果 */
+            /* 更加柔和的色彩光谱 */
             background: linear-gradient(
-                90deg, 
-                #00f3ff, #a259ff, #ff2d55, #ff9d00, #00f3ff, #a259ff
+                120deg, 
+                #00f3ff, #7000ff, #ff0055, #ff9d00, #00f3ff
             );
-            background-size: 300% 100%;
+            background-size: 400% 400%; /* 拉大背景，让流动更像液体而非条纹 */
             
             -webkit-mask:
                 linear-gradient(#fff 0 0) content-box,
@@ -187,26 +193,69 @@
             -webkit-mask-composite: xor;
             mask-composite: exclude;
             
-            filter: blur(8px);
+            /* 关键：只给极轻微的羽化，保持锐度 */
+            filter: blur(1px); 
+            
+            /* 动画：流光位移 */
+            animation: siri-stream 6s ease infinite;
         }
 
-        .bottom-nav:hover ~ #siri-screen-glow,
-        #siri-screen-glow.active {
-            opacity: 1;
+        /* 层级2：环境光晕 (Glow) - 这一层负责产生“溢彩”效果 */
+        #siri-screen-glow::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            padding: 3px;
+            z-index: -1;
+            
+            background: linear-gradient(
+                120deg, 
+                #00f3ff, #7000ff, #ff0055, #ff9d00, #00f3ff
+            );
+            background-size: 400% 400%;
+            
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            
+            /* 关键：这一层负责由于光线散射产生的模糊，不影响核心线条 */
+            filter: blur(15px) opacity(0.6);
+            
+            animation: siri-stream-glow 6s ease infinite;
         }
 
-        .bottom-nav:hover ~ #siri-screen-glow::before,
-        #siri-screen-glow.active::before {
-            /* 只有背景位置移动和色相旋转，没有 transform rotate */
-            animation: siri-flow 3s linear infinite;
-        }
-        
-        @keyframes siri-flow {
+        @keyframes siri-stream {
             0% {
                 background-position: 0% 50%;
+                filter: blur(1px) hue-rotate(0deg);
+            }
+            50% {
+                background-position: 100% 50%;
+                filter: blur(1px) hue-rotate(30deg);
             }
             100% {
+                background-position: 0% 50%;
+                filter: blur(1px) hue-rotate(0deg);
+            }
+        }
+
+        @keyframes siri-stream-glow {
+            0% {
+                background-position: 0% 50%;
+                filter: blur(15px) opacity(0.6) hue-rotate(0deg);
+            }
+            50% {
                 background-position: 100% 50%;
+                filter: blur(20px) opacity(0.8) hue-rotate(30deg);
+            }
+            100% {
+                background-position: 0% 50%;
+                filter: blur(15px) opacity(0.6) hue-rotate(0deg);
             }
         }
 
@@ -258,11 +307,8 @@
         let width, height;
         let nodes = [];
         let particles = [];
-
-        // 【修复1】初始化坐标为负数，防止 null 计算错误
         let mouse = { x: -1000, y: -1000, radius: 250 };
 
-        // 【修复2】使用 clientX 代替 x，兼容 Safari 和 Firefox
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
@@ -316,14 +362,13 @@
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
-                // 鼠标交互
                 if (mouse.x > 0) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
                     let distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < mouse.radius) {
                         const force = (mouse.radius - distance) / mouse.radius;
-                        this.x += dx * force * 0.03; // 修正为引力/斥力方向
+                        this.x += dx * force * 0.03;
                         this.y += dy * force * 0.03;
                     }
                 }
@@ -344,7 +389,6 @@
                     ctx.fillText(this.label, this.x + 8, this.y + 4);
                 }
 
-                // 鼠标靠近增强
                 if (mouse.x > 0) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
@@ -372,7 +416,6 @@
                 if (this.progress >= 1) this.alive = false;
             }
             draw() {
-                // 安全检查，防止resize导致引用丢失
                 if (!this.nodeA || !this.nodeB) return;
 
                 const x = this.nodeA.x + (this.nodeB.x - this.nodeA.x) * this.progress;
@@ -397,7 +440,6 @@
         function init() {
             nodes = [];
             particles = [];
-            // 【修复3】防止高分屏节点过多卡死，设置上限 180
             let rawCount = (width * height) / 13000;
             let count = Math.min(rawCount, 180); 
             
@@ -429,7 +471,6 @@
                         ctx.lineTo(nodes[j].x, nodes[j].y);
                         ctx.stroke();
 
-                        // 扫描线
                         let scanPos = (Date.now() % 2000) / 2000;
                         if (Math.random() > 0.995) {
                             let sx = nodes[i].x + dx * -scanPos;
@@ -444,7 +485,6 @@
                     }
                 }
 
-                // 鼠标连线
                 if (mouse.x > 0) {
                     let dx = nodes[i].x - mouse.x;
                     let dy = nodes[i].y - mouse.y;
@@ -472,7 +512,6 @@
             requestAnimationFrame(animate);
         }
 
-        // JS 交互逻辑
         const bottomNav = document.querySelector('.bottom-nav');
         const siriGlow = document.getElementById('siri-screen-glow');
 
