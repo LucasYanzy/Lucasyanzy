@@ -15,19 +15,17 @@
     <meta property="og:description"
         content="Explore the algorithmic portfolio of Lucas Yan, intersecting Finance and Computer Science.">
     <meta property="og:image" content="https://lucasyanzy.github.io/Intro/assets/preview.png">
+    
     <link rel="canonical" href="https://lucasyanzy.github.io/Intro/">
     <link rel="me" href="https://www.linkedin.com/in/lucasyanzy/">
     <style>
         :root {
             --bg: #050505;
-            /* 深空黑 */
             --text-color: #ffffff;
             --primary-node: #00f3ff;
-            /* 节点青色 */
         }
 
-        body,
-        html {
+        body, html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -108,7 +106,6 @@
             text-transform: uppercase;
             opacity: 0.6;
             transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            /* Blue/Purple Dominant Base */
             color: #bfaaff;
             background: linear-gradient(120deg,
                     #00f3ff 0%, #a259ff 40%, #ff2d55 50%, #ff9d00 52%, #a259ff 65%, #00f3ff 100%);
@@ -145,7 +142,6 @@
             z-index: 2;
         }
 
-        /* 引导点击的脉冲环 (Ripple) - 锦上添花 */
         .circle-btn::before {
             content: '';
             position: absolute;
@@ -159,7 +155,7 @@
             z-index: -1;
         }
 
-        /* Siri Screen Edge Liquid Stream */
+        /* --- Siri Screen Edge Liquid Stream (修正版：全屏环绕) --- */
         #siri-screen-glow {
             position: fixed;
             inset: 0;
@@ -174,19 +170,15 @@
             position: absolute;
             inset: 0;
             padding: 4px; /* 边框厚度 */
-            
-            /* Let's change the background gradient here */
-            /* 原来的代码只在底部有一小段颜色。 */
-            /* 修改为：环绕一周的连续渐变，确保四边都有颜色 */
+            /* 全角度渐变，确保四边都有颜色 */
             background: conic-gradient(
                 from 0deg, 
                 #00f3ff, 
                 #a259ff, 
                 #00f3ff, 
                 #a259ff, 
-                #00f3ff /* 结尾回到起点颜色确保平滑 */
+                #00f3ff
             );
-
             -webkit-mask:
                 linear-gradient(#fff 0 0) content-box,
                 linear-gradient(#fff 0 0);
@@ -195,28 +187,22 @@
                 linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
-            filter: blur(10px); /* 液态柔和感 */
+            filter: blur(8px);
         }
 
-        .bottom-nav:hover~#siri-screen-glow,
+        .bottom-nav:hover ~ #siri-screen-glow,
         #siri-screen-glow.active {
             opacity: 1;
         }
 
-        .bottom-nav:hover~#siri-screen-glow::before,
+        .bottom-nav:hover ~ #siri-screen-glow::before,
         #siri-screen-glow.active::before {
-            /* 旋转动画保持不变 */
             animation: siri-rotate 4s linear infinite;
         }
         
-        /* 需要补充定义旋转动画的关键帧 */
         @keyframes siri-rotate {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .bottom-nav:hover .circle-btn {
@@ -225,51 +211,19 @@
             box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
         }
 
-        @keyframes breathe {
-
-            0%,
-            100% {
-                transform: scale(0.8);
-                opacity: 0.5;
-            }
-
-            50% {
-                transform: scale(1.2);
-                opacity: 1;
-            }
-        }
-
         @keyframes pulse-ring {
-            0% {
-                transform: scale(0.9);
-                opacity: 0.8;
-            }
-
-            70%,
-            100% {
-                transform: scale(2.0);
-                opacity: 0;
-            }
+            0% { transform: scale(0.9); opacity: 0.8; }
+            70%, 100% { transform: scale(2.0); opacity: 0; }
         }
 
         @keyframes siri-sweep {
-            0% {
-                background-position: -150% center;
-            }
-
-            100% {
-                background-position: 150% center;
-            }
+            0% { background-position: -150% center; }
+            100% { background-position: 150% center; }
         }
 
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-
-            h2 {
-                font-size: 1.2rem;
-            }
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.2rem; }
         }
     </style>
 </head>
@@ -286,9 +240,7 @@
     <a href="intro.html" class="bottom-nav">
         <span class="click-text">Explore My Universe / 探索我的宇宙</span>
         <div class="circle-btn">
-            <div
-                style="width: 10px; height: 10px; background: #00f3ff; border-radius: 50%; box-shadow: 0 0 15px #00f3ff; opacity: 0.5;">
-            </div>
+            <div style="width: 10px; height: 10px; background: #00f3ff; border-radius: 50%; box-shadow: 0 0 15px #00f3ff; opacity: 0.5;"></div>
         </div>
     </a>
 
@@ -302,22 +254,25 @@
         let nodes = [];
         let particles = [];
 
-        let mouse = { x: null, y: null, radius: 250 };
+        // 【修复1】初始化坐标为负数，防止 null 计算错误
+        let mouse = { x: -1000, y: -1000, radius: 250 };
 
+        // 【修复2】使用 clientX 代替 x，兼容 Safari 和 Firefox
         window.addEventListener('mousemove', (e) => {
-            mouse.x = e.x;
-            mouse.y = e.y;
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
         });
+        
         window.addEventListener('mouseout', () => {
-            mouse.x = null;
-            mouse.y = null;
+            mouse.x = -1000;
+            mouse.y = -1000;
         });
 
         const config = {
             nodeCount: 80,
             connectDist: 160,
             mouseConnectDist: 220,
-            speed: 0.4,
+            speed: 0.5,
             packetSpawnRate: 0.015,
             complexities: ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)', 'O(n²)'],
             labelChars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -352,17 +307,19 @@
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
+                
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
-                if (mouse.x != null) {
+                // 鼠标交互
+                if (mouse.x > 0) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
                     let distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < mouse.radius) {
                         const force = (mouse.radius - distance) / mouse.radius;
-                        this.x += (mouse.x - this.x) * force * 0.02;
-                        this.y += (mouse.y - this.y) * force * 0.02;
+                        this.x += dx * force * 0.03; // 修正为引力/斥力方向
+                        this.y += dy * force * 0.03;
                     }
                 }
             }
@@ -376,15 +333,14 @@
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // 绘制节点标签 (锦上添花)
                 if (this.isPrimary) {
                     ctx.fillStyle = 'rgba(0, 243, 255, 0.6)';
                     ctx.font = '9px monospace';
                     ctx.fillText(this.label, this.x + 8, this.y + 4);
                 }
 
-                // 鼠标靠近时增强显示
-                if (mouse.x != null) {
+                // 鼠标靠近增强
+                if (mouse.x > 0) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
@@ -392,7 +348,7 @@
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                         ctx.font = '10px monospace';
                         ctx.fillText(this.label, this.x + 8, this.y + 4);
-                        if (Math.random() > 0.95) this.label = this.generateLabel(); // 动态闪烁
+                        if (Math.random() > 0.95) this.label = this.generateLabel();
                     }
                 }
             }
@@ -411,6 +367,9 @@
                 if (this.progress >= 1) this.alive = false;
             }
             draw() {
+                // 安全检查，防止resize导致引用丢失
+                if (!this.nodeA || !this.nodeB) return;
+
                 const x = this.nodeA.x + (this.nodeB.x - this.nodeA.x) * this.progress;
                 const y = this.nodeA.y + (this.nodeB.y - this.nodeA.y) * this.progress;
 
@@ -422,7 +381,6 @@
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // 偶尔在数据包上显示 Big O
                 if (this.progress > 0.4 && this.progress < 0.45 && Math.random() > 0.9) {
                     ctx.fillStyle = 'rgba(189, 0, 255, 0.8)';
                     ctx.font = 'italic 10px monospace';
@@ -434,7 +392,10 @@
         function init() {
             nodes = [];
             particles = [];
-            let count = (width * height) / 13000;
+            // 【修复3】防止高分屏节点过多卡死，设置上限 180
+            let rawCount = (width * height) / 13000;
+            let count = Math.min(rawCount, 180); 
+            
             for (let i = 0; i < count; i++) {
                 nodes.push(new Node());
             }
@@ -449,7 +410,6 @@
             }
 
             for (let i = 0; i < nodes.length; i++) {
-                // 1. 普通轨道
                 for (let j = i + 1; j < nodes.length; j++) {
                     let dx = nodes[i].x - nodes[j].x;
                     let dy = nodes[i].y - nodes[j].y;
@@ -458,28 +418,19 @@
                     if (dist < config.connectDist) {
                         let opacity = 1 - dist / config.connectDist;
                         ctx.beginPath();
-
-                        // 【修改点】：颜色加深
-                        // 之前的浅蓝是 135, 206, 235
-                        // 现在改为深科技蓝：4, 110, 190 (Deep Tech Blue)
-                        // 并稍微提高了基础透明度 (0.2 -> 0.25) 让深色能被看见
                         ctx.strokeStyle = `rgba(4, 110, 190, ${opacity * 0.75})`;
-
                         ctx.lineWidth = 0.5;
                         ctx.moveTo(nodes[i].x, nodes[i].y);
                         ctx.lineTo(nodes[j].x, nodes[j].y);
                         ctx.stroke();
 
-                        // 【新增】：扫描线效果 (Sorting simulation)
+                        // 扫描线
                         let scanPos = (Date.now() % 2000) / 2000;
-                        if (Math.random() > 0.99) { // 随机在某些线上显示扫描点
-                            ctx.beginPath();
-                            ctx.strokeStyle = '#fff';
-                            ctx.lineWidth = 1;
-                            let sx = nodes[i].x + dx * scanPos;
-                            let sy = nodes[i].y + dy * scanPos;
-                            ctx.arc(sx, sy, 1, 0, Math.PI * 2);
-                            ctx.stroke();
+                        if (Math.random() > 0.995) {
+                            let sx = nodes[i].x + dx * -scanPos;
+                            let sy = nodes[i].y + dy * -scanPos;
+                            ctx.fillStyle = '#fff';
+                            ctx.fillRect(sx, sy, 1, 1);
                         }
 
                         if (Math.random() < config.packetSpawnRate) {
@@ -488,8 +439,8 @@
                     }
                 }
 
-                // 2. 鼠标交互轨道 (紫色)
-                if (mouse.x != null) {
+                // 鼠标连线
+                if (mouse.x > 0) {
                     let dx = nodes[i].x - mouse.x;
                     let dy = nodes[i].y - mouse.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
@@ -512,21 +463,23 @@
                 p.draw();
                 if (!p.alive) particles.splice(i, 1);
             }
+
             requestAnimationFrame(animate);
         }
 
-        // Siri Glow Interaction - 原有的 JS 交互逻辑保留
-        // 这样除了 CSS hover 之外，JS 事件也能触发 active 类
+        // JS 交互逻辑：除了 CSS hover，JS 也辅助触发 active
         const bottomNav = document.querySelector('.bottom-nav');
         const siriGlow = document.getElementById('siri-screen-glow');
 
-        bottomNav.addEventListener('mouseenter', () => {
-            siriGlow.classList.add('active');
-        });
+        if(bottomNav && siriGlow) {
+            bottomNav.addEventListener('mouseenter', () => {
+                siriGlow.classList.add('active');
+            });
 
-        bottomNav.addEventListener('mouseleave', () => {
-            siriGlow.classList.remove('active');
-        });
+            bottomNav.addEventListener('mouseleave', () => {
+                siriGlow.classList.remove('active');
+            });
+        }
 
         resize();
         animate();
