@@ -1,286 +1,4 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucas Yan | Finance & CS Portfolio</title>
-    <meta name="description"
-        content="Lucas Yan - Finance, SCM & Computer Science at Rutgers. Explore my algorithmic universe and professional portfolio.">
-    <meta name="keywords" content="Lucas Yan, Rutgers, Finance, Computer Science, SCM, Portfolio, Algorithmic Universe">
-
-    <!-- Open Graph / LinkedIn -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://lucasyanzy.github.io/Intro/">
-    <meta property="og:title" content="Lucas Yan | Finance & CS Portfolio">
-    <meta property="og:description"
-        content="Explore the algorithmic portfolio of Lucas Yan, intersecting Finance and Computer Science.">
-    <meta property="og:image" content="https://lucasyanzy.github.io/Intro/assets/preview.png">
-    <!-- Placeholder for future use -->
-
-    <!-- Professional Links -->
-    <link rel="canonical" href="https://lucasyanzy.github.io/Intro/">
-    <link rel="me" href="https://www.linkedin.com/in/lucasyanzy/">
-    <style>
-        :root {
-            --bg: #050505;
-            /* 深空黑 */
-            --text-color: #ffffff;
-            --primary-node: #00f3ff;
-            /* 节点青色 */
-        }
-
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: var(--bg);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: var(--text-color);
-        }
-
-        canvas {
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 0;
-            transition: opacity 0.8s ease, filter 0.8s ease;
-        }
-
-        .center-content {
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2;
-            text-align: center;
-            pointer-events: none;
-            user-select: none;
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        body:has(.bottom-nav:hover) .center-content {
-            opacity: 0.15;
-            transform: translate(-50%, -55%);
-        }
-
-        body:has(.bottom-nav:hover) canvas {
-            opacity: 0.25;
-            filter: blur(3px);
-        }
-
-        h1 {
-            font-size: 4.5rem;
-            font-weight: 300;
-            margin: 0;
-            letter-spacing: 2px;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(0, 243, 255, 0.4), 0 0 40px rgba(0, 0, 0, 0.8);
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            margin-top: 15px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.8);
-            letter-spacing: 8px;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-        }
-
-        .bottom-nav {
-            position: absolute;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            cursor: pointer;
-            text-decoration: none;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .click-text {
-            font-size: 0.95rem;
-            font-weight: 500;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            opacity: 0.6;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            /* Blue/Purple Dominant Base */
-            color: #bfaaff;
-            background: linear-gradient(120deg,
-                    #00f3ff 0%, #a259ff 40%, #ff2d55 50%, #ff9d00 52%, #a259ff 65%, #00f3ff 100%);
-            background-size: 300% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            white-space: nowrap;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .bottom-nav:hover .click-text {
-            opacity: 1;
-            transform: scale(1.02);
-            animation: siri-sweep 3s ease-in-out infinite;
-            filter: drop-shadow(0 0 5px rgba(162, 89, 255, 0.3));
-        }
-
-        .circle-btn {
-            width: 60px;
-            height: 60px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            position: relative;
-            z-index: 2;
-        }
-
-        /* Siri Screen Edge Liquid Glow */
-        #siri-screen-glow {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 1.2s cubic-bezier(0.23, 1, 0.32, 1);
-            box-shadow:
-                inset 0 0 30px rgba(0, 243, 255, 0),
-                inset 0 0 60px rgba(162, 89, 255, 0);
-        }
-
-        .bottom-nav:hover~#siri-screen-glow,
-        #siri-screen-glow.active {
-            opacity: 1;
-            animation: siri-liquid-glow 8s linear infinite;
-        }
-
-        @keyframes siri-liquid-glow {
-            0% {
-                box-shadow:
-                    inset 5px 5px 40px rgba(0, 243, 255, 0.4),
-                    inset -5px -5px 40px rgba(162, 89, 255, 0.4);
-            }
-
-            25% {
-                box-shadow:
-                    inset -5px 5px 40px rgba(255, 45, 85, 0.4),
-                    inset 5px -5px 40px rgba(0, 243, 255, 0.4);
-            }
-
-            50% {
-                box-shadow:
-                    inset -5px -5px 40px rgba(162, 89, 255, 0.4),
-                    inset 5px 5px 40px rgba(255, 157, 0, 0.4);
-            }
-
-            75% {
-                box-shadow:
-                    inset 5px -5px 40px rgba(0, 243, 255, 0.4),
-                    inset -5px 5px 40px rgba(162, 89, 255, 0.4);
-            }
-
-            100% {
-                box-shadow:
-                    inset 5px 5px 40px rgba(0, 243, 255, 0.4),
-                    inset -5px -5px 40px rgba(162, 89, 255, 0.4);
-            }
-        }
-
-        .bottom-nav:hover~#siri-screen-glow,
-        #siri-screen-glow.active {
-            opacity: 0.8;
-        }
-
-        .bottom-nav:hover .circle-btn {
-            transform: scale(1.1);
-            border-color: rgba(0, 243, 255, 0.6);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
-        }
-
-        @keyframes breathe {
-
-            0%,
-            100% {
-                transform: scale(0.8);
-                opacity: 0.5;
-            }
-
-            50% {
-                transform: scale(1.2);
-                opacity: 1;
-            }
-        }
-
-        @keyframes pulse-ring {
-            0% {
-                transform: scale(0.9);
-                opacity: 0.8;
-            }
-
-            70%,
-            100% {
-                transform: scale(2.0);
-                opacity: 0;
-            }
-        }
-
-        @keyframes siri-sweep {
-            0% {
-                background-position: -150% center;
-            }
-
-            100% {
-                background-position: 150% center;
-            }
-        }
-
-        @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-
-            h2 {
-                font-size: 1.2rem;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <canvas id="universe"></canvas>
-
-    <div class="center-content">
-        <h1>Lucas Yan</h1>
-        <h2>闫智尧</h2>
-    </div>
-
-    <a href="intro.html" class="bottom-nav">
-        <span class="click-text">Explore My Universe / 探索我的宇宙</span>
-        <div class="circle-btn">
-            <div
-                style="width: 10px; height: 10px; background: #00f3ff; border-radius: 50%; box-shadow: 0 0 15px #00f3ff; opacity: 0.5;">
-            </div>
-        </div>
-    </a>
-
-    <div id="siri-screen-glow"></div>
-
-    <script>
+<script>
         const canvas = document.getElementById('universe');
         const ctx = canvas.getContext('2d');
 
@@ -288,22 +6,26 @@
         let nodes = [];
         let particles = [];
 
-        let mouse = { x: null, y: null, radius: 250 };
+        // 【修复1】初始化鼠标对象，避免 null 检查时的潜在问题
+        let mouse = { x: -1000, y: -1000, radius: 250 };
 
+        // 【修复2】使用标准的 clientX/Y，兼容 Firefox/Safari
         window.addEventListener('mousemove', (e) => {
-            mouse.x = e.x;
-            mouse.y = e.y;
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
         });
+        
+        // 鼠标移出时移开交互点，而不是设为 null，避免逻辑判断复杂化
         window.addEventListener('mouseout', () => {
-            mouse.x = null;
-            mouse.y = null;
+            mouse.x = -1000;
+            mouse.y = -1000;
         });
 
         const config = {
             nodeCount: 80,
             connectDist: 160,
             mouseConnectDist: 220,
-            speed: 0.4,
+            speed: 0.5, // 稍微调快一点点让运动更明显
             packetSpawnRate: 0.015,
             complexities: ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)', 'O(n²)'],
             labelChars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -338,17 +60,21 @@
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
+                
+                // 边界反弹
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
-                if (mouse.x != null) {
+                // 鼠标交互力场
+                if (mouse.x > 0) { // 简单检查
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
                     let distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < mouse.radius) {
                         const force = (mouse.radius - distance) / mouse.radius;
-                        this.x += (mouse.x - this.x) * force * 0.02;
-                        this.y += (mouse.y - this.y) * force * 0.02;
+                        // 斥力/引力效果：这里用平滑的牵引
+                        this.x += dx * force * 0.03;
+                        this.y += dy * force * 0.03;
                     }
                 }
             }
@@ -362,7 +88,6 @@
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // 绘制节点标签 (锦上添花)
                 if (this.isPrimary) {
                     ctx.fillStyle = 'rgba(0, 243, 255, 0.6)';
                     ctx.font = '9px monospace';
@@ -370,7 +95,7 @@
                 }
 
                 // 鼠标靠近时增强显示
-                if (mouse.x != null) {
+                if (mouse.x > 0) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
@@ -378,7 +103,7 @@
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                         ctx.font = '10px monospace';
                         ctx.fillText(this.label, this.x + 8, this.y + 4);
-                        if (Math.random() > 0.95) this.label = this.generateLabel(); // 动态闪烁
+                        if (Math.random() > 0.95) this.label = this.generateLabel();
                     }
                 }
             }
@@ -397,6 +122,9 @@
                 if (this.progress >= 1) this.alive = false;
             }
             draw() {
+                // 增加安全检查，防止 resize 时节点丢失报错
+                if (!this.nodeA || !this.nodeB) return;
+
                 const x = this.nodeA.x + (this.nodeB.x - this.nodeA.x) * this.progress;
                 const y = this.nodeA.y + (this.nodeB.y - this.nodeA.y) * this.progress;
 
@@ -408,7 +136,6 @@
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // 偶尔在数据包上显示 Big O
                 if (this.progress > 0.4 && this.progress < 0.45 && Math.random() > 0.9) {
                     ctx.fillStyle = 'rgba(189, 0, 255, 0.8)';
                     ctx.font = 'italic 10px monospace';
@@ -420,7 +147,12 @@
         function init() {
             nodes = [];
             particles = [];
-            let count = (width * height) / 13000;
+            
+            // 【修复3】性能优化：计算节点数量，但设置硬上限
+            // 原始代码在 4K 屏会生成太多节点导致卡死
+            let rawCount = (width * height) / 13000;
+            let count = Math.min(rawCount, 180); // 限制最大 180 个节点
+
             for (let i = 0; i < count; i++) {
                 nodes.push(new Node());
             }
@@ -429,13 +161,14 @@
         function animate() {
             ctx.clearRect(0, 0, width, height);
 
+            // 更新和绘制所有节点
             for (let node of nodes) {
                 node.update();
                 node.draw();
             }
 
+            // 绘制连线
             for (let i = 0; i < nodes.length; i++) {
-                // 1. 普通轨道
                 for (let j = i + 1; j < nodes.length; j++) {
                     let dx = nodes[i].x - nodes[j].x;
                     let dy = nodes[i].y - nodes[j].y;
@@ -444,28 +177,20 @@
                     if (dist < config.connectDist) {
                         let opacity = 1 - dist / config.connectDist;
                         ctx.beginPath();
-
-                        // 【修改点】：颜色加深
-                        // 之前的浅蓝是 135, 206, 235
-                        // 现在改为深科技蓝：4, 110, 190 (Deep Tech Blue)
-                        // 并稍微提高了基础透明度 (0.2 -> 0.25) 让深色能被看见
                         ctx.strokeStyle = `rgba(4, 110, 190, ${opacity * 0.75})`;
-
                         ctx.lineWidth = 0.5;
                         ctx.moveTo(nodes[i].x, nodes[i].y);
                         ctx.lineTo(nodes[j].x, nodes[j].y);
                         ctx.stroke();
 
-                        // 【新增】：扫描线效果 (Sorting simulation)
+                        // 扫描线效果
                         let scanPos = (Date.now() % 2000) / 2000;
-                        if (Math.random() > 0.99) { // 随机在某些线上显示扫描点
-                            ctx.beginPath();
-                            ctx.strokeStyle = '#fff';
-                            ctx.lineWidth = 1;
-                            let sx = nodes[i].x + dx * scanPos;
-                            let sy = nodes[i].y + dy * scanPos;
-                            ctx.arc(sx, sy, 1, 0, Math.PI * 2);
-                            ctx.stroke();
+                        if (Math.random() > 0.995) { // 稍微降低频率
+                            let sx = nodes[i].x + dx * -scanPos; // 注意方向
+                            let sy = nodes[i].y + dy * -scanPos;
+                            // 简单的点装饰
+                            ctx.fillStyle = '#fff';
+                            ctx.fillRect(sx, sy, 1, 1);
                         }
 
                         if (Math.random() < config.packetSpawnRate) {
@@ -474,8 +199,8 @@
                     }
                 }
 
-                // 2. 鼠标交互轨道 (紫色)
-                if (mouse.x != null) {
+                // 鼠标连线
+                if (mouse.x > 0) {
                     let dx = nodes[i].x - mouse.x;
                     let dy = nodes[i].y - mouse.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
@@ -492,6 +217,7 @@
                 }
             }
 
+            // 更新数据包
             for (let i = particles.length - 1; i >= 0; i--) {
                 let p = particles[i];
                 p.update();
@@ -499,23 +225,10 @@
                 if (!p.alive) particles.splice(i, 1);
             }
 
+            requestAnimationFrame(animate);
         }
 
-        // Siri Glow Interaction
-        const bottomNav = document.querySelector('.bottom-nav');
-        const siriGlow = document.getElementById('siri-screen-glow');
-
-        bottomNav.addEventListener('mouseenter', () => {
-            siriGlow.classList.add('active');
-        });
-
-        bottomNav.addEventListener('mouseleave', () => {
-            siriGlow.classList.remove('active');
-        });
-
+        // 启动
         resize();
         animate();
     </script>
-</body>
-
-</html>
