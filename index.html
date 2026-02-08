@@ -155,7 +155,7 @@
             z-index: -1;
         }
 
-        /* --- Siri Screen Edge Liquid Stream (Apple Intelligence 玻璃流体版) --- */
+        /* --- Siri Screen Edge Liquid Stream (Apple Intelligence 宽幅液态版) --- */
         #siri-screen-glow {
             position: fixed;
             inset: 0;
@@ -164,8 +164,7 @@
             opacity: 0;
             transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
-            /* 关键：给整个容器加一个轻微的圆角，模拟屏幕边缘 */
-            border-radius: 20px; 
+            border-radius: 24px; /* 稍微增大圆角 */
         }
 
         .bottom-nav:hover ~ #siri-screen-glow,
@@ -173,35 +172,32 @@
             opacity: 1;
         }
 
-        /* Layer 1: 核心流体层 (The Liquid Core) 
-           负责产生大范围的、柔和的色彩晕染
+        /* Layer 1: 核心流体层 (The Wide Liquid Core) 
+           负责产生宽幅的、极其柔和的色彩晕染
         */
         #siri-screen-glow::before {
             content: '';
             position: absolute;
-            /* 让流体稍微超出屏幕一点，避免边缘露白 */
-            inset: -50px; 
+            /* 【改进】扩大外部范围，让模糊更自然 */
+            inset: -100px; 
             
-            /* Apple Intelligence 经典色谱 - 锥形渐变产生旋转流体感 */
-            background: conic-gradient(
-                from 0deg,
-                #ff0055, 
-                #0000ff,
-                #00f3ff,
-                #ff9d00,
-                #ff0055
+            /* 【改进】使用巨大的线性渐变背景进行平移，模拟液态流动，而非旋转 */
+            background: linear-gradient(
+                135deg, 
+                #ff0055, #0000ff, #00f3ff, #ff9d00, #ff0055, #0000ff, #00f3ff
             );
+            background-size: 400% 400%; /* 拉伸背景 */
             
-            /* 【已修改】模糊度降为 50px，比之前清晰一点 */
-            filter: blur(50px);
-            opacity: 0.8;
+            /* 【改进】极大增加模糊度，制造毛玻璃后的光晕感 */
+            filter: blur(80px) saturate(1.5);
+            opacity: 0.7;
 
-            /* 【已修改】遮罩范围改为 75%，让光晕更贴边，不遮挡中间 */
-            -webkit-mask-image: radial-gradient(ellipse at center, transparent 75%, black 100%);
-            mask-image: radial-gradient(ellipse at center, transparent 75%, black 100%);
+            /* 【改进】调整遮罩：透明区域改小到 60%，让光晕向中心延伸更多，显得更宽 */
+            -webkit-mask-image: radial-gradient(ellipse at center, transparent 60%, black 100%);
+            mask-image: radial-gradient(ellipse at center, transparent 60%, black 100%);
 
-            /* 旋转动画 */
-            animation: spin-glow 8s linear infinite;
+            /* 新的流动动画 */
+            animation: flow-gradient 15s ease infinite alternate;
         }
 
         /* Layer 2: 玻璃高光层 (The Glass Rim) 
@@ -211,37 +207,28 @@
             content: '';
             position: absolute;
             inset: 0;
+            border: 3px solid transparent; /* 稍微调细一点边框 */
+            border-radius: 24px;
+            background: linear-gradient(120deg, #00f3ff, #a259ff, #ff2d55, #00f3ff) border-box;
+            background-size: 300% 300%;
             
-            /* 这里的边框是关键，模拟玻璃边缘的反光 */
-            border: 4px solid transparent;
-            border-radius: 20px;
-            
-            background: linear-gradient(120deg, #00f3ff, #a259ff, #ff2d55) border-box;
-            
-            /* 这里的 Mask 逻辑：只显示边框，中间挖空 */
             -webkit-mask: 
                 linear-gradient(#fff 0 0) padding-box, 
                 linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
 
-            /* 轻微模糊，不要太硬 */
-            filter: blur(8px) brightness(2);
-            opacity: 0.6;
+            /* 【改进】增加高光层的模糊，使其更融合 */
+            filter: blur(12px) brightness(1.8);
+            opacity: 0.8;
             
-            animation: hue-shift 10s linear infinite;
+            animation: flow-gradient 8s linear infinite;
         }
 
-        @keyframes spin-glow {
-            0% { transform: rotate(0deg) scale(1.2); }
-            50% { transform: rotate(180deg) scale(1.3); } /* 呼吸感 */
-            100% { transform: rotate(360deg) scale(1.2); }
-        }
-
-        @keyframes hue-shift {
-            0% { filter: blur(8px) brightness(1.5) hue-rotate(0deg); }
-            50% { filter: blur(10px) brightness(2) hue-rotate(180deg); }
-            100% { filter: blur(8px) brightness(1.5) hue-rotate(360deg); }
+        /* 新的背景流动动画，替代旋转 */
+        @keyframes flow-gradient {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
         }
 
         /* --- End Siri Effect --- */
