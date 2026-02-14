@@ -298,6 +298,46 @@
             font-size: 0.95rem;
         }
 
+        /* --- Timeline Styles (Restored) --- */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+            border-left: 2px solid rgba(0, 243, 255, 0.3);
+            margin-left: 10px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 40px;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -39px;
+            top: 0;
+            width: 16px;
+            height: 16px;
+            background: #000;
+            border: 2px solid var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: translateX(10px);
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(0, 243, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
         .edu-year {
             font-family: monospace;
             color: var(--accent-cyan);
@@ -375,23 +415,19 @@
         <section>
             <h3 class="section-title">Education Journey / 教育经历</h3>
 
-            <div class="edu-grid">
+            <div class="timeline">
                 <!-- Rutgers Business School -->
-                <div class="edu-card">
-                    <div class="edu-info">
-                        <h3>Rutgers Business School</h3>
-                        <p>Finance & Supply Chain Management</p>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-content">
+                        <div class="edu-info">
+                            <h3>Rutgers Business School</h3>
+                            <p>Finance & Supply Chain Management</p>
+                        </div>
+                        <div style="margin-top: 15px;">
+                            <span class="edu-year">2026 - 2029</span>
+                        </div>
                     </div>
-                    <div class="edu-year">2026 - 2029</div>
-                </div>
-
-                <!-- School of Arts & Sciences -->
-                <div class="edu-card">
-                    <div class="edu-info">
-                        <h3>School of Arts & Sciences</h3>
-                        <p>Computer Science</p>
-                    </div>
-                    <div class="edu-year">Double Major</div>
                 </div>
             </div>
         </section>

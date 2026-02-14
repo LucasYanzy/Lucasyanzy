@@ -128,83 +128,72 @@
             filter: drop-shadow(0 0 5px rgba(162, 89, 255, 0.3));
         }
 
-        /* True Moving Light Bezel (Static Frame, Rotating Light) */
+        /* True Moving Light Bezel (Liquid Organic Feel) */
         #liquid-glass-bezel {
             position: fixed;
             inset: 0;
             z-index: 9998;
             pointer-events: none;
 
-            /* The Magic Mask: 
-               Updated to use a GRADIENT for the inner edge to create a smooth fade-out
-               instead of a hard cut.
-               Note: mask-image overrides mask shorthand, so we rely on the radial-gradient
-               to create the "hole" in the center.
-            */
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-
-            /* Add a radial gradient mask to soften the inner edge transition */
-            mask-image: radial-gradient(circle at center, transparent 65%, black 100%);
-            -webkit-mask-image: radial-gradient(circle at center, transparent 65%, black 100%);
+            /* Soft Mask: Fades gracefully from opaque border to transparent center */
+            -webkit-mask-image: radial-gradient(circle at center, transparent 55%, black 85%);
+            mask-image: radial-gradient(circle at center, transparent 55%, black 85%);
 
             padding: 20px;
-            /* Border thickness */
-
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transition: opacity 1.2s ease;
         }
 
-        /* The Rotating Light Source (Huge Gradient) */
+        /* Layer 1: The Main Flowing Light (Blurred & Morphing) */
         #liquid-glass-bezel::before {
             content: '';
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 200vmax;
-            /* Covers screen at any angle */
-            height: 200vmax;
+            width: 150vmax;
+            height: 150vmax;
             transform: translate(-50%, -50%);
 
-            /* The "Stream" - A small slice of light in a mostly transparent circle */
+            /* Organic Gradient */
             background: conic-gradient(from 0deg,
                     transparent 0%,
-                    transparent 85%,
-                    rgba(0, 243, 255, 0.1) 88%,
-                    rgba(162, 89, 255, 0.8) 92%,
-                    /* Core stream color */
-                    rgba(0, 243, 255, 0.8) 95%,
+                    rgba(0, 243, 255, 0.1) 20%,
+                    rgba(162, 89, 255, 0.6) 40%,
+                    rgba(0, 243, 255, 0.9) 50%,
+                    rgba(162, 89, 255, 0.6) 60%,
+                    rgba(0, 243, 255, 0.1) 80%,
                     transparent 100%);
 
-            /* Initial opacity */
-            opacity: 1;
+            /* Heavy blur makes it look like liquid, not a shape */
+            filter: blur(80px);
+            opacity: 0.8;
+            animation: rotate-organic 8s linear infinite;
         }
 
-        /* The Glass Texture (Static, constrained to border by parent mask) */
+        /* Layer 2: A second light to create interference/morphing */
         #liquid-glass-bezel::after {
             content: '';
             position: absolute;
-            inset: 0;
-            background: rgba(255, 255, 255, 0.05);
-
-            /* Blur only applies to the masked border area */
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-
-            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+            top: 50%;
+            left: 50%;
+            width: 120vmax;
+            height: 120vmax;
+            transform: translate(-50%, -50%);
+            background: conic-gradient(from 180deg,
+                    transparent 0%,
+                    rgba(0, 243, 255, 0.5) 50%,
+                    transparent 100%);
+            filter: blur(100px);
+            opacity: 0.5;
+            animation: rotate-organic 12s linear infinite reverse;
+            mix-blend-mode: screen;
         }
 
-        /* Interaction */
         body:has(.bottom-nav:hover) #liquid-glass-bezel {
             opacity: 1;
         }
 
-        /* Rotate ONLY the light source (::before), NOT the frame */
-        body:has(.bottom-nav:hover) #liquid-glass-bezel::before {
-            animation: rotate-stream 2.5s linear infinite;
-        }
-
-        @keyframes rotate-stream {
+        @keyframes rotate-organic {
             from {
                 transform: translate(-50%, -50%) rotate(0deg);
             }
@@ -368,54 +357,53 @@
                 this.x += this.vx;
                 this.y += this.vy;
 
+                // Bounce off edges
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
-                // 鼠标交互 (Mouse Interaction) - Repulsion/Attraction Balance
+                // --- PHYSICS OVERHAUL ---
+
+                // 1. Mouse Interaction: NO ATTRACTION (Causes Clumping). 
+                //    Instead, slight Repulsion to clear space for the cursor/text.
                 if (mouse.x > 0) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let distance = Math.sqrt(dx * dx + dy * dy);
+                    let dx = this.x - mouse.x;
+                    let dy = this.y - mouse.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
 
-                    // Gentle attraction, but cap the force to prevent "black hole" clumping
-                    if (distance < mouse.radius) {
-                        const forceDirectionX = dx / distance;
-                        const forceDirectionY = dy / distance;
-                        const force = (mouse.radius - distance) / mouse.radius;
-
-                        // Much softer force
-                        const strength = 0.02;
-
-                        this.vx += forceDirectionX * force * strength;
-                        this.vy += forceDirectionY * force * strength;
+                    if (dist < 150) {
+                        let force = (150 - dist) / 150;
+                        let pushStr = 0.05; // Gentle push
+                        this.vx += (dx / dist) * force * pushStr;
+                        this.vy += (dy / dist) * force * pushStr;
                     }
                 }
 
-                // Node-to-Node Repulsion (Anti-Clumping)
-                // Iterate through other nodes to push them away if too close
+                // 2. Node-to-Node Repulsion (Strong Anti-Clumping)
                 for (let other of nodes) {
                     if (other === this) continue;
                     let dx = this.x - other.x;
                     let dy = this.y - other.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
 
-                    // If nodes are too close, push them apart
-                    if (dist < 40) {
-                        let force = (40 - dist) / 40;
-                        let repulsionStrength = 0.05;
-                        this.vx += (dx / dist) * force * repulsionStrength;
-                        this.vy += (dy / dist) * force * repulsionStrength;
+                    // Repel radius
+                    let minDist = 60;
+                    if (dist < minDist) {
+                        let force = (minDist - dist) / minDist; // 0 to 1
+                        let repelStrength = 0.1; // Strong repulsion
+
+                        this.vx += (dx / dist) * force * repelStrength;
+                        this.vy += (dy / dist) * force * repelStrength;
                     }
                 }
 
-                // Friction/Damping to prevent speed buildup
-                this.vx *= 0.98;
-                this.vy *= 0.98;
+                // 3. Friction/Damping limits max speed
+                this.vx *= 0.99; // Less friction to keep them floating
+                this.vy *= 0.99;
 
-                // Keep them moving a little bit always
-                if (Math.abs(this.vx) < 0.1 && Math.abs(this.vy) < 0.1) {
-                    this.vx += (Math.random() - 0.5) * 0.1;
-                    this.vy += (Math.random() - 0.5) * 0.1;
+                // 4. Minimum ambient movement
+                if (this.vx * this.vx + this.vy * this.vy < 0.05) {
+                    this.vx += (Math.random() - 0.5) * 0.05;
+                    this.vy += (Math.random() - 0.5) * 0.05;
                 }
             }
 
@@ -542,19 +530,22 @@
 
                     if (dist < config.mouseConnectDist) {
                         let intensity = 1 - dist / config.mouseConnectDist;
+                        intensity = Math.pow(intensity, 2); // Sharpen curve
+
                         ctx.beginPath();
-
-                        // Bright Ray-Tracing effect
-                        ctx.strokeStyle = `rgba(0, 243, 255, ${intensity})`; // Cyan Glow
-                        ctx.lineWidth = 1 + intensity * 2; // Thicker near mouse
-
+                        // Bright Cyan Ray-Tracing, Thicker
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${intensity * 0.8})`;
+                        ctx.lineWidth = 1 + intensity * 3;
                         ctx.moveTo(nodes[i].x, nodes[i].y);
                         ctx.lineTo(mouse.x, mouse.y);
+                        // Use screen blend for glow effect
+                        ctx.globalCompositeOperation = 'screen';
                         ctx.stroke();
+                        ctx.globalCompositeOperation = 'source-over'; // Reset
 
-                        // Add a glow dot at the node connection point
+                        // Glow dot at contact
                         ctx.beginPath();
-                        ctx.arc(nodes[i].x, nodes[i].y, 3, 0, Math.PI * 2);
+                        ctx.arc(nodes[i].x, nodes[i].y, 4 + intensity * 2, 0, Math.PI * 2);
                         ctx.fillStyle = `rgba(255, 255, 255, ${intensity})`;
                         ctx.fill();
                     }
