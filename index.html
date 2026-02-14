@@ -422,18 +422,20 @@
                     let dy = mouse.y - this.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < config.mouseConnectDist) {
-                        color = '#ff2d55'; // Pink
+                        color = '#ffffff'; // White Highlight
                     }
                 }
 
                 ctx.fillStyle = color;
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = color;
+                // Stronger glow for White nodes
+                ctx.shadowBlur = (color === '#ffffff') ? 15 : 8;
+                ctx.shadowColor = (color === '#ffffff') ? '#00f3ff' : color;
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
                 if (this.isPrimary) {
-                    ctx.fillStyle = (color === '#ff2d55') ? '#fff' : 'rgba(0, 243, 255, 0.6)';
+                    // If node is White (highlighted), text should be Cyan for contrast
+                    ctx.fillStyle = (color === '#ffffff') ? '#00f3ff' : 'rgba(0, 243, 255, 0.6)';
                     ctx.font = '9px monospace';
                     ctx.fillText(this.label, this.x + 8, this.y + 4);
                 }
@@ -506,8 +508,8 @@
             // "Another Dimension" Background Spotlight
             if (mouse.x > 0) {
                 let gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 400);
-                gradient.addColorStop(0, 'rgba(255, 45, 85, 0.15)'); // Pink center
-                gradient.addColorStop(0.5, 'rgba(80, 0, 80, 0.05)'); // Purple mid
+                gradient.addColorStop(0, 'rgba(0, 243, 255, 0.15)'); // Cyan center
+                gradient.addColorStop(0.5, 'rgba(0, 100, 255, 0.05)'); // Blue mid
                 gradient.addColorStop(1, 'transparent');
 
                 ctx.fillStyle = gradient;
