@@ -9,13 +9,14 @@
         content="Lucas Yan - Finance, SCM & Computer Science at Rutgers. Explore my algorithmic universe and professional portfolio.">
     <meta name="keywords" content="Lucas Yan, Rutgers, Finance, Computer Science, SCM, Portfolio, Algorithmic Universe">
 
+    <!-- Open Graph / LinkedIn -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://lucasyanzy.github.io/Intro/">
     <meta property="og:title" content="Lucas Yan | Finance & CS Portfolio">
     <meta property="og:description"
         content="Explore the algorithmic portfolio of Lucas Yan, intersecting Finance and Computer Science.">
     <meta property="og:image" content="https://lucasyanzy.github.io/Intro/assets/preview.png">
-    
+
     <link rel="canonical" href="https://lucasyanzy.github.io/Intro/">
     <link rel="me" href="https://www.linkedin.com/in/lucasyanzy/">
     <style>
@@ -25,7 +26,8 @@
             --primary-node: #00f3ff;
         }
 
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             width: 100%;
@@ -155,83 +157,80 @@
             z-index: -1;
         }
 
-        /* --- Siri Screen Edge Liquid Stream (Apple Intelligence 宽幅液态版) --- */
-        #siri-screen-glow {
+        /* --- Apple Intelligence "Liquid Glass" Mesh Gradient --- */
+
+        #apple-glow-container {
             position: fixed;
             inset: 0;
             z-index: 9999;
             pointer-events: none;
             opacity: 0;
-            transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
             overflow: hidden;
-            border-radius: 24px; /* 稍微增大圆角 */
+
+            /* Masking: strictly keeps the center clear, showing glow only at edges */
+            -webkit-mask-image: radial-gradient(ellipse at center, transparent 55%, black 100%);
+            mask-image: radial-gradient(ellipse at center, transparent 55%, black 100%);
         }
 
-        .bottom-nav:hover ~ #siri-screen-glow,
-        #siri-screen-glow.active {
+        .bottom-nav:hover~#apple-glow-container,
+        #apple-glow-container.active {
             opacity: 1;
         }
 
-        /* Layer 1: 核心流体层 (The Wide Liquid Core) 
-           负责产生宽幅的、极其柔和的色彩晕染
-        */
-        #siri-screen-glow::before {
-            content: '';
+        /* Layer 1: Atmosphere (Deep Blur Mesh) */
+        .glow-atmosphere {
             position: absolute;
-            /* 【改进】扩大外部范围，让模糊更自然 */
-            inset: -100px; 
-            
-            /* 【改进】使用巨大的线性渐变背景进行平移，模拟液态流动，而非旋转 */
-            background: linear-gradient(
-                135deg, 
-                #ff0055, #0000ff, #00f3ff, #ff9d00, #ff0055, #0000ff, #00f3ff
-            );
-            background-size: 400% 400%; /* 拉伸背景 */
-            
-            /* 【改进】极大增加模糊度，制造毛玻璃后的光晕感 */
-            filter: blur(80px) saturate(1.5);
-            opacity: 0.7;
-
-            /* 【改进】调整遮罩：透明区域改小到 60%，让光晕向中心延伸更多，显得更宽 */
-            -webkit-mask-image: radial-gradient(ellipse at center, transparent 60%, black 100%);
-            mask-image: radial-gradient(ellipse at center, transparent 60%, black 100%);
-
-            /* 新的流动动画 */
-            animation: flow-gradient 15s ease infinite alternate;
+            /* Extend beyond viewport to ensure rotation covers corners */
+            inset: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg,
+                    #ff0055,
+                    #0000ff,
+                    #00f3ff,
+                    #ff9d00,
+                    #ff0055);
+            filter: blur(80px);
+            /* Heavy blur for the "bleeding light" look */
+            animation: rotate-mesh 10s linear infinite;
+            opacity: 0.5;
         }
 
-        /* Layer 2: 玻璃高光层 (The Glass Rim) 
-           负责产生紧贴屏幕边缘的锐利高光，增加通透感
-        */
-        #siri-screen-glow::after {
-            content: '';
+        /* Layer 2: Refraction Highlight (The oscillating glass tint) */
+        .glow-refraction {
+            position: absolute;
+            inset: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 180deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.3) 15%,
+                    transparent 30%,
+                    rgba(200, 200, 255, 0.1) 50%,
+                    transparent 100%);
+            filter: blur(30px);
+            mix-blend-mode: overlay;
+            animation: rotate-mesh 15s linear infinite reverse;
+        }
+
+        /* Layer 3: Glass Edge (Subtle Physical Border) */
+        .glow-edge {
             position: absolute;
             inset: 0;
-            border: 3px solid transparent; /* 稍微调细一点边框 */
-            border-radius: 24px;
-            background: linear-gradient(120deg, #00f3ff, #a259ff, #ff2d55, #00f3ff) border-box;
-            background-size: 300% 300%;
-            
-            -webkit-mask: 
-                linear-gradient(#fff 0 0) padding-box, 
-                linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-
-            /* 【改进】增加高光层的模糊，使其更融合 */
-            filter: blur(12px) brightness(1.8);
-            opacity: 0.8;
-            
-            animation: flow-gradient 8s linear infinite;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: inset 0 0 40px rgba(0, 243, 255, 0.1);
         }
 
-        /* 新的背景流动动画，替代旋转 */
-        @keyframes flow-gradient {
-            0% { background-position: 0% 50%; }
-            100% { background-position: 100% 50%; }
-        }
+        @keyframes rotate-mesh {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
 
-        /* --- End Siri Effect --- */
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
 
         .bottom-nav:hover .circle-btn {
             transform: scale(1.1);
@@ -240,19 +239,66 @@
         }
 
         @keyframes pulse-ring {
-            0% { transform: scale(0.9); opacity: 0.8; }
-            70%, 100% { transform: scale(2.0); opacity: 0; }
+            0% {
+                transform: scale(0.9);
+                opacity: 0.8;
+            }
+
+            70%,
+            100% {
+                transform: scale(2.0);
+                opacity: 0;
+            }
         }
 
         @keyframes siri-sweep {
-            0% { background-position: -150% center; }
-            100% { background-position: 150% center; }
-        }
+            0% {
+                background-position: -150% center;
+            }
 
-        @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            h2 { font-size: 1.2rem; }
-        }
+            100% {
+                @media (max-width: 768px) {
+                    h1 {
+                        font-size: 2.5rem;
+                    }
+
+                    h2 {
+                        font-size: 1.2rem;
+                    }
+                }
+
+                /* --- Social Links (New) --- */
+                .social-links {
+                    position: absolute;
+                    bottom: 30px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    display: flex;
+                    gap: 25px;
+                    z-index: 10000;
+                    /* Ensure above glow container event blocking if any */
+                }
+
+                .social-icon {
+                    color: rgba(255, 255, 255, 0.5);
+                    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    text-decoration: none;
+                }
+
+                .social-icon svg {
+                    width: 20px;
+                    height: 20px;
+                    fill: currentColor;
+                }
+
+                .social-icon:hover {
+                    color: #00f3ff;
+                    transform: translateY(-3px) scale(1.15);
+                    filter: drop-shadow(0 0 10px rgba(0, 243, 255, 0.6));
+                }
     </style>
 </head>
 
@@ -268,11 +314,40 @@
     <a href="intro.html" class="bottom-nav">
         <span class="click-text">Explore My Universe / 探索我的宇宙</span>
         <div class="circle-btn">
-            <div style="width: 10px; height: 10px; background: #00f3ff; border-radius: 50%; box-shadow: 0 0 15px #00f3ff; opacity: 0.5;"></div>
+            <div
+                style="width: 10px; height: 10px; background: #00f3ff; border-radius: 50%; box-shadow: 0 0 15px #00f3ff; opacity: 0.5;">
+            </div>
         </div>
     </a>
 
-    <div id="siri-screen-glow"></div>
+    <!-- Social Links -->
+    <div class="social-links">
+        <a href="https://www.instagram.com/lucasyanzy/" target="_blank" class="social-icon" title="Instagram">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.069-4.85.069-3.204 0-3.584-.012-4.849-.069-3.225-.149-4.771-1.664-4.919-4.919-.058-1.265-.069-1.644-.069-4.849.149-3.225 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+            </svg>
+        </a>
+        <a href="https://github.com/lucasyanzy" target="_blank" class="social-icon" title="GitHub">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            </svg>
+        </a>
+        <a href="mailto:LucasYanzy@gmail.com" class="social-icon" title="Email Me">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M0 3v18h24v-18h-24zm6.623 7.929l-4.623 5.712v-11.174l4.623 5.462zm2.141 2.529c1.034 1.245 2.233 2.542 3.236 2.542 1.002 0 2.201-1.295 3.235-2.542l4.801 5.542h-16.074l4.802-5.542zm5.402-2.339l4.576-5.411v11.139l-4.576-5.728zm-6.173-2.903l-4.993-5.216h17.989l-4.992 5.216-4.004 4.887-4-4.887z" />
+            </svg>
+        </a>
+    </div>
+
+    <!-- Siri "Liquid Glass" Glow Container -->
+    <div id="apple-glow-container">
+        <div class="glow-atmosphere"></div>
+        <div class="glow-refraction"></div>
+        <div class="glow-edge"></div>
+    </div>
 
     <script>
         const canvas = document.getElementById('universe');
@@ -281,13 +356,16 @@
         let width, height;
         let nodes = [];
         let particles = [];
+
+        // 【修复1】初始化坐标为负数，防止 null 计算错误
         let mouse = { x: -1000, y: -1000, radius: 250 };
 
+        // 【修复2】使用 clientX 代替 x，兼容 Safari 和 Firefox
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
         });
-        
+
         window.addEventListener('mouseout', () => {
             mouse.x = -1000;
             mouse.y = -1000;
@@ -332,17 +410,18 @@
             update() {
                 this.x += this.vx;
                 this.y += this.vy;
-                
+
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
+                // 鼠标交互
                 if (mouse.x > 0) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
                     let distance = Math.sqrt(dx * dx + dy * dy);
                     if (distance < mouse.radius) {
                         const force = (mouse.radius - distance) / mouse.radius;
-                        this.x += dx * force * 0.03;
+                        this.x += dx * force * 0.03; // 修正为引力/斥力方向
                         this.y += dy * force * 0.03;
                     }
                 }
@@ -363,6 +442,7 @@
                     ctx.fillText(this.label, this.x + 8, this.y + 4);
                 }
 
+                // 鼠标靠近增强
                 if (mouse.x > 0) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
@@ -390,6 +470,7 @@
                 if (this.progress >= 1) this.alive = false;
             }
             draw() {
+                // 安全检查，防止resize导致引用丢失
                 if (!this.nodeA || !this.nodeB) return;
 
                 const x = this.nodeA.x + (this.nodeB.x - this.nodeA.x) * this.progress;
@@ -414,9 +495,10 @@
         function init() {
             nodes = [];
             particles = [];
+            // 【修复3】防止高分屏节点过多卡死，设置上限 180
             let rawCount = (width * height) / 13000;
-            let count = Math.min(rawCount, 180); 
-            
+            let count = Math.min(rawCount, 180);
+
             for (let i = 0; i < count; i++) {
                 nodes.push(new Node());
             }
@@ -445,6 +527,7 @@
                         ctx.lineTo(nodes[j].x, nodes[j].y);
                         ctx.stroke();
 
+                        // 扫描线
                         let scanPos = (Date.now() % 2000) / 2000;
                         if (Math.random() > 0.995) {
                             let sx = nodes[i].x + dx * -scanPos;
@@ -459,6 +542,7 @@
                     }
                 }
 
+                // 鼠标连线
                 if (mouse.x > 0) {
                     let dx = nodes[i].x - mouse.x;
                     let dy = nodes[i].y - mouse.y;
@@ -486,16 +570,17 @@
             requestAnimationFrame(animate);
         }
 
+        // --- Interaction Logic ---
         const bottomNav = document.querySelector('.bottom-nav');
-        const siriGlow = document.getElementById('siri-screen-glow');
+        const glowContainer = document.getElementById('apple-glow-container');
 
-        if(bottomNav && siriGlow) {
+        if (bottomNav && glowContainer) {
             bottomNav.addEventListener('mouseenter', () => {
-                siriGlow.classList.add('active');
+                glowContainer.classList.add('active');
             });
 
             bottomNav.addEventListener('mouseleave', () => {
-                siriGlow.classList.remove('active');
+                glowContainer.classList.remove('active');
             });
         }
 
