@@ -128,6 +128,124 @@
             filter: drop-shadow(0 0 5px rgba(162, 89, 255, 0.3));
         }
 
+        /* Social Links (Top-Right) */
+        .social-links {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            display: flex;
+            gap: 20px;
+            z-index: 100;
+        }
+
+        .social-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+        }
+
+        .social-btn svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+            transition: transform 0.4s ease;
+        }
+
+        .social-btn:hover {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: #00f3ff;
+            color: #00f3ff;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .social-btn:hover svg {
+            transform: scale(1.1);
+        }
+
+        /* True Liquid Glass Bezel */
+        #liquid-glass-bezel {
+            position: fixed;
+            inset: 0;
+            z-index: 9998;
+            pointer-events: none;
+
+            /* Glass Base */
+            border: 20px solid rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+
+            /* Refraction simulated by inner shadows */
+            box-shadow:
+                inset 0 0 20px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+
+            opacity: 0;
+            transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        /* The Liquid Light flowing INSIDE the glass */
+        #liquid-glass-bezel::after {
+            content: '';
+            position: absolute;
+            inset: -20px;
+            /* Cover the border area */
+            border: 20px solid transparent;
+            /* Match parent border width */
+
+            /* The flowing light source */
+            background: conic-gradient(from 0deg,
+                    transparent 0%,
+                    transparent 70%,
+                    rgba(0, 243, 255, 0.1) 80%,
+                    rgba(162, 89, 255, 0.6) 90%,
+                    rgba(0, 243, 255, 0.8) 95%,
+                    transparent 100%);
+            background-origin: border-box;
+            background-clip: border-box;
+
+            /* Mask to keep it in the border only */
+            -webkit-mask:
+                linear-gradient(#fff 0 0) padding-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Interaction States */
+        .bottom-nav:hover~#liquid-glass-bezel {
+            opacity: 1;
+            transform: scale(1.002);
+        }
+
+        .bottom-nav:hover~#liquid-glass-bezel::after {
+            opacity: 1;
+            animation: liquid-flow 3s linear infinite;
+        }
+
+        @keyframes liquid-flow {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
         .circle-btn {
             width: 60px;
             height: 60px;
@@ -159,78 +277,6 @@
 
         /* --- Apple Intelligence "Liquid Glass" Mesh Gradient --- */
 
-        #apple-glow-container {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-
-            /* Masking: strictly keeps the center clear, showing glow only at edges */
-            -webkit-mask-image: radial-gradient(ellipse at center, transparent 55%, black 100%);
-            mask-image: radial-gradient(ellipse at center, transparent 55%, black 100%);
-        }
-
-        .bottom-nav:hover~#apple-glow-container,
-        #apple-glow-container.active {
-            opacity: 1;
-        }
-
-        /* Layer 1: Atmosphere (Deep Blur Mesh) */
-        .glow-atmosphere {
-            position: absolute;
-            /* Extend beyond viewport to ensure rotation covers corners */
-            inset: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 0deg,
-                    #ff0055,
-                    #0000ff,
-                    #00f3ff,
-                    #ff9d00,
-                    #ff0055);
-            filter: blur(80px);
-            /* Heavy blur for the "bleeding light" look */
-            animation: rotate-mesh 10s linear infinite;
-            opacity: 0.5;
-        }
-
-        /* Layer 2: Refraction Highlight (The oscillating glass tint) */
-        .glow-refraction {
-            position: absolute;
-            inset: -50%;
-            width: 200%;
-            height: 200%;
-            background: conic-gradient(from 180deg,
-                    transparent 0%,
-                    rgba(255, 255, 255, 0.3) 15%,
-                    transparent 30%,
-                    rgba(200, 200, 255, 0.1) 50%,
-                    transparent 100%);
-            filter: blur(30px);
-            mix-blend-mode: overlay;
-            animation: rotate-mesh 15s linear infinite reverse;
-        }
-
-        /* Layer 3: Glass Edge (Subtle Physical Border) */
-        .glow-edge {
-            position: absolute;
-            inset: 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: inset 0 0 40px rgba(0, 243, 255, 0.1);
-        }
-
-        @keyframes rotate-mesh {
-            0% {
-                transform: translate(0, 0) rotate(0deg);
-            }
-
-            100% {
-                transform: translate(0, 0) rotate(360deg);
-            }
-        }
 
         .bottom-nav:hover .circle-btn {
             transform: scale(1.1);
@@ -306,6 +352,21 @@
 
     <canvas id="universe"></canvas>
 
+    <div class="social-links">
+        <a href="https://github.com/LucasYanzy" target="_blank" class="social-btn" aria-label="GitHub">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+            </svg>
+        </a>
+        <a href="https://instagram.com/LucasYanzy" target="_blank" class="social-btn" aria-label="Instagram">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+            </svg>
+        </a>
+    </div>
+
     <div class="center-content">
         <h1>Lucas Yan</h1>
         <h2>闫智尧</h2>
@@ -320,34 +381,8 @@
         </div>
     </a>
 
-    <!-- Social Links -->
-    <div class="social-links">
-        <a href="https://www.instagram.com/lucasyanzy/" target="_blank" class="social-icon" title="Instagram">
-            <svg viewBox="0 0 24 24">
-                <path
-                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.069-4.85.069-3.204 0-3.584-.012-4.849-.069-3.225-.149-4.771-1.664-4.919-4.919-.058-1.265-.069-1.644-.069-4.849.149-3.225 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-            </svg>
-        </a>
-        <a href="https://github.com/lucasyanzy" target="_blank" class="social-icon" title="GitHub">
-            <svg viewBox="0 0 24 24">
-                <path
-                    d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-            </svg>
-        </a>
-        <a href="mailto:LucasYanzy@gmail.com" class="social-icon" title="Email Me">
-            <svg viewBox="0 0 24 24">
-                <path
-                    d="M0 3v18h24v-18h-24zm6.623 7.929l-4.623 5.712v-11.174l4.623 5.462zm2.141 2.529c1.034 1.245 2.233 2.542 3.236 2.542 1.002 0 2.201-1.295 3.235-2.542l4.801 5.542h-16.074l4.802-5.542zm5.402-2.339l4.576-5.411v11.139l-4.576-5.728zm-6.173-2.903l-4.993-5.216h17.989l-4.992 5.216-4.004 4.887-4-4.887z" />
-            </svg>
-        </a>
-    </div>
-
-    <!-- Siri "Liquid Glass" Glow Container -->
-    <div id="apple-glow-container">
-        <div class="glow-atmosphere"></div>
-        <div class="glow-refraction"></div>
-        <div class="glow-edge"></div>
-    </div>
+    <!-- Liquid Glass Bezel -->
+    <div id="liquid-glass-bezel"></div>
 
     <script>
         const canvas = document.getElementById('universe');
@@ -572,17 +607,8 @@
 
         // --- Interaction Logic ---
         const bottomNav = document.querySelector('.bottom-nav');
-        const glowContainer = document.getElementById('apple-glow-container');
-
-        if (bottomNav && glowContainer) {
-            bottomNav.addEventListener('mouseenter', () => {
-                glowContainer.classList.add('active');
-            });
-
-            bottomNav.addEventListener('mouseleave', () => {
-                glowContainer.classList.remove('active');
-            });
-        }
+        /* Liquid Glass effect is handled effectively by CSS, 
+           JS not required for this iteration unless complex logic needed */
 
         resize();
         animate();

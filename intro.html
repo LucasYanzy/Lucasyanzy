@@ -164,6 +164,73 @@
             box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
         }
 
+        /* --- Timeline Styles --- */
+        .timeline {
+            position: relative;
+            margin: 40px 0 20px 20px;
+            padding-left: 20px;
+            border-left: 2px solid rgba(0, 243, 255, 0.3);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 35px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            left: -29px;
+            /* Adjust based on border width and padding */
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            background: var(--bg-color);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover .timeline-marker {
+            background: var(--accent-cyan);
+            box-shadow: 0 0 20px var(--accent-cyan);
+            transform: scale(1.2);
+        }
+
+        .timeline-date {
+            font-size: 0.9rem;
+            color: var(--accent-cyan);
+            margin-bottom: 5px;
+            font-family: monospace;
+        }
+
+        .timeline-title {
+            font-size: 1.3rem;
+            color: #fff;
+            margin: 0 0 5px 0;
+            font-weight: 600;
+        }
+
+        .timeline-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin: 0 0 10px 0;
+        }
+
+        .tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            color: #ddd;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
         @media (max-width: 768px) {
             .name-block h1 {
                 font-size: 2.5rem;
@@ -186,9 +253,23 @@
                 <h1>Lucas Yan</h1>
                 <h2>闫智尧</h2>
             </div>
-            <div class="info-tags">
-                <span>Rutgers Business School '29</span>
-                <span>Finance / SCM & CS Intersection</span>
+
+            <!-- Education Timeline -->
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-date">2026 - 2029 (Expected)</div>
+                    <h3 class="timeline-title">Rutgers Business School</h3>
+                    <p class="timeline-subtitle">Finance & Supply Chain Management</p>
+                    <span class="tag">Freshman</span>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-marker"></div>
+                    <div class="timeline-date">Double Major</div>
+                    <h3 class="timeline-title">School of Arts & Sciences</h3>
+                    <p class="timeline-subtitle">Computer Science</p>
+                    <span class="tag">Dean's List</span>
+                </div>
             </div>
             <p style="color: var(--accent-cyan); margin-top: 20px; font-family: monospace; font-size: 1.1rem;">
                 LucasYanzy@gmail.com</p>
