@@ -128,8 +128,6 @@
             filter: drop-shadow(0 0 5px rgba(162, 89, 255, 0.3));
         }
 
-        /* Social Links moved to intro.html */
-
         /* True Moving Light Bezel (Static Frame, Rotating Light) */
         #liquid-glass-bezel {
             position: fixed;
@@ -138,17 +136,17 @@
             pointer-events: none;
 
             /* The Magic Mask: 
-               Composite mask that punches a hole in the center, leaving only the border.
-               Center is strictly transparent, no blur. 
+               Updated to use a GRADIENT for the inner edge to create a smooth fade-out
+               instead of a hard cut.
+               Note: mask-image overrides mask shorthand, so we rely on the radial-gradient
+               to create the "hole" in the center.
             */
-            -webkit-mask:
-                linear-gradient(#fff 0 0) content-box,
-                linear-gradient(#fff 0 0);
-            mask:
-                linear-gradient(#fff 0 0) content-box,
-                linear-gradient(#fff 0 0);
             -webkit-mask-composite: xor;
             mask-composite: exclude;
+
+            /* Add a radial gradient mask to soften the inner edge transition */
+            mask-image: radial-gradient(circle at center, transparent 65%, black 100%);
+            -webkit-mask-image: radial-gradient(circle at center, transparent 65%, black 100%);
 
             padding: 20px;
             /* Border thickness */
@@ -216,9 +214,6 @@
             }
         }
 
-        /* Social Links removed from here, moving to intro.html */
-
-
         .circle-btn {
             width: 60px;
             height: 60px;
@@ -248,9 +243,6 @@
             z-index: -1;
         }
 
-        /* --- Apple Intelligence "Liquid Glass" Mesh Gradient --- */
-
-
         .bottom-nav:hover .circle-btn {
             transform: scale(1.1);
             border-color: rgba(0, 243, 255, 0.8);
@@ -276,17 +268,19 @@
             }
 
             100% {
-                @media (max-width: 768px) {
-                    h1 {
-                        font-size: 2.5rem;
-                    }
+                background-position: 150% center;
+            }
+        }
 
-                    h2 {
-                        font-size: 1.2rem;
-                    }
-                }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
 
-                /* --- Social Links (New) --- */
+            h2 {
+                font-size: 1.2rem;
+            }
+        }
     </style>
 </head>
 
@@ -377,16 +371,51 @@
                 if (this.x < 0 || this.x > width) this.vx *= -1;
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
-                // 鼠标交互
+                // 鼠标交互 (Mouse Interaction) - Repulsion/Attraction Balance
                 if (mouse.x > 0) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
                     let distance = Math.sqrt(dx * dx + dy * dy);
+
+                    // Gentle attraction, but cap the force to prevent "black hole" clumping
                     if (distance < mouse.radius) {
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
                         const force = (mouse.radius - distance) / mouse.radius;
-                        this.x += dx * force * 0.03; // 修正为引力/斥力方向
-                        this.y += dy * force * 0.03;
+
+                        // Much softer force
+                        const strength = 0.02;
+
+                        this.vx += forceDirectionX * force * strength;
+                        this.vy += forceDirectionY * force * strength;
                     }
+                }
+
+                // Node-to-Node Repulsion (Anti-Clumping)
+                // Iterate through other nodes to push them away if too close
+                for (let other of nodes) {
+                    if (other === this) continue;
+                    let dx = this.x - other.x;
+                    let dy = this.y - other.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+
+                    // If nodes are too close, push them apart
+                    if (dist < 40) {
+                        let force = (40 - dist) / 40;
+                        let repulsionStrength = 0.05;
+                        this.vx += (dx / dist) * force * repulsionStrength;
+                        this.vy += (dy / dist) * force * repulsionStrength;
+                    }
+                }
+
+                // Friction/Damping to prevent speed buildup
+                this.vx *= 0.98;
+                this.vy *= 0.98;
+
+                // Keep them moving a little bit always
+                if (Math.abs(this.vx) < 0.1 && Math.abs(this.vy) < 0.1) {
+                    this.vx += (Math.random() - 0.5) * 0.1;
+                    this.vy += (Math.random() - 0.5) * 0.1;
                 }
             }
 
@@ -505,7 +534,7 @@
                     }
                 }
 
-                // 鼠标连线
+                // 鼠标连线 (Ray Tracing Interaction)
                 if (mouse.x > 0) {
                     let dx = nodes[i].x - mouse.x;
                     let dy = nodes[i].y - mouse.y;
@@ -514,11 +543,20 @@
                     if (dist < config.mouseConnectDist) {
                         let intensity = 1 - dist / config.mouseConnectDist;
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(189, 0, 255, ${intensity * 0.8})`;
-                        ctx.lineWidth = 0.5 + intensity * 1.5;
+
+                        // Bright Ray-Tracing effect
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${intensity})`; // Cyan Glow
+                        ctx.lineWidth = 1 + intensity * 2; // Thicker near mouse
+
                         ctx.moveTo(nodes[i].x, nodes[i].y);
                         ctx.lineTo(mouse.x, mouse.y);
                         ctx.stroke();
+
+                        // Add a glow dot at the node connection point
+                        ctx.beginPath();
+                        ctx.arc(nodes[i].x, nodes[i].y, 3, 0, Math.PI * 2);
+                        ctx.fillStyle = `rgba(255, 255, 255, ${intensity})`;
+                        ctx.fill();
                     }
                 }
             }
