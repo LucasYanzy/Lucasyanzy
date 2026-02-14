@@ -363,18 +363,20 @@
 
                 // --- PHYSICS OVERHAUL ---
 
-                // 1. Mouse Interaction: NO ATTRACTION (Causes Clumping). 
-                //    Instead, slight Repulsion to clear space for the cursor/text.
+                // 1. Mouse Interaction: CONNECTION (Attraction)
+                //    User wants "Connection", not "Push away". 
+                //    Gentle attraction to create a "swarm" feel without hard clumping.
                 if (mouse.x > 0) {
-                    let dx = this.x - mouse.x;
-                    let dy = this.y - mouse.y;
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (dist < 150) {
-                        let force = (150 - dist) / 150;
-                        let pushStr = 0.05; // Gentle push
-                        this.vx += (dx / dist) * force * pushStr;
-                        this.vy += (dy / dist) * force * pushStr;
+                    if (dist < 300) {
+                        let force = (300 - dist) / 300;
+                        let pullStr = 0.03; // Gentle pull
+
+                        this.vx += (dx / dist) * force * pullStr;
+                        this.vy += (dy / dist) * force * pullStr;
                     }
                 }
 
@@ -410,26 +412,40 @@
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-                ctx.fillStyle = '#00f3ff';
+
+                // Default: Cyan
+                let color = '#00f3ff';
+
+                // MOUSE DIMENSION: Nodes turn Pink/White near mouse
+                if (mouse.x > 0) {
+                    let dx = mouse.x - this.x;
+                    let dy = mouse.y - this.y;
+                    let dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < config.mouseConnectDist) {
+                        color = '#ff2d55'; // Pink
+                    }
+                }
+
+                ctx.fillStyle = color;
                 ctx.shadowBlur = 8;
-                ctx.shadowColor = '#00f3ff';
+                ctx.shadowColor = color;
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
                 if (this.isPrimary) {
-                    ctx.fillStyle = 'rgba(0, 243, 255, 0.6)';
+                    ctx.fillStyle = (color === '#ff2d55') ? '#fff' : 'rgba(0, 243, 255, 0.6)';
                     ctx.font = '9px monospace';
                     ctx.fillText(this.label, this.x + 8, this.y + 4);
                 }
 
-                // 鼠标靠近增强
+                // Mouse Text Reveal (White)
                 if (mouse.x > 0) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < 100) {
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                        ctx.font = '10px monospace';
+                        ctx.fillStyle = '#fff'; // Pure white text at center
+                        ctx.font = 'bold 10px monospace';
                         ctx.fillText(this.label, this.x + 8, this.y + 4);
                         if (Math.random() > 0.95) this.label = this.generateLabel();
                     }
@@ -487,6 +503,17 @@
         function animate() {
             ctx.clearRect(0, 0, width, height);
 
+            // "Another Dimension" Background Spotlight
+            if (mouse.x > 0) {
+                let gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 400);
+                gradient.addColorStop(0, 'rgba(255, 45, 85, 0.15)'); // Pink center
+                gradient.addColorStop(0.5, 'rgba(80, 0, 80, 0.05)'); // Purple mid
+                gradient.addColorStop(1, 'transparent');
+
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+            }
+
             for (let node of nodes) {
                 node.update();
                 node.draw();
@@ -528,26 +555,24 @@
                     let dy = nodes[i].y - mouse.y;
                     let dist = Math.sqrt(dx * dx + dy * dy);
 
-                    if (dist < config.mouseConnectDist) {
-                        let intensity = 1 - dist / config.mouseConnectDist;
-                        intensity = Math.pow(intensity, 2); // Sharpen curve
+                    // 鼠标连线 (Ray Tracing - Another Dimension)
+                    if (mouse.x > 0) {
+                        let dx = nodes[i].x - mouse.x;
+                        let dy = nodes[i].y - mouse.y;
+                        let dist = Math.sqrt(dx * dx + dy * dy);
 
-                        ctx.beginPath();
-                        // Bright Cyan Ray-Tracing, Thicker
-                        ctx.strokeStyle = `rgba(0, 243, 255, ${intensity * 0.8})`;
-                        ctx.lineWidth = 1 + intensity * 3;
-                        ctx.moveTo(nodes[i].x, nodes[i].y);
-                        ctx.lineTo(mouse.x, mouse.y);
-                        // Use screen blend for glow effect
-                        ctx.globalCompositeOperation = 'screen';
-                        ctx.stroke();
-                        ctx.globalCompositeOperation = 'source-over'; // Reset
+                        if (dist < config.mouseConnectDist) {
+                            let intensity = 1 - dist / config.mouseConnectDist;
+                            intensity = Math.pow(intensity, 2);
 
-                        // Glow dot at contact
-                        ctx.beginPath();
-                        ctx.arc(nodes[i].x, nodes[i].y, 4 + intensity * 2, 0, Math.PI * 2);
-                        ctx.fillStyle = `rgba(255, 255, 255, ${intensity})`;
-                        ctx.fill();
+                            ctx.beginPath();
+                            // "Pink Dimension" Lines
+                            ctx.strokeStyle = `rgba(255, 45, 85, ${intensity})`; // Pink (#ff2d55)
+                            ctx.lineWidth = 1 + intensity * 2;
+                            ctx.moveTo(nodes[i].x, nodes[i].y);
+                            ctx.lineTo(mouse.x, mouse.y);
+                            ctx.stroke();
+                        }
                     }
                 }
             }
