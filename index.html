@@ -1,602 +1,848 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lucas Yan | Finance & CS Portfolio</title>
-    <meta name="description"
-        content="Lucas Yan - Finance, SCM & Computer Science at Rutgers. Explore my algorithmic universe and professional portfolio.">
-    <meta name="keywords" content="Lucas Yan, Rutgers, Finance, Computer Science, SCM, Portfolio, Algorithmic Universe">
-
-    <!-- Open Graph / LinkedIn -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://lucasyanzy.github.io/Intro/">
-    <meta property="og:title" content="Lucas Yan | Finance & CS Portfolio">
-    <meta property="og:description"
-        content="Explore the algorithmic portfolio of Lucas Yan, intersecting Finance and Computer Science.">
-    <meta property="og:image" content="https://lucasyanzy.github.io/Intro/assets/preview.png">
-
-    <link rel="canonical" href="https://lucasyanzy.github.io/Intro/">
-    <link rel="me" href="https://www.linkedin.com/in/lucasyanzy/">
+    <meta name="description" content="Lucas Yan - Finance & Computer Science at Rutgers University. Explore my professional journey and technical projects.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
+            --primary: #00f3ff;
+            --primary-glow: rgba(0, 243, 255, 0.3);
             --bg: #050505;
-            --text-color: #ffffff;
-            --primary-node: #00f3ff;
+            --surface: #0a0a0a;
+            --card-bg: rgba(15, 15, 15, 0.6);
+            --text-main: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.7);
+            --text-dim: rgba(255, 255, 255, 0.4);
+            --border: rgba(0, 243, 255, 0.15);
+            --nav-bg: rgba(5, 5, 5, 0.7);
+            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        body,
-        html {
+        * {
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: var(--bg);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            color: var(--text-color);
+            box-sizing: border-box;
         }
 
-        canvas {
-            display: block;
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        /* --- Canvas Background --- */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+
+        /* --- Navigation --- */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 20px 0;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            background: var(--nav-bg);
+            border-bottom: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 1.5rem;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: var(--transition);
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        /* --- Layout --- */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        section {
+            padding: 100px 0;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 50px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--primary);
+        }
+
+        .section-title::after {
+            content: '';
+            height: 1px;
+            background: linear-gradient(to right, var(--primary), transparent);
+            flex-grow: 1;
+            opacity: 0.3;
+        }
+
+        /* --- Hero Section --- */
+        #home {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0;
+            opacity: 1;
+            transform: none;
+        }
+
+        .hero-content h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(3rem, 10vw, 6rem);
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+
+        .hero-content h2 {
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+            letter-spacing: 5px;
+            margin-bottom: 40px;
+        }
+
+        .explore-btn {
+            padding: 15px 40px;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            background: rgba(0, 243, 255, 0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .explore-btn:hover {
+            background: var(--primary);
+            color: var(--bg);
+            box-shadow: 0 0 30px var(--primary-glow);
+            transform: scale(1.05);
+        }
+
+        /* --- Grid/Cards --- */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            transform: translateY(-5px);
+        }
+
+        /* --- Education/Experience Timeline --- */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary), transparent);
+            opacity: 0.3;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -34px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            background: var(--bg);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--primary-glow);
+            z-index: 1;
+        }
+
+        .timeline-date {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            opacity: 0.8;
+        }
+
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .timeline-header h3 {
+            font-size: 1.25rem;
+            color: var(--text-main);
+        }
+
+        .timeline-org {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .timeline-content {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .timeline-content ul {
+            margin-top: 15px;
+            padding-left: 20px;
+            list-style: none;
+        }
+
+        .timeline-content li {
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .timeline-content li::before {
+            content: '▫';
+            position: absolute;
+            left: -20px;
+            color: var(--primary);
+        }
+
+        /* --- Skills Section --- */
+        .skills-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .skill-item {
+            margin-bottom: 25px;
+        }
+
+        .skill-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .skill-name {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .skill-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .skill-progress {
             position: absolute;
             top: 0;
             left: 0;
-            z-index: 0;
-            transition: opacity 0.8s ease, filter 0.8s ease;
+            height: 100%;
+            background: linear-gradient(to right, #0084ff, var(--primary));
+            border-radius: 10px;
+            width: 0;
+            transition: width 1.5s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        .center-content {
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2;
+        /* --- Projects Section --- */
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .project-card {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .project-tags {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            padding: 4px 12px;
+            background: rgba(0, 243, 255, 0.08);
+            border: 1px solid var(--border);
+            color: var(--primary);
+            border-radius: 20px;
+        }
+
+        /* --- Contact Section --- */
+        .contact-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             text-align: center;
-            pointer-events: none;
-            user-select: none;
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        body:has(.bottom-nav:hover) .center-content {
-            opacity: 0.4;
-            transform: translate(-50%, -55%);
+        .contact-links {
+            display: flex;
+            gap: 40px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
-        body:has(.bottom-nav:hover) canvas {
-            opacity: 0.5;
-            filter: blur(2px);
-        }
-
-        h1 {
-            font-size: 4.5rem;
-            font-weight: 300;
-            margin: 0;
-            letter-spacing: 2px;
-            color: #fff;
-            text-shadow: 0 0 20px rgba(0, 243, 255, 0.4), 0 0 40px rgba(0, 0, 0, 0.8);
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            margin-top: 15px;
-            font-weight: 400;
-            color: rgba(255, 255, 255, 0.8);
-            letter-spacing: 8px;
-            text-shadow: 0 0 10px rgba(0, 0, 0, 0.9);
-        }
-
-        .bottom-nav {
-            position: absolute;
-            bottom: 60px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 10;
-            cursor: pointer;
+        .contact-item {
+            color: var(--text-main);
             text-decoration: none;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            transition: var(--transition);
         }
 
-        .click-text {
-            font-size: 0.95rem;
-            font-weight: 500;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            opacity: 0.6;
-            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
-            color: #bfaaff;
-            background: linear-gradient(120deg,
-                    #00f3ff 0%, #a259ff 40%, #ff2d55 50%, #ff9d00 52%, #a259ff 65%, #00f3ff 100%);
-            background-size: 300% auto;
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            white-space: nowrap;
-            margin-bottom: 20px;
-            position: relative;
-            z-index: 2;
+        .contact-item svg {
+            width: 32px;
+            height: 32px;
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 1.5;
+            transition: var(--transition);
         }
 
-        .bottom-nav:hover .click-text {
-            opacity: 1;
-            transform: scale(1.02);
-            animation: siri-sweep 3s ease-in-out infinite;
-            filter: drop-shadow(0 0 5px rgba(162, 89, 255, 0.3));
+        .contact-item:hover {
+            color: var(--primary);
+            transform: translateY(-5px);
         }
 
-        /* True Moving Light Bezel (Liquid Organic Feel) */
-        #liquid-glass-bezel {
-            position: fixed;
-            inset: 0;
-            z-index: 9998;
-            pointer-events: none;
-
-            /* Soft Mask: Fades gracefully from opaque border to transparent center */
-            -webkit-mask-image: radial-gradient(circle at center, transparent 55%, black 85%);
-            mask-image: radial-gradient(circle at center, transparent 55%, black 85%);
-
-            padding: 20px;
-            opacity: 0;
-            transition: opacity 1.2s ease;
+        .contact-item:hover svg {
+            filter: drop-shadow(0 0 10px var(--primary-glow));
         }
 
-        /* Layer 1: The Main Flowing Light (Blurred & Morphing) */
-        #liquid-glass-bezel::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 150vmax;
-            height: 150vmax;
-            transform: translate(-50%, -50%);
-
-            /* Organic Gradient */
-            background: conic-gradient(from 0deg,
-                    transparent 0%,
-                    rgba(0, 243, 255, 0.1) 20%,
-                    rgba(162, 89, 255, 0.6) 40%,
-                    rgba(0, 243, 255, 0.9) 50%,
-                    rgba(162, 89, 255, 0.6) 60%,
-                    rgba(0, 243, 255, 0.1) 80%,
-                    transparent 100%);
-
-            /* Heavy blur makes it look like liquid, not a shape */
-            filter: blur(80px);
-            opacity: 0.8;
-            animation: rotate-organic 8s linear infinite;
+        /* --- Footer --- */
+        footer {
+            padding: 50px 0;
+            text-align: center;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.85rem;
         }
 
-        /* Layer 2: A second light to create interference/morphing */
-        #liquid-glass-bezel::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 120vmax;
-            height: 120vmax;
-            transform: translate(-50%, -50%);
-            background: conic-gradient(from 180deg,
-                    transparent 0%,
-                    rgba(0, 243, 255, 0.5) 50%,
-                    transparent 100%);
-            filter: blur(100px);
-            opacity: 0.5;
-            animation: rotate-organic 12s linear infinite reverse;
-            mix-blend-mode: screen;
-        }
-
-        body:has(.bottom-nav:hover) #liquid-glass-bezel {
-            opacity: 1;
-        }
-
-        @keyframes rotate-organic {
-            from {
-                transform: translate(-50%, -50%) rotate(0deg);
-            }
-
-            to {
-                transform: translate(-50%, -50%) rotate(360deg);
-            }
-        }
-
-        .circle-btn {
-            width: 60px;
-            height: 60px;
-            border: 1px solid rgba(0, 243, 255, 0.4);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            position: relative;
-            z-index: 2;
-        }
-
-        .circle-btn::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border: 1px solid #00f3ff;
-            border-radius: 50%;
-            animation: pulse-ring 2s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
-            pointer-events: none;
-            opacity: 0.6;
-            z-index: -1;
-        }
-
-        .bottom-nav:hover .circle-btn {
-            transform: scale(1.1);
-            border-color: rgba(0, 243, 255, 0.8);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
-        }
-
-        @keyframes pulse-ring {
-            0% {
-                transform: scale(0.9);
-                opacity: 0.8;
-            }
-
-            70%,
-            100% {
-                transform: scale(2.0);
-                opacity: 0;
-            }
-        }
-
-        @keyframes siri-sweep {
-            0% {
-                background-position: -150% center;
-            }
-
-            100% {
-                background-position: 150% center;
-            }
-        }
-
+        /* --- Responsive --- */
         @media (max-width: 768px) {
-            h1 {
-                font-size: 2.5rem;
-            }
-
-            h2 {
-                font-size: 1.2rem;
-            }
+            .nav-links { display: none; }
+            .hero-content h2 { font-size: 1.2rem; letter-spacing: 2px; }
+            .timeline-header { flex-direction: column; }
+            .section-title { font-size: 20px; }
+            section { padding: 60px 0; }
         }
     </style>
 </head>
-
 <body>
 
-    <canvas id="universe"></canvas>
+    <canvas id="bg-canvas"></canvas>
 
-
-    <div class="center-content">
-        <h1>Lucas Yan</h1>
-        <h2>闫智尧</h2>
-    </div>
-
-    <a href="intro.html" class="bottom-nav">
-        <span class="click-text">Explore My Universe / 探索我的宇宙</span>
-        <div class="circle-btn">
-            <div
-                style="width: 10px; height: 10px; background: #00f3ff; border-radius: 50%; box-shadow: 0 0 15px #00f3ff; opacity: 0.5;">
-            </div>
+    <nav id="navbar">
+        <div class="container">
+            <a href="#home" class="logo">LY.</a>
+            <ul class="nav-links">
+                <li><a href="#home">首页</a></li>
+                <li><a href="#education">教育经历</a></li>
+                <li><a href="#experience">职业经历</a></li>
+                <li><a href="#skills">技能专长</a></li>
+                <li><a href="#projects">项目案例</a></li>
+                <li><a href="#contact">联系我</a></li>
+            </ul>
         </div>
-    </a>
+    </nav>
 
-    <!-- Liquid Glass Bezel -->
-    <div id="liquid-glass-bezel"></div>
+    <main>
+        <!-- Hero Section -->
+        <section id="home">
+            <div class="hero-content">
+                <h1>Lucas Yan</h1>
+                <h2>闫智尧</h2>
+                <a href="#education" class="explore-btn" id="explore-nav">
+                    Explore My Universe / 探索我的宇宙
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg>
+                </a>
+            </div>
+        </section>
+
+        <div class="container">
+            
+            <!-- Education Section -->
+            <section id="education">
+                <h2 class="section-title">Education Journey / 教育经历</h2>
+                <div class="timeline">
+                    <!-- Rutgers -->
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025 - 2029 (Expected)</div>
+                        <div class="card">
+                            <div class="timeline-header">
+                                <div>
+                                    <h3>Bachelor of Science In Finance & Computer Science</h3>
+                                    <div class="timeline-org">Rutgers University, New Brunswick, NJ</div>
+                                </div>
+                            </div>
+                            <div class="timeline-content">
+                                <p>专注于金融与计算机科学交叉领域，致力于利用技术驱动金融效率提升。</p>
+                                <ul>
+                                    <li>Bender Trust Stock Analyst Project Participant</li>
+                                    <li>Rutgers Entrepreneur Society</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- High School -->
+                    <div class="timeline-item">
+                        <div class="timeline-date">2021 - 2025</div>
+                        <div class="card">
+                            <div class="timeline-header">
+                                <div>
+                                    <h3>High School Diploma</h3>
+                                    <div class="timeline-org">Kunming No.1 High School International Department</div>
+                                </div>
+                                <div class="tag">GPA: 3.5 / 4.0</div>
+                            </div>
+                            <div class="timeline-content">
+                                <ul>
+                                    <li>Club President of Environmental Protection</li>
+                                    <li>Debate Star & Track and Field Club Member</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Experience Section -->
+            <section id="experience">
+                <h2 class="section-title">Professional Experience / 职业经历</h2>
+                <div class="timeline">
+                    <!-- Tutturo -->
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025.10 - Present</div>
+                        <div class="card">
+                            <div class="timeline-header">
+                                <div>
+                                    <h3>Global Business Lead</h3>
+                                    <div class="timeline-org">Tutturo LLC</div>
+                                </div>
+                            </div>
+                            <div class="timeline-content">
+                                <ul>
+                                    <li>负责初创企业的全球业务运营及品牌设计，搭建企业级官方网站以对齐视觉形象与愿景。</li>
+                                    <li>在 Rutgers Sharktank 比赛中展示商业模式，成功从全校参赛团队中获得第 8 名。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CSSA -->
+                    <div class="timeline-item">
+                        <div class="timeline-date">2025.08 - Present</div>
+                        <div class="card">
+                            <div class="timeline-header">
+                                <div>
+                                    <h3>Project Management Member</h3>
+                                    <div class="timeline-org">Rutgers Chinese Students and Scholars Association (CSSA)</div>
+                                </div>
+                            </div>
+                            <div class="timeline-content">
+                                <ul>
+                                    <li>在策划部主理活动推进与物流管理，优化组织效率。</li>
+                                    <li>重新设计比赛框架并简化评审流程，显著提升活动执行力和团队生产力。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Foundation -->
+                    <div class="timeline-item">
+                        <div class="timeline-date">2020.05 - 2025.06</div>
+                        <div class="card">
+                            <div class="timeline-header">
+                                <div>
+                                    <h3>Founder & Project Manager</h3>
+                                    <div class="timeline-org">Yunnan DianChi Lake Protection & Improvement Foundation</div>
+                                </div>
+                            </div>
+                            <div class="timeline-content">
+                                <ul>
+                                    <li>领导 56 名学生志愿者团队，组织大型公众活动及媒体宣教，6 年间覆盖 5000+ 社区成员。</li>
+                                    <li>与多家 NGO 及基金会建立深度合作网络，统筹项目资源。</li>
+                                    <li>主导涵盖 20 个湿地点的生物多样性研究，记录 300+ 植物与 50+ 动物物种，构建完整本地生态数据库。</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Skills Section -->
+            <section id="skills">
+                <h2 class="section-title">Skills & Expertise / 技能专长</h2>
+                <div class="skills-container">
+                    <div class="card">
+                        <h3 style="margin-bottom: 25px; color: var(--text-main);">Programming & Tech</h3>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">Python / Java / C++</span>
+                                <span class="skill-percentage">85%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-progress" data-width="85%"></div></div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">Arduino / Hardware Dev</span>
+                                <span class="skill-percentage">80%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-progress" data-width="80%"></div></div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">Web Dev / AI Tools</span>
+                                <span class="skill-percentage">90%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-progress" data-width="90%"></div></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <h3 style="margin-bottom: 25px; color: var(--text-main);">Business & Tools</h3>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">Global Business Ops</span>
+                                <span class="skill-percentage">75%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-progress" data-width="75%"></div></div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">Office 365 (Excle/PPT)</span>
+                                <span class="skill-percentage">95%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-progress" data-width="95%"></div></div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <span class="skill-name">Languages (EN/CN)</span>
+                                <span class="skill-percentage">100%</span>
+                            </div>
+                            <div class="skill-bar"><div class="skill-progress" data-width="100%"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Projects Section -->
+            <section id="projects">
+                <h2 class="section-title">Projects & Highlights / 项目与亮点</h2>
+                <div class="project-grid">
+                    <!-- Project 1 -->
+                    <div class="card project-card">
+                        <div>
+                            <h3 style="margin-bottom: 15px;">Magic Glove (IEEE Build-a-thon)</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                                荣获 Rutgers IEEE 26 小时工程赛 "Best Productivity / Automation Challenge" 奖项。
+                                利用 C++ 及 Arduino 开发的可穿戴硬件控制器，将自然手势转化为数字指令。
+                            </p>
+                        </div>
+                        <div class="project-tags">
+                            <span class="tag">C++</span>
+                            <span class="tag">Arduino</span>
+                            <span class="tag">Hardware</span>
+                            <span class="tag">Award Winner</span>
+                        </div>
+                    </div>
+
+                    <!-- Project 2 -->
+                    <div class="card project-card">
+                        <div>
+                            <h3 style="margin-bottom: 15px;">AI Web Portfolio</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                                融合 AI 开发流打造的响应式个人门户，部署于 GitHub Pages。
+                                展示技术项目、职业背景，集成动态视觉与高度可访问性。
+                            </p>
+                        </div>
+                        <div class="project-tags">
+                            <span class="tag">HTML/CSS/JS</span>
+                            <span class="tag">AI Integration</span>
+                            <span class="tag">Design</span>
+                        </div>
+                    </div>
+
+                    <!-- Placeholder -->
+                    <div class="card project-card" style="border-style: dashed; opacity: 0.6; display: flex; align-items: center; justify-content: center; min-height: 200px;">
+                        <p>More projects loading... / 更多项目筹备中</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section id="contact">
+                <h2 class="section-title">Get In Touch / 联系我</h2>
+                <div class="card contact-content">
+                    <p style="margin-bottom: 30px; font-size: 1.1rem; color: var(--text-secondary);">
+                        不论是关于金融科技、硬件开发，还是跨界项目的合作，欢迎随时通过以下方式联系我。
+                    </p>
+                    <div class="contact-links">
+                        <a href="mailto:LucasYanzy@outlook.com" class="contact-item">
+                            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <span>Email</span>
+                        </a>
+                        <a href="https://www.linkedin.com/in/lucasyanzy/" target="_blank" class="contact-item">
+                            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                            <span>LinkedIn</span>
+                        </a>
+                        <a href="https://github.com/LucasYanzy" target="_blank" class="contact-item">
+                            <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                            <span>GitHub</span>
+                        </a>
+                        <div class="contact-item">
+                            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <span>Phone: +1 848 / +86 157</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 Lucas Yan. Designed for exploration at the intersection of Finance & CS.</p>
+    </footer>
 
     <script>
-        const canvas = document.getElementById('universe');
+        // --- 30FPS Background Animation ---
+        const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
-
         let width, height;
-        let nodes = [];
         let particles = [];
-
-        // 【修复1】初始化坐标为负数，防止 null 计算错误
-        let mouse = { x: -1000, y: -1000, radius: 250 };
-
-        // 【修复2】使用 clientX 代替 x，兼容 Safari 和 Firefox
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
-
-        window.addEventListener('mouseout', () => {
-            mouse.x = -1000;
-            mouse.y = -1000;
-        });
-
-        const config = {
-            nodeCount: 80,
-            connectDist: 160,
-            mouseConnectDist: 220,
-            speed: 0.5,
-            packetSpawnRate: 0.015,
-            complexities: ['O(1)', 'O(log n)', 'O(n)', 'O(n log n)', 'O(n²)'],
-            labelChars: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-        };
 
         function resize() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            init();
+            initParticles();
         }
+
         window.addEventListener('resize', resize);
-
-        class Node {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.vx = (Math.random() - 0.5) * config.speed;
-                this.vy = (Math.random() - 0.5) * config.speed;
-                this.radius = Math.random() * 1.5 + 1;
-                this.label = this.generateLabel();
-                this.isPrimary = this.radius > 2.0;
-            }
-
-            generateLabel() {
-                let res = '';
-                for (let i = 0; i < 5; i++) {
-                    res += config.labelChars.charAt(Math.floor(Math.random() * config.labelChars.length));
-                }
-                return res;
-            }
-
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
-
-                // Bounce off edges
-                if (this.x < 0 || this.x > width) this.vx *= -1;
-                if (this.y < 0 || this.y > height) this.vy *= -1;
-
-                // --- PHYSICS OVERHAUL ---
-
-                // 1. Mouse Interaction: CONNECTION (Attraction)
-                //    User wants "Connection", not "Push away". 
-                //    Gentle attraction to create a "swarm" feel without hard clumping.
-                if (mouse.x > 0) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-
-                    if (dist < 300) {
-                        let force = (300 - dist) / 300;
-                        let pullStr = 0.03; // Gentle pull
-
-                        this.vx += (dx / dist) * force * pullStr;
-                        this.vy += (dy / dist) * force * pullStr;
-                    }
-                }
-
-                // 2. Node-to-Node Repulsion (Strong Anti-Clumping)
-                for (let other of nodes) {
-                    if (other === this) continue;
-                    let dx = this.x - other.x;
-                    let dy = this.y - other.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-
-                    // Repel radius
-                    let minDist = 60;
-                    if (dist < minDist) {
-                        let force = (minDist - dist) / minDist; // 0 to 1
-                        let repelStrength = 0.1; // Strong repulsion
-
-                        this.vx += (dx / dist) * force * repelStrength;
-                        this.vy += (dy / dist) * force * repelStrength;
-                    }
-                }
-
-                // 3. Friction/Damping limits max speed
-                this.vx *= 0.99; // Less friction to keep them floating
-                this.vy *= 0.99;
-
-                // 4. Minimum ambient movement
-                if (this.vx * this.vx + this.vy * this.vy < 0.05) {
-                    this.vx += (Math.random() - 0.5) * 0.05;
-                    this.vy += (Math.random() - 0.5) * 0.05;
-                }
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-
-                // Default: Cyan
-                let color = '#00f3ff';
-
-                // MOUSE DIMENSION: Nodes turn Pink/White near mouse
-                if (mouse.x > 0) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < config.mouseConnectDist) {
-                        color = '#ffffff'; // White Highlight
-                    }
-                }
-
-                ctx.fillStyle = color;
-                // Stronger glow for White nodes
-                ctx.shadowBlur = (color === '#ffffff') ? 15 : 8;
-                ctx.shadowColor = (color === '#ffffff') ? '#00f3ff' : color;
-                ctx.fill();
-                ctx.shadowBlur = 0;
-
-                if (this.isPrimary) {
-                    // If node is White (highlighted), text should be Cyan for contrast
-                    ctx.fillStyle = (color === '#ffffff') ? '#00f3ff' : 'rgba(0, 243, 255, 0.6)';
-                    ctx.font = '9px monospace';
-                    ctx.fillText(this.label, this.x + 8, this.y + 4);
-                }
-
-                // Mouse Text Reveal (White)
-                if (mouse.x > 0) {
-                    let dx = mouse.x - this.x;
-                    let dy = mouse.y - this.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 100) {
-                        ctx.fillStyle = '#fff'; // Pure white text at center
-                        ctx.font = 'bold 10px monospace';
-                        ctx.fillText(this.label, this.x + 8, this.y + 4);
-                        if (Math.random() > 0.95) this.label = this.generateLabel();
-                    }
-                }
-            }
-        }
-
-        class Packet {
-            constructor(nodeA, nodeB) {
-                this.nodeA = nodeA;
-                this.nodeB = nodeB;
-                this.progress = 0;
-                this.speed = 0.02 + Math.random() * 0.03;
-                this.alive = true;
-            }
-            update() {
-                this.progress += this.speed;
-                if (this.progress >= 1) this.alive = false;
-            }
-            draw() {
-                // 安全检查，防止resize导致引用丢失
-                if (!this.nodeA || !this.nodeB) return;
-
-                const x = this.nodeA.x + (this.nodeB.x - this.nodeA.x) * this.progress;
-                const y = this.nodeA.y + (this.nodeB.y - this.nodeA.y) * this.progress;
-
-                ctx.beginPath();
-                ctx.arc(x, y, 1.8, 0, Math.PI * 2);
-                ctx.fillStyle = '#ffffff';
-                ctx.shadowBlur = 6;
-                ctx.shadowColor = '#ffffff';
-                ctx.fill();
-                ctx.shadowBlur = 0;
-
-                if (this.progress > 0.4 && this.progress < 0.45 && Math.random() > 0.9) {
-                    ctx.fillStyle = 'rgba(189, 0, 255, 0.8)';
-                    ctx.font = 'italic 10px monospace';
-                    ctx.fillText(config.complexities[Math.floor(Math.random() * config.complexities.length)], x + 5, y - 5);
-                }
-            }
-        }
-
-        function init() {
-            nodes = [];
-            particles = [];
-            // 【修复3】防止高分屏节点过多卡死，设置上限 180
-            let rawCount = (width * height) / 13000;
-            let count = Math.min(rawCount, 180);
-
-            for (let i = 0; i < count; i++) {
-                nodes.push(new Node());
-            }
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-
-            // "Another Dimension" Background Spotlight
-            if (mouse.x > 0) {
-                let gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 400);
-                gradient.addColorStop(0, 'rgba(0, 243, 255, 0.15)'); // Cyan center
-                gradient.addColorStop(0.5, 'rgba(0, 100, 255, 0.05)'); // Blue mid
-                gradient.addColorStop(1, 'transparent');
-
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, width, height);
-            }
-
-            for (let node of nodes) {
-                node.update();
-                node.draw();
-            }
-
-            for (let i = 0; i < nodes.length; i++) {
-                for (let j = i + 1; j < nodes.length; j++) {
-                    let dx = nodes[i].x - nodes[j].x;
-                    let dy = nodes[i].y - nodes[j].y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-
-                    if (dist < config.connectDist) {
-                        let opacity = 1 - dist / config.connectDist;
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(4, 110, 190, ${opacity * 0.75})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.moveTo(nodes[i].x, nodes[i].y);
-                        ctx.lineTo(nodes[j].x, nodes[j].y);
-                        ctx.stroke();
-
-                        // 扫描线
-                        let scanPos = (Date.now() % 2000) / 2000;
-                        if (Math.random() > 0.995) {
-                            let sx = nodes[i].x + dx * -scanPos;
-                            let sy = nodes[i].y + dy * -scanPos;
-                            ctx.fillStyle = '#fff';
-                            ctx.fillRect(sx, sy, 1, 1);
-                        }
-
-                        if (Math.random() < config.packetSpawnRate) {
-                            particles.push(new Packet(nodes[i], nodes[j]));
-                        }
-                    }
-                }
-
-                // 鼠标连线 (Ray Tracing Interaction)
-                if (mouse.x > 0) {
-                    let dx = nodes[i].x - mouse.x;
-                    let dy = nodes[i].y - mouse.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-
-                    // 鼠标连线 (Ray Tracing - Another Dimension)
-                    if (mouse.x > 0) {
-                        let dx = nodes[i].x - mouse.x;
-                        let dy = nodes[i].y - mouse.y;
-                        let dist = Math.sqrt(dx * dx + dy * dy);
-
-                        if (dist < config.mouseConnectDist) {
-                            let intensity = 1 - dist / config.mouseConnectDist;
-                            intensity = Math.pow(intensity, 2);
-
-                            ctx.beginPath();
-                            // "Pink Dimension" Lines
-                            ctx.strokeStyle = `rgba(255, 45, 85, ${intensity})`; // Pink (#ff2d55)
-                            ctx.lineWidth = 1 + intensity * 2;
-                            ctx.moveTo(nodes[i].x, nodes[i].y);
-                            ctx.lineTo(mouse.x, mouse.y);
-                            ctx.stroke();
-                        }
-                    }
-                }
-            }
-
-            for (let i = particles.length - 1; i >= 0; i--) {
-                let p = particles[i];
-                p.update();
-                p.draw();
-                if (!p.alive) particles.splice(i, 1);
-            }
-
-            requestAnimationFrame(animate);
-        }
-
-        // --- Interaction Logic ---
-        const bottomNav = document.querySelector('.bottom-nav');
-        /* Liquid Glass effect is handled effectively by CSS, 
-           JS not required for this iteration unless complex logic needed */
-
         resize();
-        animate();
+
+        function initParticles() {
+            particles = [];
+            const count = Math.min(Math.floor((width * height) / 15000), 100);
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: Math.random() * height,
+                    vx: (Math.random() - 0.5) * 0.5,
+                    vy: (Math.random() - 0.5) * 0.5,
+                    radius: Math.random() * 1.5 + 0.5
+                });
+            }
+        }
+
+        let lastTime = 0;
+        const fps = 30;
+        const interval = 1000 / fps;
+
+        function animate(timestamp) {
+            requestAnimationFrame(animate);
+
+            const delta = timestamp - lastTime;
+            if (delta < interval) return;
+            lastTime = timestamp - (delta % interval);
+
+            ctx.clearRect(0, 0, width, height);
+            
+            // Draw lines
+            ctx.strokeStyle = 'rgba(0, 243, 255, 0.1)';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Draw dots
+            ctx.fillStyle = 'rgba(0, 243, 255, 0.4)';
+            for (let p of particles) {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > width) p.vx *= -1;
+                if (p.y < 0 || p.y > height) p.vy *= -1;
+            }
+        }
+
+        requestAnimationFrame(animate);
+
+        // --- Scroll Observer for Fade-in ---
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Trigger skill bars if in vision
+                    if (entry.target.id === 'skills') {
+                        const activeBars = entry.target.querySelectorAll('.skill-progress');
+                        activeBars.forEach(bar => {
+                            bar.style.width = bar.getAttribute('data-width');
+                        });
+                    }
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('section').forEach(section => {
+            observer.observe(section);
+        });
+
+        // --- Navbar transparency on scroll ---
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                nav.style.padding = '12px 0';
+                nav.style.background = 'rgba(5, 5, 5, 0.9)';
+            } else {
+                nav.style.padding = '20px 0';
+                nav.style.background = 'rgba(5, 5, 5, 0.7)';
+            }
+        });
     </script>
 </body>
-
 </html>
