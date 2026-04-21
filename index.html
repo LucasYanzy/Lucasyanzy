@@ -9,21 +9,25 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
             --primary: #00f3ff;
-            --primary-glow: rgba(0, 243, 255, 0.3);
-            --bg: #050505;
-            --surface: #0a0a0a;
-            --card-bg: rgba(15, 15, 15, 0.6);
+            --secondary: #904e95;
+            --primary-glow: rgba(0, 243, 255, 0.4);
+            --secondary-glow: rgba(144, 78, 149, 0.4);
+            --bg: #030305;
+            --surface: #0a0a0f;
+            --card-bg: rgba(15, 15, 20, 0.55);
+            --card-hover-bg: rgba(25, 25, 30, 0.8);
             --text-main: #ffffff;
-            --text-secondary: rgba(255, 255, 255, 0.7);
-            --text-dim: rgba(255, 255, 255, 0.4);
+            --text-en: rgba(255, 255, 255, 0.85);
+            --text-cn: rgba(200, 200, 210, 0.65);
             --border: rgba(0, 243, 255, 0.15);
-            --nav-bg: rgba(5, 5, 5, 0.7);
-            --transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            --border-hover: rgba(0, 243, 255, 0.5);
+            --nav-bg: rgba(3, 3, 5, 0.8);
+            --transition: all 0.5s cubic-bezier(0.25, 1, 0.3, 1);
         }
 
         * {
@@ -34,32 +38,26 @@
 
         html {
             scroll-behavior: smooth;
-            scroll-padding-top: 80px;
+            scroll-padding-top: 90px;
         }
 
         body {
             background-color: var(--bg);
             color: var(--text-main);
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            line-height: 1.6;
+            line-height: 1.7;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
         }
 
         /* --- Custom Scrollbar --- */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: var(--bg);
-        }
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
         ::-webkit-scrollbar-thumb {
-            background: var(--border);
+            background: linear-gradient(to bottom, var(--primary), var(--secondary));
             border-radius: 10px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary);
-        }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
         /* --- Canvas Background --- */
         #bg-canvas {
@@ -69,8 +67,27 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            opacity: 0.4;
+            opacity: 0.55;
             pointer-events: none;
+        }
+
+        /* --- Bilingual Text Classes --- */
+        .bilingual {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 15px;
+        }
+        .bilingual .en {
+            color: var(--text-en);
+            font-size: 1rem;
+            font-weight: 400;
+        }
+        .bilingual .cn {
+            color: var(--text-cn);
+            font-size: 0.95rem;
+            font-weight: 300;
+            letter-spacing: 0.5px;
         }
 
         /* --- Navigation --- */
@@ -81,8 +98,8 @@
             width: 100%;
             z-index: 1000;
             padding: 20px 0;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             background: var(--nav-bg);
             border-bottom: 1px solid var(--border);
             transition: var(--transition);
@@ -97,44 +114,71 @@
         .logo {
             font-family: 'Outfit', sans-serif;
             font-weight: 800;
-            font-size: 1.5rem;
-            color: var(--primary);
+            font-size: 1.8rem;
+            background: linear-gradient(to right, #fff, var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             text-decoration: none;
             letter-spacing: 1px;
+            transition: var(--transition);
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+            text-shadow: 0 0 15px var(--primary-glow);
         }
 
         .nav-links {
             display: flex;
-            gap: 30px;
+            gap: 35px;
             list-style: none;
         }
 
         .nav-links a {
-            color: var(--text-secondary);
+            color: var(--text-en);
             text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             transition: var(--transition);
-            letter-spacing: 0.5px;
+            position: relative;
+            padding-bottom: 5px;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--primary);
+            transition: var(--transition);
+            box-shadow: 0 0 8px var(--primary-glow);
         }
 
         .nav-links a:hover {
-            color: var(--primary);
-            text-shadow: 0 0 10px var(--primary-glow);
+            color: #ffffff;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
         }
 
         /* --- Layout --- */
         .container {
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 0 30px;
+            padding: 0 40px;
         }
 
         section {
-            padding: 100px 0;
+            padding: 120px 0;
             opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease, transform 0.8s ease;
+            transform: translateY(40px);
+            transition: opacity 1s cubic-bezier(0.25, 1, 0.3, 1), transform 1s cubic-bezier(0.25, 1, 0.3, 1);
         }
 
         section.visible {
@@ -144,21 +188,22 @@
 
         .section-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
-            margin-bottom: 50px;
+            margin-bottom: 60px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
             color: var(--primary);
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
         }
 
         .section-title::after {
-            content: '';
-            height: 1px;
-            background: linear-gradient(to right, var(--primary), transparent);
-            flex-grow: 1;
-            opacity: 0.3;
+             content: '';
+             height: 1px;
+             background: linear-gradient(to right, var(--primary), transparent);
+             flex-grow: 1;
+             opacity: 0.4;
         }
 
         /* --- Hero Section --- */
@@ -172,182 +217,237 @@
             padding: 0;
             opacity: 1;
             transform: none;
+            position: relative;
         }
 
         .hero-content h1 {
             font-family: 'Outfit', sans-serif;
-            font-size: clamp(3rem, 10vw, 6rem);
+            font-size: clamp(3.5rem, 12vw, 7rem);
             font-weight: 800;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
             -webkit-background-clip: text;
             background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: transparent;
             line-height: 1.1;
+            letter-spacing: -2px;
         }
 
         .hero-content h2 {
-            font-size: 1.8rem;
+            font-size: clamp(1.2rem, 3vw, 2.2rem);
             font-weight: 300;
-            color: var(--text-secondary);
-            letter-spacing: 5px;
-            margin-bottom: 40px;
+            color: var(--text-en);
+            letter-spacing: 6px;
+            margin-bottom: 50px;
+            text-transform: uppercase;
         }
 
+        /* Animated Interactive Button */
         .explore-btn {
-            padding: 15px 40px;
-            border: 1px solid var(--primary);
-            color: var(--primary);
+            position: relative;
+            padding: 16px 45px;
+            color: #fff;
             text-decoration: none;
             border-radius: 50px;
             font-weight: 600;
             letter-spacing: 1px;
             transition: var(--transition);
-            background: rgba(0, 243, 255, 0.05);
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            background: rgba(0, 243, 255, 0.05);
+            border: 1px solid var(--primary);
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
+        }
+
+        .explore-btn::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 0%; height: 100%;
+            background: linear-gradient(90deg, rgba(0,243,255,0.2), var(--primary));
+            transition: var(--transition);
+            z-index: -1;
         }
 
         .explore-btn:hover {
-            background: var(--primary);
-            color: var(--bg);
-            box-shadow: 0 0 30px var(--primary-glow);
-            transform: scale(1.05);
+            color: #000;
+            box-shadow: 0 0 40px var(--primary-glow);
+            transform: translateY(-3px) scale(1.05);
+            border-color: transparent;
         }
 
-        /* --- Grid/Cards --- */
+        .explore-btn:hover::before {
+            width: 100%;
+        }
+        
+        .explore-btn svg {
+            transition: transform 0.3s ease;
+        }
+        .explore-btn:hover svg {
+            transform: translateX(5px);
+            stroke: #000;
+        }
+
+        /* --- Grid/Cards with Strong Hover Interaction --- */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 30px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 35px;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            pointer-events: none;
+        }
+
+        .card:hover::before {
+            opacity: 1;
         }
 
         .card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
-            transform: translateY(-5px);
+            background: var(--card-hover-bg);
+            border-color: var(--border-hover);
+            box-shadow: 0 20px 50px rgba(0, 243, 255, 0.15), inset 0 0 20px rgba(0, 243, 255, 0.05);
+            transform: translateY(-8px) scale(1.01);
         }
 
         /* --- Education/Experience Timeline --- */
         .timeline {
             position: relative;
-            padding-left: 30px;
+            padding-left: 40px;
         }
 
         .timeline::before {
             content: '';
             position: absolute;
-            left: 0;
-            top: 5px;
-            bottom: 5px;
+            left: 5px;
+            top: 10px;
+            bottom: 10px;
             width: 2px;
-            background: linear-gradient(to bottom, var(--primary), transparent);
-            opacity: 0.3;
+            background: linear-gradient(to bottom, var(--primary), var(--secondary), transparent);
+            opacity: 0.5;
         }
 
         .timeline-item {
             position: relative;
-            margin-bottom: 50px;
+            margin-bottom: 60px;
         }
 
         .timeline-item::before {
             content: '';
             position: absolute;
-            left: -34px;
-            top: 5px;
-            width: 10px;
-            height: 10px;
+            left: -42px;
+            top: 10px;
+            width: 14px;
+            height: 14px;
             background: var(--bg);
             border: 2px solid var(--primary);
             border-radius: 50%;
-            box-shadow: 0 0 10px var(--primary-glow);
+            box-shadow: 0 0 15px var(--primary-glow);
             z-index: 1;
+            transition: var(--transition);
+        }
+
+        .timeline-item:hover::before {
+            background: var(--primary);
+            transform: scale(1.5);
+            box-shadow: 0 0 25px var(--primary);
         }
 
         .timeline-date {
             font-family: 'Outfit', sans-serif;
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-            opacity: 0.8;
+            font-weight: 700;
+            font-size: 1.1rem;
+            background: linear-gradient(90deg, var(--primary), #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            display: inline-block;
         }
 
         .timeline-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 15px;
         }
 
         .timeline-header h3 {
-            font-size: 1.25rem;
+            font-size: 1.4rem;
             color: var(--text-main);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
         }
 
         .timeline-org {
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-
-        .timeline-content {
-            color: var(--text-secondary);
-            font-size: 1rem;
+            font-weight: 500;
+            color: var(--primary);
+            margin-top: 5px;
         }
 
         .timeline-content ul {
-            margin-top: 15px;
-            padding-left: 20px;
             list-style: none;
+            margin-top: 20px;
         }
 
         .timeline-content li {
             position: relative;
-            margin-bottom: 8px;
+            margin-bottom: 15px;
+            padding-left: 20px;
         }
-
         .timeline-content li::before {
-            content: '▫';
+            content: '▹';
             position: absolute;
-            left: -20px;
+            left: 0;
             color: var(--primary);
+            font-size: 1.2rem;
+            line-height: 1.5;
         }
 
         /* --- Skills Section --- */
         .skills-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 40px;
         }
 
         .skill-item {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .skill-info {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .skill-name {
-            font-weight: 600;
-            color: var(--text-main);
+            margin-bottom: 12px;
+            font-weight: 500;
         }
 
         .skill-bar {
-            height: 6px;
+            height: 8px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
             overflow: hidden;
             position: relative;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
         }
 
         .skill-progress {
@@ -355,39 +455,55 @@
             top: 0;
             left: 0;
             height: 100%;
-            background: linear-gradient(to right, #0084ff, var(--primary));
+            background: linear-gradient(90deg, #0084ff, var(--primary));
             border-radius: 10px;
             width: 0;
-            transition: width 1.5s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: width 2s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+        }
+        
+        .skill-progress::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; left: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
         /* --- Projects Section --- */
         .project-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 30px;
-        }
-
-        .project-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 40px;
         }
 
         .project-tags {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 25px;
             flex-wrap: wrap;
         }
 
         .tag {
-            font-size: 0.75rem;
-            padding: 4px 12px;
-            background: rgba(0, 243, 255, 0.08);
+            font-size: 0.8rem;
+            padding: 6px 16px;
+            background: rgba(0, 243, 255, 0.05);
             border: 1px solid var(--border);
             color: var(--primary);
-            border-radius: 20px;
+            border-radius: 30px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: var(--transition);
+        }
+        .card:hover .tag {
+            background: rgba(0, 243, 255, 0.15);
+            border-color: var(--primary);
+            color: #fff;
         }
 
         /* --- Contact Section --- */
@@ -396,24 +512,39 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
+            padding: 60px 40px;
         }
 
         .contact-links {
             display: flex;
-            gap: 40px;
-            margin-top: 40px;
+            gap: 50px;
+            margin-top: 50px;
             flex-wrap: wrap;
             justify-content: center;
         }
 
         .contact-item {
-            color: var(--text-main);
+            color: var(--text-en);
             text-decoration: none;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
             transition: var(--transition);
+            position: relative;
+        }
+
+        .contact-icon-wrapper {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .contact-item svg {
@@ -426,67 +557,86 @@
         }
 
         .contact-item:hover {
-            color: var(--primary);
-            transform: translateY(-5px);
+            transform: translateY(-8px);
         }
-
+        .contact-item:hover .contact-icon-wrapper {
+            background: rgba(0, 243, 255, 0.1);
+            border-color: var(--primary);
+            box-shadow: 0 10px 25px var(--primary-glow);
+            transform: scale(1.1);
+        }
         .contact-item:hover svg {
-            filter: drop-shadow(0 0 10px var(--primary-glow));
+            stroke: #fff;
+            filter: drop-shadow(0 0 5px #fff);
         }
+        .contact-item span {
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+        .contact-item:hover span { color: var(--primary); }
 
         /* --- Footer --- */
         footer {
-            padding: 50px 0;
+            padding: 60px 0 40px;
             text-align: center;
             border-top: 1px solid var(--border);
-            color: var(--text-dim);
-            font-size: 0.85rem;
+            color: var(--text-cn);
+            font-size: 0.9rem;
+            background: linear-gradient(to top, rgba(0,243,255,0.02), transparent);
         }
 
         /* --- Responsive --- */
-        @media (max-width: 768px) {
+        @media (max-width: 900px) {
             .nav-links { display: none; }
-            .hero-content h2 { font-size: 1.2rem; letter-spacing: 2px; }
+            .container { padding: 0 25px; }
+            section { padding: 80px 0; }
+            .hero-content h2 { font-size: 1.2rem; letter-spacing: 3px; }
             .timeline-header { flex-direction: column; }
-            .section-title { font-size: 20px; }
-            section { padding: 60px 0; }
+            .section-title { font-size: 24px; margin-bottom: 40px; }
+            .project-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
+    <!-- 动态背景 -->
     <canvas id="bg-canvas"></canvas>
 
     <nav id="navbar">
         <div class="container">
             <a href="#home" class="logo">LY.</a>
             <ul class="nav-links">
-                <li><a href="#home">首页</a></li>
-                <li><a href="#education">教育经历</a></li>
-                <li><a href="#experience">职业经历</a></li>
-                <li><a href="#skills">技能专长</a></li>
-                <li><a href="#projects">项目案例</a></li>
-                <li><a href="#contact">联系我</a></li>
+                <li><a href="#home">Home | 首页</a></li>
+                <li><a href="#education">Education | 教育</a></li>
+                <li><a href="#experience">Experience | 经历</a></li>
+                <li><a href="#skills">Skills | 技能</a></li>
+                <li><a href="#projects">Projects | 项目</a></li>
+                <li><a href="#contact">Contact | 联系</a></li>
             </ul>
         </div>
     </nav>
 
     <main>
-        <!-- Hero Section -->
+        <!-- Home / 首页 -->
         <section id="home">
             <div class="hero-content">
                 <h1>Lucas Yan</h1>
                 <h2>闫智尧</h2>
+                <div class="bilingual" style="margin-bottom: 40px;">
+                    <span class="en" style="font-size: 1.2rem; letter-spacing: 2px;">Finance & Computer Science Innovator</span>
+                    <span class="cn" style="font-size: 1.1rem;">金融与计算机科学交叉领域创新者</span>
+                </div>
                 <a href="#education" class="explore-btn" id="explore-nav">
-                    Explore My Universe / 探索我的宇宙
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg>
+                    <span>Explore My Universe / 探索我的宇宙</span>
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg>
                 </a>
             </div>
         </section>
 
         <div class="container">
             
-            <!-- Education Section -->
+            <!-- Education / 教育经历 -->
             <section id="education">
                 <h2 class="section-title">Education Journey / 教育经历</h2>
                 <div class="timeline">
@@ -501,10 +651,23 @@
                                 </div>
                             </div>
                             <div class="timeline-content">
-                                <p>专注于金融与计算机科学交叉领域，致力于利用技术驱动金融效率提升。</p>
+                                <div class="bilingual">
+                                    <span class="en">Focusing on the intersection of Finance and Computer Science, dedicated to utilizing technology to drive efficiency and innovation in the financial sector.</span>
+                                    <span class="cn">专注于金融与计算机科学交叉领域，致力于利用技术驱动金融领域的效率提升与创新。</span>
+                                </div>
                                 <ul>
-                                    <li>Bender Trust Stock Analyst Project Participant</li>
-                                    <li>Rutgers Entrepreneur Society</li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Bender Trust Stock Analyst Project Participant</span>
+                                            <span class="cn">Bender Trust 股票分析项目参与者</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Rutgers Entrepreneur Society Member</span>
+                                            <span class="cn">罗格斯大学创业协会成员</span>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -523,8 +686,18 @@
                             </div>
                             <div class="timeline-content">
                                 <ul>
-                                    <li>Club President of Environmental Protection</li>
-                                    <li>Debate Star & Track and Field Club Member</li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Club President of Environmental Protection</span>
+                                            <span class=" cn">环保社社长</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Debate Star & Track and Field Club Member</span>
+                                            <span class="cn">辩论之星与田径社成员</span>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -532,7 +705,7 @@
                 </div>
             </section>
 
-            <!-- Experience Section -->
+            <!-- Experience / 职业经历 -->
             <section id="experience">
                 <h2 class="section-title">Professional Experience / 职业经历</h2>
                 <div class="timeline">
@@ -548,8 +721,18 @@
                             </div>
                             <div class="timeline-content">
                                 <ul>
-                                    <li>负责初创企业的全球业务运营及品牌设计，搭建企业级官方网站以对齐视觉形象与愿景。</li>
-                                    <li>在 Rutgers Sharktank 比赛中展示商业模式，成功从全校参赛团队中获得第 8 名。</li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Directed global business operations for an early-stage startup; managed brand design and built the corporate website to align visual identity with the startup vision.</span>
+                                            <span class="cn">负责初创企业的全球业务运营及品牌设计，搭建企业级官方网站以对齐视觉形象与愿景。</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Pitched the business model at the Rutgers Sharktank competition, successfully securing 8th place overall among competing university teams.</span>
+                                            <span class="cn">在 Rutgers Sharktank 比赛中展示商业模式，成功从全校参赛团队中获得第 8 名。</span>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -567,8 +750,18 @@
                             </div>
                             <div class="timeline-content">
                                 <ul>
-                                    <li>在策划部主理活动推进与物流管理，优化组织效率。</li>
-                                    <li>重新设计比赛框架并简化评审流程，显著提升活动执行力和团队生产力。</li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Optimized organizational efficiency and managed event logistics within the planning department.</span>
+                                            <span class="cn">在策划部主理活动推进与物流管理，优化组织效率。</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Redesigned competition frameworks and streamlined the judging process to enhance event execution and team productivity.</span>
+                                            <span class="cn">重新设计比赛框架并简化评审流程，显著提升活动执行力和团队生产力。</span>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -586,9 +779,24 @@
                             </div>
                             <div class="timeline-content">
                                 <ul>
-                                    <li>领导 56 名学生志愿者团队，组织大型公众活动及媒体宣教，6 年间覆盖 5000+ 社区成员。</li>
-                                    <li>与多家 NGO 及基金会建立深度合作网络，统筹项目资源。</li>
-                                    <li>主导涵盖 20 个湿地点的生物多样性研究，记录 300+ 植物与 50+ 动物物种，构建完整本地生态数据库。</li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Mobilized and managed a team of 56 student volunteers to organize large-scale public engagement events and TV media campaigns, impacting over 5,000 community members across 6 years.</span>
+                                            <span class="cn">领导 56 名学生志愿者团队，组织大型公众活动及电视媒体宣教，6 年间覆盖涵盖并影响了 5000+ 社区成员。</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Established and managed projects, building a robust network with socially-driven NGOs and foundations as strategic collaborators.</span>
+                                            <span class="cn">与多家环保 NGO 及基金会建立深度合作网络，作为战略合作伙伴统筹项目资源。</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Directed a longitudinal biodiversity study across 20 wetland zones, documenting 300+ plant and 50+ animal species to construct a comprehensive local ecological database.</span>
+                                            <span class="cn">主导涵盖 20 个湿地点的跨度生物多样性研究，实地记录 300+ 植物与 50+ 动物物种，成功构建完整本地生态数据库。</span>
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -596,29 +804,30 @@
                 </div>
             </section>
 
-            <!-- Skills Section -->
+            <!-- Skills / 技能专长 -->
             <section id="skills">
                 <h2 class="section-title">Skills & Expertise / 技能专长</h2>
                 <div class="skills-container">
                     <div class="card">
-                        <h3 style="margin-bottom: 25px; color: var(--text-main);">Programming & Tech</h3>
+                        <h3 style="margin-bottom: 25px; color: var(--text-main); font-family: 'Outfit', sans-serif;">Programming & Tech / 编程与技术</h3>
+                        
                         <div class="skill-item">
                             <div class="skill-info">
-                                <span class="skill-name">Python / Java / C++</span>
+                                <span class="skill-name">Python / Java / C++ (VibeCoding)</span>
                                 <span class="skill-percentage">85%</span>
                             </div>
                             <div class="skill-bar"><div class="skill-progress" data-width="85%"></div></div>
                         </div>
                         <div class="skill-item">
                             <div class="skill-info">
-                                <span class="skill-name">Arduino / Hardware Dev</span>
+                                <span class="skill-name">Arduino / Hardware Integration</span>
                                 <span class="skill-percentage">80%</span>
                             </div>
                             <div class="skill-bar"><div class="skill-progress" data-width="80%"></div></div>
                         </div>
                         <div class="skill-item">
                             <div class="skill-info">
-                                <span class="skill-name">Web Dev / AI Tools</span>
+                                <span class="skill-name">Web Dev / AI Tools Proficiency</span>
                                 <span class="skill-percentage">90%</span>
                             </div>
                             <div class="skill-bar"><div class="skill-progress" data-width="90%"></div></div>
@@ -626,24 +835,25 @@
                     </div>
 
                     <div class="card">
-                        <h3 style="margin-bottom: 25px; color: var(--text-main);">Business & Tools</h3>
+                        <h3 style="margin-bottom: 25px; color: var(--text-main); font-family: 'Outfit', sans-serif;">Business & Soft Skills / 商业与综合技能</h3>
+                        
                         <div class="skill-item">
                             <div class="skill-info">
-                                <span class="skill-name">Global Business Ops</span>
+                                <span class="skill-name">Global Business Operations</span>
                                 <span class="skill-percentage">75%</span>
                             </div>
                             <div class="skill-bar"><div class="skill-progress" data-width="75%"></div></div>
                         </div>
                         <div class="skill-item">
                             <div class="skill-info">
-                                <span class="skill-name">Office 365 (Excle/PPT)</span>
+                                <span class="skill-name">Office 365 / Data Visuals</span>
                                 <span class="skill-percentage">95%</span>
                             </div>
                             <div class="skill-bar"><div class="skill-progress" data-width="95%"></div></div>
                         </div>
                         <div class="skill-item">
                             <div class="skill-info">
-                                <span class="skill-name">Languages (EN/CN)</span>
+                                <span class="skill-name">Languages (English Fluent, Mandarin Native)</span>
                                 <span class="skill-percentage">100%</span>
                             </div>
                             <div class="skill-bar"><div class="skill-progress" data-width="100%"></div></div>
@@ -652,23 +862,23 @@
                 </div>
             </section>
 
-            <!-- Projects Section -->
+            <!-- Projects / 项目案例 -->
             <section id="projects">
                 <h2 class="section-title">Projects & Highlights / 项目与亮点</h2>
                 <div class="project-grid">
                     <!-- Project 1 -->
                     <div class="card project-card">
                         <div>
-                            <h3 style="margin-bottom: 15px;">Magic Glove (IEEE Build-a-thon)</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.95rem;">
-                                荣获 Rutgers IEEE 26 小时工程赛 "Best Productivity / Automation Challenge" 奖项。
-                                利用 C++ 及 Arduino 开发的可穿戴硬件控制器，将自然手势转化为数字指令。
-                            </p>
+                            <h3 style="margin-bottom: 20px; font-size: 1.4rem;">Magic Glove (IEEE Build-a-thon)</h3>
+                            <div class="bilingual">
+                                <span class="en">Awarded "Best Productivity / Automation Challenge Prize" by Rutgers IEEE for exceptional technical execution. Developed "Magic Glove," a wearable hardware controller utilizing C++ and Arduino IDE to translate natural hand movements into direct digital commands.</span>
+                                <span class="cn">荣获 Rutgers IEEE 26 小时工程赛 "最佳生产力与自动化挑战" 奖项。开发了 "Magic Glove"，一款利用 C++ 及 Arduino IDE 打造的独立可穿戴硬件控制器，将自然手势精准转化为数字指令，替代传统键鼠输入。</span>
+                            </div>
                         </div>
                         <div class="project-tags">
                             <span class="tag">C++</span>
                             <span class="tag">Arduino</span>
-                            <span class="tag">Hardware</span>
+                            <span class="tag">Hardware Integration</span>
                             <span class="tag">Award Winner</span>
                         </div>
                     </div>
@@ -676,50 +886,49 @@
                     <!-- Project 2 -->
                     <div class="card project-card">
                         <div>
-                            <h3 style="margin-bottom: 15px;">AI Web Portfolio</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.95rem;">
-                                融合 AI 开发流打造的响应式个人门户，部署于 GitHub Pages。
-                                展示技术项目、职业背景，集成动态视觉与高度可访问性。
-                            </p>
+                            <h3 style="margin-bottom: 20px; font-size: 1.4rem;">AI Web Portfolio</h3>
+                            <div class="bilingual">
+                                <span class="en">Designed, deployed, and managed a personal portfolio website hosted on GitHub Pages to showcase technical programming projects and professional background, highlighting UI aesthetics and interactivity.</span>
+                                <span class="cn">自主设计并部署响应式个人门户网站，托管于 GitHub Pages。全面展示各类硬核技术项目与职业背景履历，深度融入 AI 辅助开发理念，强调 UI 交互美学与现代 web 可访问性。</span>
+                            </div>
                         </div>
                         <div class="project-tags">
                             <span class="tag">HTML/CSS/JS</span>
+                            <span class="tag">UI/UX Design</span>
                             <span class="tag">AI Integration</span>
-                            <span class="tag">Design</span>
                         </div>
-                    </div>
-
-                    <!-- Placeholder -->
-                    <div class="card project-card" style="border-style: dashed; opacity: 0.6; display: flex; align-items: center; justify-content: center; min-height: 200px;">
-                        <p>More projects loading... / 更多项目筹备中</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Contact Section -->
+            <!-- Contact / 联系方式 -->
             <section id="contact">
                 <h2 class="section-title">Get In Touch / 联系我</h2>
                 <div class="card contact-content">
-                    <p style="margin-bottom: 30px; font-size: 1.1rem; color: var(--text-secondary);">
-                        不论是关于金融科技、硬件开发，还是跨界项目的合作，欢迎随时通过以下方式联系我。
-                    </p>
+                    <div class="bilingual" style="text-align: center; max-width: 600px; margin: 0 auto 10px;">
+                        <span class="en" style="font-size: 1.1rem;">Whether it's about Fintech, Hardware Development, or cross-disciplinary collaborations, I'm always open to discussing new opportunities. Let's build the future together.</span>
+                        <span class="cn" style="font-size: 1.05rem;">不论是关于金融科技、硬件开发，还是富有挑战的跨界项目合作，欢迎随时通过以下方式联系我。让我们共同创造未来。</span>
+                    </div>
+                    
                     <div class="contact-links">
                         <a href="mailto:LucasYanzy@outlook.com" class="contact-item">
-                            <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                            <span>Email</span>
+                            <div class="contact-icon-wrapper">
+                                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            </div>
+                            <span>LucasYanzy@outlook.com</span>
                         </a>
                         <a href="https://www.linkedin.com/in/lucasyanzy/" target="_blank" class="contact-item">
-                            <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
-                            <span>LinkedIn</span>
+                            <div class="contact-icon-wrapper">
+                                <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+                            </div>
+                            <span>LinkedIn Profile</span>
                         </a>
                         <a href="https://github.com/LucasYanzy" target="_blank" class="contact-item">
-                            <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                            <span>GitHub</span>
+                            <div class="contact-icon-wrapper">
+                                <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                            </div>
+                            <span>GitHub Portfolio</span>
                         </a>
-                        <div class="contact-item">
-                            <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                            <span>Phone: +1 848 / +86 157</span>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -727,15 +936,29 @@
     </main>
 
     <footer>
-        <p>© 2026 Lucas Yan. Designed for exploration at the intersection of Finance & CS.</p>
+        <div class="bilingual" style="margin-bottom: 0;">
+            <span class="en" style="font-size: 0.85rem;">© 2026 Lucas Yan. Designed for exploration at the intersection of Finance & CS.</span>
+            <span class="cn" style="font-size: 0.8rem;">© 2026 闫智尧 版权所有. 探索科技与金融的未来边界。</span>
+        </div>
     </footer>
 
     <script>
-        // --- 30FPS Background Animation ---
+        // --- 交互式超感粒子背景网络 ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let width, height;
         let particles = [];
+        const mouse = { x: null, y: null, radius: 200 };
+
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
 
         function resize() {
             width = canvas.width = window.innerWidth;
@@ -748,20 +971,23 @@
 
         function initParticles() {
             particles = [];
-            const count = Math.min(Math.floor((width * height) / 15000), 100);
+            // 细致权衡：增加粒子数量以强化视觉效果，同时控制总数确保30fps下性能稳定
+            const count = Math.min(Math.floor((width * height) / 10000), 120);
             for (let i = 0; i < count; i++) {
                 particles.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * 0.5,
-                    vy: (Math.random() - 0.5) * 0.5,
-                    radius: Math.random() * 1.5 + 0.5
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    baseRadius: Math.random() * 1.5 + 0.8,
+                    radius: 0
                 });
+                particles[i].radius = particles[i].baseRadius;
             }
         }
 
         let lastTime = 0;
-        const fps = 30;
+        const fps = 30; // 严格限制最大 30fps 以确保浏览顺滑且无眩晕感
         const interval = 1000 / fps;
 
         function animate(timestamp) {
@@ -771,18 +997,29 @@
             if (delta < interval) return;
             lastTime = timestamp - (delta % interval);
 
+            // 清除画布并留下尾迹反馈 (低强度)
             ctx.clearRect(0, 0, width, height);
+
+            // 如果鼠标存在，绘制一个跟随鼠标的渐变柔和光晕
+            if (mouse.x !== null) {
+                const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, mouse.radius);
+                gradient.addColorStop(0, 'rgba(0, 243, 255, 0.05)');
+                gradient.addColorStop(1, 'transparent');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, width, height);
+            }
             
-            // Draw lines
-            ctx.strokeStyle = 'rgba(0, 243, 255, 0.1)';
-            ctx.lineWidth = 0.5;
+            // 绘制粒子间连线与交互引力线
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
                     const dy = particles[i].y - particles[j].y;
                     const d = Math.sqrt(dx * dx + dy * dy);
-                    if (d < 150) {
+                    
+                    if (d < 120) {
                         ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${0.12 - d/1000})`;
+                        ctx.lineWidth = 0.6;
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
                         ctx.stroke();
@@ -790,16 +1027,55 @@
                 }
             }
 
-            // Draw dots
-            ctx.fillStyle = 'rgba(0, 243, 255, 0.4)';
+            // 更新绘制独立粒子，加入物理避让/吸引反馈
             for (let p of particles) {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fill();
-
+                // 默认缓动轨道
                 p.x += p.vx;
                 p.y += p.vy;
 
+                // 物理连线：鼠标引力效果
+                p.radius = p.baseRadius;
+                if (mouse.x !== null) {
+                    const dx = mouse.x - p.x;
+                    const dy = mouse.y - p.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < mouse.radius) {
+                        // 靠得越近，受到的吸引/推斥力表现
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const force = (mouse.radius - distance) / mouse.radius;
+                        
+                        // 缓慢靠拢效果
+                        p.x += forceDirectionX * force * 1.5;
+                        p.y += forceDirectionY * force * 1.5;
+                        
+                        // 点亮特效
+                        p.radius = p.baseRadius * 1.5 + (force * 1.5);
+                        
+                        // 从鼠标处引出连线核心
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${force * 0.3})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(mouse.x, mouse.y);
+                        ctx.lineTo(p.x, p.y);
+                        ctx.stroke();
+                    }
+                }
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = (mouse.x !== null && Math.sqrt(Math.pow(mouse.x - p.x, 2) + Math.pow(mouse.y - p.y, 2)) < 100) 
+                              ? '#ffffff' // 接近鼠标时粒子高亮为纯白
+                              : 'rgba(0, 243, 255, 0.6)';
+                
+                // 给粒子发光
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#00f3ff';
+                ctx.fill();
+                ctx.shadowBlur = 0; // reset
+
+                // 边界反弹
                 if (p.x < 0 || p.x > width) p.vx *= -1;
                 if (p.y < 0 || p.y > height) p.vy *= -1;
             }
@@ -807,9 +1083,10 @@
 
         requestAnimationFrame(animate);
 
-        // --- Scroll Observer for Fade-in ---
+        // --- 视差滚动与进入动画感知 ---
         const observerOptions = {
-            threshold: 0.1
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
         };
 
         const observer = new IntersectionObserver((entries) => {
@@ -817,12 +1094,14 @@
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
                     
-                    // Trigger skill bars if in vision
+                    // 技能条触发动画
                     if (entry.target.id === 'skills') {
-                        const activeBars = entry.target.querySelectorAll('.skill-progress');
-                        activeBars.forEach(bar => {
-                            bar.style.width = bar.getAttribute('data-width');
-                        });
+                        setTimeout(() => {
+                            const activeBars = entry.target.querySelectorAll('.skill-progress');
+                            activeBars.forEach(bar => {
+                                bar.style.width = bar.getAttribute('data-width');
+                            });
+                        }, 300); // 稍微延迟更优雅
                     }
                 }
             });
@@ -832,15 +1111,17 @@
             observer.observe(section);
         });
 
-        // --- Navbar transparency on scroll ---
+        // --- 导航栏磨砂玻璃滚动交互 ---
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('navbar');
             if (window.scrollY > 50) {
                 nav.style.padding = '12px 0';
-                nav.style.background = 'rgba(5, 5, 5, 0.9)';
+                nav.style.background = 'rgba(3, 3, 5, 0.9)';
+                nav.style.boxShadow = '0 5px 20px rgba(0,0,0,0.5)';
             } else {
                 nav.style.padding = '20px 0';
-                nav.style.background = 'rgba(5, 5, 5, 0.7)';
+                nav.style.background = 'rgba(3, 3, 5, 0.5)';
+                nav.style.boxShadow = 'none';
             }
         });
     </script>
