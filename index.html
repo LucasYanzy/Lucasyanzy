@@ -52,12 +52,13 @@
 
         /* --- Custom Scrollbar --- */
         ::-webkit-scrollbar { width: 10px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb {
-            background: linear-gradient(to bottom, var(--primary), var(--secondary));
+            background: var(--scroll-color, rgba(0, 243, 255, 0));
             border-radius: 10px;
+            border: 1px solid var(--scroll-border, rgba(255, 255, 255, 0));
+            box-shadow: inset 0 0 10px var(--scroll-shadow, rgba(255, 255, 255, 0));
         }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
         /* --- Canvas Background --- */
         #bg-canvas {
@@ -113,58 +114,37 @@
 
         .logo {
             font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            font-size: 1.8rem;
-            background: linear-gradient(to right, #fff, var(--primary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+            font-weight: 300;
+            font-size: 1.1rem;
+            color: #fff;
             text-decoration: none;
-            letter-spacing: 1px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
             transition: var(--transition);
         }
         
         .logo:hover {
-            transform: scale(1.05);
-            text-shadow: 0 0 15px var(--primary-glow);
+            color: var(--primary);
         }
 
         .nav-links {
             display: flex;
-            gap: 35px;
+            gap: 25px;
             list-style: none;
         }
 
         .nav-links a {
-            color: var(--text-en);
+            color: rgba(255, 255, 255, 0.7);
             text-decoration: none;
             font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
+            font-weight: 400;
             letter-spacing: 1px;
+            text-transform: uppercase;
             transition: var(--transition);
-            position: relative;
-            padding-bottom: 5px;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: 0;
-            left: 0;
-            background-color: var(--primary);
-            transition: var(--transition);
-            box-shadow: 0 0 8px var(--primary-glow);
         }
 
         .nav-links a:hover {
-            color: #ffffff;
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
+            color: var(--primary);
         }
 
         /* --- Layout --- */
@@ -339,8 +319,37 @@
             top: 10px;
             bottom: 10px;
             width: 2px;
-            background: linear-gradient(to bottom, var(--primary), var(--secondary), transparent);
-            opacity: 0.5;
+            background: linear-gradient(to bottom, var(--primary) 0%, #bc00ff 100%);
+            opacity: 0.2;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 10px;
+            bottom: 10px;
+            width: 2px;
+            background: linear-gradient(to bottom, var(--primary) 0%, #bc00ff 100%);
+            -webkit-mask-image: linear-gradient(to bottom, 
+                transparent calc(var(--mouse-y, 50%) - 80px), 
+                black calc(var(--mouse-y, 50%) - 10px), 
+                black calc(var(--mouse-y, 50%) + 10px), 
+                transparent calc(var(--mouse-y, 50%) + 80px)
+            );
+            mask-image: linear-gradient(to bottom, 
+                transparent calc(var(--mouse-y, 50%) - 80px), 
+                black calc(var(--mouse-y, 50%) - 10px), 
+                black calc(var(--mouse-y, 50%) + 10px), 
+                transparent calc(var(--mouse-y, 50%) + 80px)
+            );
+            filter: blur(1px) drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .timeline:hover::after {
+            opacity: 1;
         }
 
         .timeline-item {
@@ -423,57 +432,116 @@
             line-height: 1.5;
         }
 
-        /* --- Skills Section --- */
-        .skills-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 40px;
-        }
-
-        .skill-item {
-            margin-bottom: 30px;
-        }
-
-        .skill-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 12px;
-            font-weight: 500;
-        }
-
-        .skill-bar {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+        /* --- Skills Section (Carousel) --- */
+        .skills-carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px 50px;
             overflow: hidden;
-            position: relative;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
         }
 
-        .skill-progress {
+        .skills-carousel-track-wrapper {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .skills-carousel-track {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .skill-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: calc(33.333% - 20px);
+            margin: 0 10px;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+
+        .skill-card:hover {
+            border-color: var(--primary);
+            background: var(--card-hover-bg);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px var(--primary-glow);
+        }
+
+        .carousel-btn {
             position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            background: linear-gradient(90deg, #0084ff, var(--primary));
-            border-radius: 10px;
-            width: 0;
-            transition: width 2s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 2.5rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: var(--transition);
+            opacity: 0.7;
+        }
+
+        .carousel-btn:hover {
+            opacity: 1;
+            color: #fff;
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .carousel-btn.prev { left: 0; }
+        .carousel-btn.next { right: 0; }
+        
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 25px;
         }
         
-        .skill-progress::after {
-            content: '';
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-            animation: shimmer 2s infinite;
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .dot.active {
+            background: var(--primary);
+            box-shadow: 0 0 8px var(--primary-glow);
         }
 
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+        @media (max-width: 768px) {
+            .skill-card { width: calc(50% - 20px); }
         }
+        @media (max-width: 480px) {
+            .skill-card { width: calc(100% - 20px); }
+            .skills-carousel-container { padding: 20px 30px; }
+        }
+
+        .skill-icon {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .skill-card h4 {
+            font-size: 1rem;
+            margin: 0;
+            color: var(--text-main);
+        }
+
+        .skill-card .bilingual .en { font-size: 0.8rem; }
+        .skill-card .bilingual .cn { font-size: 0.75rem; }
 
         /* --- Projects Section --- */
         .project-grid {
@@ -605,14 +673,14 @@
 
     <nav id="navbar">
         <div class="container">
-            <a href="#home" class="logo">LY.</a>
+            <a href="#home" class="logo">Lucas Yan</a>
             <ul class="nav-links">
-                <li><a href="#home">Home | 首页</a></li>
-                <li><a href="#education">Education | 教育</a></li>
-                <li><a href="#experience">Experience | 经历</a></li>
-                <li><a href="#skills">Skills | 技能</a></li>
-                <li><a href="#projects">Projects | 项目</a></li>
-                <li><a href="#contact">Contact | 联系</a></li>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#education">Education</a></li>
+                <li><a href="#experience">Experience</a></li>
+                <li><a href="#skills">Skills</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
     </nav>
@@ -647,7 +715,7 @@
                             <div class="timeline-header">
                                 <div>
                                     <h3>Bachelor of Science In Finance & Computer Science</h3>
-                                    <div class="timeline-org">Rutgers University, New Brunswick, NJ</div>
+                                    <div class="timeline-org">Rutgers University, New Brunswick | Rutgers Business School (RBS)</div>
                                 </div>
                             </div>
                             <div class="timeline-content">
@@ -664,8 +732,8 @@
                                     </li>
                                     <li>
                                         <div class="bilingual">
-                                            <span class="en">Rutgers Entrepreneur Society Member</span>
-                                            <span class="cn">罗格斯大学创业协会成员</span>
+                                            <span class="en">Rutgers Entrepreneur Society Participant</span>
+                                            <span class="cn">罗格斯大学创业协会参与者</span>
                                         </div>
                                     </li>
                                 </ul>
@@ -673,32 +741,45 @@
                         </div>
                     </div>
                     
-                    <!-- High School -->
+                    <!-- High School Diploma -->
                     <div class="timeline-item">
                         <div class="timeline-date">2021 - 2025</div>
                         <div class="card">
                             <div class="timeline-header">
                                 <div>
                                     <h3>High School Diploma</h3>
-                                    <div class="timeline-org">Kunming No.1 High School International Department</div>
+                                    <div class="timeline-org">Kunming World Youth Academy (KWYA) & Kunming No.1 High School International Department</div>
                                 </div>
-                                <div class="tag">GPA: 3.5 / 4.0</div>
                             </div>
                             <div class="timeline-content">
-                                <ul>
-                                    <li>
-                                        <div class="bilingual">
-                                            <span class="en">Club President of Environmental Protection</span>
-                                            <span class=" cn">环保社社长</span>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="bilingual">
-                                            <span class="en">Debate Star & Track and Field Club Member</span>
-                                            <span class="cn">辩论之星与田径社成员</span>
-                                        </div>
-                                    </li>
-                                </ul>
+                                <div style="margin-bottom: 20px;">
+                                    <strong style="color: var(--primary); display: block; margin-bottom: 8px;">Kunming World Youth Academy (KWYA) | 昆明世青国际学校</strong>
+                                    <ul>
+                                        <li>
+                                            <div class="bilingual">
+                                                <span class="en">Debate Star & Best Chinese Writer</span>
+                                                <span class="cn">辩论之星 & 最佳中文创作者</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <strong style="color: var(--primary); display: block; margin-bottom: 8px;">Kunming No.1 High School International Department | 昆明一中国际部</strong>
+                                    <ul>
+                                        <li>
+                                            <div class="bilingual">
+                                                <span class="en">Long-distance runner / Track and Field Team Member</span>
+                                                <span class="cn">长跑运动员 / 田径队成员</span>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="bilingual">
+                                                <span class="en">Club President of Environmental Protection</span>
+                                                <span class="cn">环保社社长</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -805,61 +886,53 @@
             </section>
 
             <!-- Skills / 技能专长 -->
-            <section id="skills">
+            <section id="skills" style="padding-bottom: 0px;">
                 <h2 class="section-title">Skills & Expertise / 技能专长</h2>
-                <div class="skills-container">
-                    <div class="card">
-                        <h3 style="margin-bottom: 25px; color: var(--text-main); font-family: 'Outfit', sans-serif;">Programming & Tech / 编程与技术</h3>
-                        
-                        <div class="skill-item">
-                            <div class="skill-info">
-                                <span class="skill-name">Python / Java / C++ (VibeCoding)</span>
-                                <span class="skill-percentage">85%</span>
+                
+                <div class="skills-carousel-container" id="skillsCarousel">
+                    <button class="carousel-btn prev" id="prevSkill">❮</button>
+                    <div class="skills-carousel-track-wrapper">
+                        <div class="skills-carousel-track" id="skillsTrack">
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
+                                <h4>Python</h4>
+                                <div class="bilingual"><span class="en">Data & Automation</span><span class="cn">数据与自动化</span></div>
                             </div>
-                            <div class="skill-bar"><div class="skill-progress" data-width="85%"></div></div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-info">
-                                <span class="skill-name">Arduino / Hardware Integration</span>
-                                <span class="skill-percentage">80%</span>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg></div>
+                                <h4>Java</h4>
+                                <div class="bilingual"><span class="en">System Logic</span><span class="cn">系统逻辑</span></div>
                             </div>
-                            <div class="skill-bar"><div class="skill-progress" data-width="80%"></div></div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-info">
-                                <span class="skill-name">Web Dev / AI Tools Proficiency</span>
-                                <span class="skill-percentage">90%</span>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg></div>
+                                <h4>C++ (VibeCoding)</h4>
+                                <div class="bilingual"><span class="en">Hardware Control</span><span class="cn">硬件底层控制</span></div>
                             </div>
-                            <div class="skill-bar"><div class="skill-progress" data-width="90%"></div></div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h3 style="margin-bottom: 25px; color: var(--text-main); font-family: 'Outfit', sans-serif;">Business & Soft Skills / 商业与综合技能</h3>
-                        
-                        <div class="skill-item">
-                            <div class="skill-info">
-                                <span class="skill-name">Global Business Operations</span>
-                                <span class="skill-percentage">75%</span>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M7 10h4M7 14h4M13 12h4"></path></svg></div>
+                                <h4>Arduino IDE</h4>
+                                <div class="bilingual"><span class="en">System Integration</span><span class="cn">嵌入式系统集成</span></div>
                             </div>
-                            <div class="skill-bar"><div class="skill-progress" data-width="75%"></div></div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-info">
-                                <span class="skill-name">Office 365 / Data Visuals</span>
-                                <span class="skill-percentage">95%</span>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg></div>
+                                <h4>AI Tools</h4>
+                                <div class="bilingual"><span class="en">Prompt Engineering</span><span class="cn">AI辅助开发</span></div>
                             </div>
-                            <div class="skill-bar"><div class="skill-progress" data-width="95%"></div></div>
-                        </div>
-                        <div class="skill-item">
-                            <div class="skill-info">
-                                <span class="skill-name">Languages (English Fluent, Mandarin Native)</span>
-                                <span class="skill-percentage">100%</span>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg></div>
+                                <h4>Office 365</h4>
+                                <div class="bilingual"><span class="en">Excel & Data Visuals</span><span class="cn">数据处理与可视化</span></div>
                             </div>
-                            <div class="skill-bar"><div class="skill-progress" data-width="100%"></div></div>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
+                                <h4>Languages</h4>
+                                <div class="bilingual"><span class="en">English & Mandarin</span><span class="cn">中英双语流利</span></div>
+                            </div>
                         </div>
                     </div>
+                    <button class="carousel-btn next" id="nextSkill">❯</button>
                 </div>
+                <div class="carousel-dots" id="skillsDots"></div>
             </section>
 
             <!-- Projects / 项目案例 -->
@@ -867,21 +940,25 @@
                 <h2 class="section-title">Projects & Highlights / 项目与亮点</h2>
                 <div class="project-grid">
                     <!-- Project 1 -->
-                    <div class="card project-card">
+                    <a href="https://github.com/LucasYanzy/Magic-Glove" target="_blank" class="card project-card" style="text-decoration: none; color: inherit; position: relative;">
                         <div>
                             <h3 style="margin-bottom: 20px; font-size: 1.4rem;">Magic Glove (IEEE Build-a-thon)</h3>
                             <div class="bilingual">
                                 <span class="en">Awarded "Best Productivity / Automation Challenge Prize" by Rutgers IEEE for exceptional technical execution. Developed "Magic Glove," a wearable hardware controller utilizing C++ and Arduino IDE to translate natural hand movements into direct digital commands.</span>
-                                <span class="cn">荣获 Rutgers IEEE 26 小时工程赛 "最佳生产力与自动化挑战" 奖项。开发了 "Magic Glove"，一款利用 C++ 及 Arduino IDE 打造的独立可穿戴硬件控制器，将自然手势精准转化为数字指令，替代传统键鼠输入。</span>
+                                <span class="cn">荣获 Rutgers IEEE 26 小时工程赛 "最佳生产力与自动化挑战" 奖项。开发了 "Magic Glove"，一款利用 C++ 及 Arduino IDE 打造的可穿戴硬件控制器，实现自然手势到数字指令的实时转换。</span>
                             </div>
+                        </div>
+                        <div style="margin-top: 15px; font-size: 0.85rem; color: var(--primary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                            <span>Visit Repo / 点击访问仓库</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                         </div>
                         <div class="project-tags">
                             <span class="tag">C++</span>
                             <span class="tag">Arduino</span>
-                            <span class="tag">Hardware Integration</span>
+                            <span class="tag">Hardware</span>
                             <span class="tag">Award Winner</span>
                         </div>
-                    </div>
+                    </a>
 
                     <!-- Project 2 -->
                     <div class="card project-card">
@@ -911,11 +988,11 @@
                     </div>
                     
                     <div class="contact-links">
-                        <a href="mailto:LucasYanzy@outlook.com" class="contact-item">
+                        <a href="mailto:zhiyao.yan@rutgers.edu" class="contact-item">
                             <div class="contact-icon-wrapper">
                                 <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                             </div>
-                            <span>LucasYanzy@outlook.com</span>
+                            <span>Email</span>
                         </a>
                         <a href="https://www.linkedin.com/in/lucasyanzy/" target="_blank" class="contact-item">
                             <div class="contact-icon-wrapper">
@@ -929,6 +1006,21 @@
                             </div>
                             <span>GitHub Portfolio</span>
                         </a>
+                        <a href="https://www.instagram.com/lucasyanzy/" target="_blank" class="contact-item">
+                            <div class="contact-icon-wrapper">
+                                <svg viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+                            </div>
+                            <span>Instagram</span>
+                        </a>
+                        <div class="contact-item">
+                            <div class="contact-icon-wrapper">
+                                <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            </div>
+                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 10px;">
+                                <span style="font-size: 1.1rem; color: var(--primary);">+1 (848) 437 0914</span>
+                                <span style="font-size: 1.1rem; color: var(--primary);">+86 157 5299 5980</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -943,12 +1035,12 @@
     </footer>
 
     <script>
-        // --- 交互式超感粒子背景网络 ---
+        // --- 30FPS Advanced Nebula Background ---
         const canvas = document.getElementById('bg-canvas');
         const ctx = canvas.getContext('2d');
         let width, height;
         let particles = [];
-        const mouse = { x: null, y: null, radius: 200 };
+        const mouse = { x: null, y: null, radius: 250 };
 
         window.addEventListener('mousemove', (e) => {
             mouse.x = e.clientX;
@@ -971,23 +1063,24 @@
 
         function initParticles() {
             particles = [];
-            // 细致权衡：增加粒子数量以强化视觉效果，同时控制总数确保30fps下性能稳定
+            // Adding more particles for depth, with parallax layers
             const count = Math.min(Math.floor((width * height) / 10000), 120);
             for (let i = 0; i < count; i++) {
+                const z = Math.random(); // Depth factor
                 particles.push({
                     x: Math.random() * width,
                     y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * 0.4,
-                    vy: (Math.random() - 0.5) * 0.4,
-                    baseRadius: Math.random() * 1.5 + 0.8,
-                    radius: 0
+                    vx: (Math.random() - 0.5) * (0.3 + z * 0.4),
+                    vy: (Math.random() - 0.5) * (0.3 + z * 0.4),
+                    baseRadius: 0.8 + z * 1.2,
+                    radius: 0,
+                    z: z // 0 is back, 1 is front
                 });
-                particles[i].radius = particles[i].baseRadius;
             }
         }
 
         let lastTime = 0;
-        const fps = 30; // 严格限制最大 30fps 以确保浏览顺滑且无眩晕感
+        const fps = 30;
         const interval = 1000 / fps;
 
         function animate(timestamp) {
@@ -997,87 +1090,90 @@
             if (delta < interval) return;
             lastTime = timestamp - (delta % interval);
 
-            // 清除画布并留下尾迹反馈 (低强度)
             ctx.clearRect(0, 0, width, height);
 
-            // 如果鼠标存在，绘制一个跟随鼠标的渐变柔和光晕
+            // 1. Ambient Nebula Glow
             if (mouse.x !== null) {
-                const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, mouse.radius);
-                gradient.addColorStop(0, 'rgba(0, 243, 255, 0.05)');
-                gradient.addColorStop(1, 'transparent');
-                ctx.fillStyle = gradient;
+                const nebula = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 600);
+                nebula.addColorStop(0, 'rgba(0, 243, 255, 0.08)');
+                nebula.addColorStop(0.5, 'rgba(144, 78, 149, 0.03)');
+                nebula.addColorStop(1, 'transparent');
+                ctx.fillStyle = nebula;
                 ctx.fillRect(0, 0, width, height);
             }
-            
-            // 绘制粒子间连线与交互引力线
+
+            // 2. Draw Connections with Pulse effect
+            const time = Date.now() * 0.001;
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
                     const dy = particles[i].y - particles[j].y;
                     const d = Math.sqrt(dx * dx + dy * dy);
                     
-                    if (d < 120) {
+                    if (d < 150) {
+                        const opacity = (1 - d / 150) * 0.2;
                         ctx.beginPath();
-                        ctx.strokeStyle = `rgba(0, 243, 255, ${0.12 - d/1000})`;
-                        ctx.lineWidth = 0.6;
+                        ctx.strokeStyle = `rgba(0, 243, 255, ${opacity})`;
+                        ctx.lineWidth = 0.5;
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
                         ctx.stroke();
+
+                        // Data Pulse Effect
+                        if (opacity > 0.1) {
+                            const pulsePos = (time * 0.5 + (i + j)) % 1;
+                            const px = particles[i].x + (particles[j].x - particles[i].x) * pulsePos;
+                            const py = particles[i].y + (particles[j].y - particles[i].y) * pulsePos;
+                            ctx.beginPath();
+                            ctx.arc(px, py, 1, 0, Math.PI * 2);
+                            ctx.fillStyle = `rgba(255, 255, 255, ${opacity * 2})`;
+                            ctx.fill();
+                        }
                     }
                 }
             }
 
-            // 更新绘制独立粒子，加入物理避让/吸引反馈
+            // 3. Draw Particles
             for (let p of particles) {
-                // 默认缓动轨道
                 p.x += p.vx;
                 p.y += p.vy;
 
-                // 物理连线：鼠标引力效果
+                // Mouse interaction - Focus on brightness and depth rather than sensitivity
                 p.radius = p.baseRadius;
+                p.colorOpacity = 0.4 + p.z * 0.4;
                 if (mouse.x !== null) {
                     const dx = mouse.x - p.x;
                     const dy = mouse.y - p.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < mouse.radius) {
-                        // 靠得越近，受到的吸引/推斥力表现
-                        const forceDirectionX = dx / distance;
-                        const forceDirectionY = dy / distance;
-                        const force = (mouse.radius - distance) / mouse.radius;
-                        
-                        // 缓慢靠拢效果
-                        p.x += forceDirectionX * force * 1.5;
-                        p.y += forceDirectionY * force * 1.5;
-                        
-                        // 点亮特效
-                        p.radius = p.baseRadius * 1.5 + (force * 1.5);
-                        
-                        // 从鼠标处引出连线核心
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(0, 243, 255, ${force * 0.3})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.moveTo(mouse.x, mouse.y);
-                        ctx.lineTo(p.x, p.y);
-                        ctx.stroke();
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < mouse.radius) {
+                        const force = (mouse.radius - dist) / mouse.radius;
+                        // Light movement attraction (very subtle)
+                        p.x += (dx / dist) * force * 0.8;
+                        p.y += (dy / dist) * force * 0.8;
+                        // Significant brightness boost
+                        p.radius = p.baseRadius + force * 1.5;
+                        p.colorOpacity = Math.min(1, p.colorOpacity + force * 0.6);
                     }
                 }
 
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = (mouse.x !== null && Math.sqrt(Math.pow(mouse.x - p.x, 2) + Math.pow(mouse.y - p.y, 2)) < 100) 
-                              ? '#ffffff' // 接近鼠标时粒子高亮为纯白
-                              : 'rgba(0, 243, 255, 0.6)';
                 
-                // 给粒子发光
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = '#00f3ff';
+                // Reactive coloring
+                ctx.fillStyle = `rgba(0, 243, 255, ${p.colorOpacity})`;
+                
+                if (p.radius > 2) {
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#00f3ff';
+                }
                 ctx.fill();
-                ctx.shadowBlur = 0; // reset
+                ctx.shadowBlur = 0;
 
-                // 边界反弹
-                if (p.x < 0 || p.x > width) p.vx *= -1;
-                if (p.y < 0 || p.y > height) p.vy *= -1;
+                // Wrap edges
+                if (p.x < -50) p.x = width + 50;
+                if (p.x > width + 50) p.x = -50;
+                if (p.y < -50) p.y = height + 50;
+                if (p.y > height + 50) p.y = -50;
             }
         }
 
@@ -1092,17 +1188,8 @@
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
+                    // Entry animation for sections
                     entry.target.classList.add('visible');
-                    
-                    // 技能条触发动画
-                    if (entry.target.id === 'skills') {
-                        setTimeout(() => {
-                            const activeBars = entry.target.querySelectorAll('.skill-progress');
-                            activeBars.forEach(bar => {
-                                bar.style.width = bar.getAttribute('data-width');
-                            });
-                        }, 300); // 稍微延迟更优雅
-                    }
                 }
             });
         }, observerOptions);
@@ -1124,6 +1211,123 @@
                 nav.style.boxShadow = 'none';
             }
         });
+
+        // --- 时间轴颜色流动交互 ---
+        document.querySelectorAll('.timeline').forEach(timeline => {
+            timeline.addEventListener('mousemove', (e) => {
+                const rect = timeline.getBoundingClientRect();
+                const y = e.clientY - rect.top;
+                const percent = (y / rect.height) * 100;
+                timeline.style.setProperty('--mouse-y', `${percent}%`);
+            });
+        });
+        // --- 滚动条颜色缓慢变色与自动隐藏 ---
+        let scrollHideTimeout;
+        let scrollAlpha = 0;
+        let fadeInterval = null;
+
+        function updateScrollVisuals(scrollTop, docHeight) {
+            const scrollPercent = Math.min(scrollTop / docHeight, 1);
+            // 缓慢从青色 rgb(0,243,255) 渐变到 紫粉色 rgb(188,0,255)
+            const r = Math.floor(0 + (188 - 0) * scrollPercent);
+            const g = Math.floor(243 + (0 - 243) * scrollPercent);
+            const b = 255;
+            document.documentElement.style.setProperty('--scroll-color', `rgba(${r}, ${g}, ${b}, ${scrollAlpha})`);
+            document.documentElement.style.setProperty('--scroll-border', `rgba(255, 255, 255, ${scrollAlpha * 0.4})`);
+            document.documentElement.style.setProperty('--scroll-shadow', `rgba(0, 243, 255, ${scrollAlpha * 0.2})`);
+        }
+
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.body.scrollHeight - window.innerHeight;
+            if (docHeight <= 0) return;
+            
+            clearInterval(fadeInterval);
+            scrollAlpha = 0.8;
+            updateScrollVisuals(scrollTop, docHeight);
+            
+            clearTimeout(scrollHideTimeout);
+            scrollHideTimeout = setTimeout(() => {
+                // Smooth fade out
+                fadeInterval = setInterval(() => {
+                    scrollAlpha -= 0.05;
+                    if (scrollAlpha <= 0) {
+                        scrollAlpha = 0;
+                        clearInterval(fadeInterval);
+                    }
+                    updateScrollVisuals(window.scrollY, docHeight);
+                }, 30);
+            }, 800);
+        });
+
+        // --- Skills Carousel Logic ---
+        const skillsTrack = document.getElementById('skillsTrack');
+        const skillCards = Array.from(skillsTrack.children);
+        const prevSkill = document.getElementById('prevSkill');
+        const nextSkill = document.getElementById('nextSkill');
+        const skillsDots = document.getElementById('skillsDots');
+        
+        let currentSkillIndex = 0;
+        let cardsPerView = window.innerWidth > 768 ? 3 : (window.innerWidth > 480 ? 2 : 1);
+        let maxSkillIndex = Math.max(0, skillCards.length - cardsPerView);
+
+        function updateSkillCarousel() {
+            cardsPerView = window.innerWidth > 768 ? 3 : (window.innerWidth > 480 ? 2 : 1);
+            maxSkillIndex = Math.max(0, skillCards.length - cardsPerView);
+            
+            // Adjust dots display
+            while(skillsDots.firstChild) skillsDots.removeChild(skillsDots.firstChild);
+            for (let i = 0; i <= maxSkillIndex; i++) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                if (i === currentSkillIndex) dot.classList.add('active');
+                dot.addEventListener('click', () => goToSkillSlide(i));
+                skillsDots.appendChild(dot);
+            }
+            
+            if (currentSkillIndex > maxSkillIndex) currentSkillIndex = maxSkillIndex;
+            
+            requestAnimationFrame(() => {
+                const cardWidth = skillsTrack.parentElement.clientWidth / cardsPerView;
+                skillsTrack.style.transform = `translateX(-${currentSkillIndex * cardWidth}px)`;
+            });
+        }
+
+        function goToSkillSlide(index) {
+            currentSkillIndex = index;
+            updateSkillCarousel();
+            restartSkillAutoSlide();
+        }
+
+        function nextSkillSlide() {
+            currentSkillIndex = currentSkillIndex >= maxSkillIndex ? 0 : currentSkillIndex + 1;
+            updateSkillCarousel();
+        }
+
+        function prevSkillSlide() {
+            currentSkillIndex = currentSkillIndex <= 0 ? maxSkillIndex : currentSkillIndex - 1;
+            updateSkillCarousel();
+            restartSkillAutoSlide();
+        }
+
+        nextSkill.addEventListener('click', () => { nextSkillSlide(); restartSkillAutoSlide(); });
+        prevSkill.addEventListener('click', prevSkillSlide);
+        window.addEventListener('resize', updateSkillCarousel);
+
+        // Auto slide every 2 seconds
+        let autoSkillSlideInterval = setInterval(nextSkillSlide, 2000);
+        function restartSkillAutoSlide() {
+            clearInterval(autoSkillSlideInterval);
+            autoSkillSlideInterval = setInterval(nextSkillSlide, 2000);
+        }
+        
+        const skillsCarouselContainer = document.getElementById('skillsCarousel');
+        skillsCarouselContainer.addEventListener('mouseenter', () => clearInterval(autoSkillSlideInterval));
+        skillsCarouselContainer.addEventListener('mouseleave', restartSkillAutoSlide);
+
+        // Initial setup
+        setTimeout(updateSkillCarousel, 100);
+
     </script>
 </body>
 </html>
