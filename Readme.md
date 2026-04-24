@@ -1,8 +1,8 @@
 <h1 align="center">
-  Hi there, I'm <br/>
+  Hi there, I'm <img src="https://media.giphy.com/media/hvRJCLFzcasr14yMyj/giphy.gif" width="35"> <br/>
   <a href="https://git.io/typing-svg">
     <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=36&pause=1000&color=00f3ff&center=true&vCenter=true&width=500&height=60&lines=Lucas+Yan+(%E9%97%AB%E6%99%BA%E5%B0%A7);College+Student" alt="Typing SVG" />
-  </a> 👋
+  </a>
 </h1>
 
 <h3 align="center">Finance & CS Student @ Rutgers | Global Business Lead | Hardware & AI Enthusiast</h3>
@@ -63,12 +63,12 @@
 ## 📈 GitHub Stats
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=LucasYanzy&show_icons=true&theme=radium&hide_border=true" alt="LucasYanzy's GitHub stats" width="48%" />
-  <img src="https://github-readme-streak-stats.herokuapp.com/?user=LucasYanzy&theme=radium&hide_border=true" alt="LucasYanzy's GitHub streak" width="48%" />
+  <img src="https://github-readme-stats.vercel.app/api?username=LucasYanzy&show_icons=true&theme=radical&hide_border=true" alt="LucasYanzy's GitHub stats" width="48%" />
+  <img src="https://github-readme-streak-stats.herokuapp.com/?user=LucasYanzy&theme=radical&hide_border=true" alt="LucasYanzy's GitHub streak" width="48%" />
 </p>
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=LucasYanzy&layout=compact&theme=radium&hide_border=true" alt="Top Langs" />
+  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=LucasYanzy&layout=compact&theme=radical&hide_border=true" alt="Top Langs" />
 </p>
 
-> **Note:** 很多功能目前都不能用，麻烦开发者帮我看下～ @anuraghazra (github-readme-stats) @DenverCoder1 (github-readme-streak-stats)
+> **Special thanks to the developers of these awesome widgets:** [@anuraghazra](https://github.com/anuraghazra) (github-readme-stats) & [@DenverCoder1](https://github.com/DenverCoder1) (github-readme-streak-stats) 🙌
