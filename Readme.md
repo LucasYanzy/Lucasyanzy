@@ -1,4 +1,9 @@
-<h1 align="center">Hi there, I'm Lucas Yan (闫智尧) 👋</h1>
+<h1 align="center">
+  Hi there, I'm <br/>
+  <a href="https://git.io/typing-svg">
+    <img src="https://readme-typing-svg.herokuapp.com?font=Inter&weight=600&size=36&pause=1000&color=00f3ff&center=true&vCenter=true&width=500&height=60&lines=Lucas+Yan+(%E9%97%AB%E6%99%BA%E5%B0%A7);College+Student" alt="Typing SVG" />
+  </a> 👋
+</h1>
 
 <h3 align="center">Finance & CS Student @ Rutgers | Global Business Lead | Hardware & AI Enthusiast</h3>
 
@@ -34,10 +39,10 @@
 <p align="left">
   <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" />
   <img src="https://img.shields.io/badge/Java-ED8B00?style=flat-square&logo=java&logoColor=white" />
-  <img src="https://img.shields.io/badge/C++-00599C?style=flat-square&logo=c%2B%2B&logoColor=white" />
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black" />
-  <img src="https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white" />
-  <img src="https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white" />
+  <img src="https://img.shields.io/badge/C++_(Vibe_Coding)-00599C?style=flat-square&logo=c%2B%2B&logoColor=white" />
+  <img src="https://img.shields.io/badge/JavaScript_(Vibe_Coding)-F7DF1E?style=flat-square&logo=javascript&logoColor=black" />
+  <img src="https://img.shields.io/badge/HTML5_(Vibe_Coding)-E34F26?style=flat-square&logo=html5&logoColor=white" />
+  <img src="https://img.shields.io/badge/CSS3_(Vibe_Coding)-1572B6?style=flat-square&logo=css3&logoColor=white" />
 </p>
 
 **Tools & Technologies:**
@@ -65,3 +70,5 @@
 <p align="center">
   <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=LucasYanzy&layout=compact&theme=radium&hide_border=true" alt="Top Langs" />
 </p>
+
+> **Note:** 很多功能目前都不能用，麻烦开发者帮我看下～ @anuraghazra (github-readme-stats) @DenverCoder1 (github-readme-streak-stats)
