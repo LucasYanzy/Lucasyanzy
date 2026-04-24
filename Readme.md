@@ -8,7 +8,7 @@
 <h3 align="center">Finance & CS Student @ Rutgers | Global Business Lead | Hardware & AI Enthusiast</h3>
 
 <p align="center">
-  <a href="https://lucasyanzy.github.io/LucasYanzy/" target="_blank">
+  <a href="https://lucasyanzy.github.io/LucasYanzy/intro.html" target="_blank">
     <img src="https://img.shields.io/badge/Portfolio-Website-00f3ff?style=for-the-badge&logo=Web&logoColor=white" alt="Portfolio" />
   </a>
   <a href="https://www.linkedin.com/in/lucasyanzy/" target="_blank">
@@ -26,12 +26,12 @@
 
 ## 🚀 About Me
 
-- 🔭 I’m currently working as the **Global Business Lead** at Tutturo LLC and developing my **Independent Web Portfolio**.
-- 🌱 I’m currently learning **Advanced Finance, AI Tool Integration, and Full-Stack Development**.
-- 👯 I’m looking to collaborate on **Open Source Hardware (like my Magic Glove project) & AI-driven applications**.
-- 💬 Ask me about **Python, Java, C++ (VibeCoding), and Hardware Integration (Arduino)**.
-- 📫 How to reach me: **[LucasYanzy@outlook.com](mailto:LucasYanzy@outlook.com)** or via LinkedIn.
-- ⚡ Fun fact: I founded a Lake Protection Foundation and led a biodiversity study across 20 wetland zones in Kunming!
+-  I’m currently working as the **Global Business Lead** at Tutturo LLC and developing my **Independent Web Portfolio**.
+-  I’m currently learning **Advanced Finance, AI Tool Integration, and Full-Stack Development**.
+-  I’m looking to collaborate on **Open Source Hardware (like my Magic Glove project) & AI-driven applications**.
+-  Ask me about **Python, Java, C++ (VibeCoding), and Hardware Integration (Arduino)**.
+-  How to reach me: **[LucasYanzy@outlook.com](mailto:LucasYanzy@outlook.com)** or via LinkedIn.
+-  Fun fact: I founded a Lake Protection Foundation and led a biodiversity study across 20 wetland zones in Kunming!
 
 ## 🛠️ Technical Skills
 
