@@ -26,7 +26,7 @@
 
 ## 🚀 About Me
 
--  I’m currently working as the **Global Business Lead** at Tutturo LLC and developing my **Independent Web Portfolio**.
+-  I’m currently working as the **Global Business Lead** at Tutturo LLC.
 -  I’m currently learning **Advanced Finance, AI Tool Integration, and Full-Stack Development**.
 -  I’m looking to collaborate on **Open Source Hardware (like my Magic Glove project) & AI-driven applications**.
 -  Ask me about **Python, Java, C++ (VibeCoding), and Hardware Integration (Arduino)**.
