@@ -8,7 +8,7 @@
 <h3 align="center">Finance & CS Student @ Rutgers | Global Business Lead | Hardware & AI Enthusiast</h3>
 
 <p align="center">
-  <a href="https://lucasyanzy.github.io/intro/index.html" target="_blank">
+  <a href="[https://lucasyanzy.github.io/intro/index.html](https://lucasyanzy.github.io/Lucasyanzy/)" target="_blank">
     <img src="https://img.shields.io/badge/Portfolio-Website-00f3ff?style=for-the-badge&logo=Web&logoColor=white" alt="Portfolio" />
   </a>
   <a href="https://www.linkedin.com/in/lucasyanzy/" target="_blank">
