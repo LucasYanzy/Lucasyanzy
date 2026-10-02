@@ -2,7 +2,7 @@
 
 <img src="assets/banner.svg" alt="Hi there, I'm Lucas Yan (闫智尧)" width="100%" />
 
-<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=500&size=22&duration=3200&pause=1200&color=00F3FF&center=true&vCenter=true&width=760&height=48&lines=Finance+%C3%97+Computer+Science+%40+Rutgers;Global+Business+Lead+%40+Tutturo+LLC;Hardware+%26+AI+Enthusiast;%E9%87%91%E8%9E%8D%E4%B8%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%BA%A4%E5%8F%89%E9%A2%86%E5%9F%9F%E5%88%9B%E6%96%B0%E8%80%85" alt="Finance × Computer Science @ Rutgers · Global Business Lead @ Tutturo LLC · Hardware & AI Enthusiast" />
+<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=500&size=22&duration=3200&pause=1200&color=00F3FF&center=true&vCenter=true&width=760&height=48&lines=College+Student+%40+Rutgers;Finance+%2B+Computer+Science;Tinkering+with+Arduino+%26+AI+tools;%E7%BD%97%E6%A0%BC%E6%96%AF%E5%9C%A8%E8%AF%BB+%C2%B7+%E9%87%91%E8%9E%8D+%2B+%E8%AE%A1%E7%AE%97%E6%9C%BA" alt="College Student @ Rutgers · Finance + Computer Science · Tinkering with Arduino & AI tools" />
 
 <a href="https://lucasyanzy.github.io/Lucasyanzy/"><img src="assets/btn-portfolio.svg" height="38" alt="Portfolio" /></a>
 <a href="https://www.linkedin.com/in/lucasyanzy/"><img src="assets/btn-linkedin.svg" height="38" alt="LinkedIn" /></a>
