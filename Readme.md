@@ -15,7 +15,7 @@
 
 </div>
 
-## About / 关于我
+## <img src="assets/emoji/rocket.webp" height="28" align="absmiddle" alt="" />&nbsp; About / 关于我
 
 <table width="100%">
   <tr>
@@ -48,7 +48,7 @@
   </tr>
 </table>
 
-## Experience / 经历
+## <img src="assets/emoji/briefcase.webp" height="28" align="absmiddle" alt="" />&nbsp; Experience / 经历
 
 | Period | Role | Highlights |
 | :-- | :-- | :-- |
@@ -57,7 +57,7 @@
 | <code>Apr&nbsp;2026</code> | **Hardware Developer**<br />2026 IEEE × RUHART Build-a-thon | *Best Productivity/Automation Challenge Prize*. Built [Magic Glove](https://github.com/LucasYanzy/Magic-Glove), a wearable controller that turns hand movements into digital commands |
 | <code>May&nbsp;2020&nbsp;→&nbsp;Jun&nbsp;2025</code> | **Founder & Project Manager**<br />Yunnan DianChi Lake Protection Foundation | 56 student volunteers, 5,000+ community members reached, biodiversity study across 20 wetland zones |
 
-## Stack / 技术栈
+## <img src="assets/emoji/tools.webp" height="28" align="absmiddle" alt="" />&nbsp; Stack / 技术栈
 
 | Tool | Focus |
 | :-- | :-- |
@@ -70,7 +70,7 @@
 | `Office 365` | Excel & Data Visuals |
 | `Git` `GitHub` | Version Control & Hosting |
 
-## Activity / 动态
+## <img src="assets/emoji/chart.webp" height="28" align="absmiddle" alt="" />&nbsp; Activity / 动态
 
 <p align="center">
   <img src="https://github-readme-stats.vercel.app/api?username=LucasYanzy&show_icons=true&hide_border=false&border_color=0b3a40&border_radius=12&bg_color=050505&title_color=00f3ff&text_color=c9d1d9&icon_color=00f3ff&ring_color=bd00ff" alt="LucasYanzy's GitHub stats" width="49%" />
