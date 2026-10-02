@@ -13,17 +13,17 @@
 
 ---
 
-## 🚀 About Me / 关于我
+## About Me / 关于我
 
-- 🔭 Currently working as **Global Business Lead** at Tutturo LLC
-- 🎓 Studying **Finance and Computer Science** at Rutgers University *(B.S., expected May 2029)*
-- 🌱 Learning **Advanced Finance, AI Tool Integration, and Full-Stack Development**
-- 🤝 Looking to collaborate on **open-source hardware** (like my [Magic Glove](https://github.com/LucasYanzy/Magic-Glove) project) and **AI-driven applications**
-- 💬 Ask me about **Python, Java, C++ (Vibe Coding), and hardware integration with Arduino**
-- 📫 How to reach me: **[LucasYanzy@outlook.com](mailto:LucasYanzy@outlook.com)** or via [LinkedIn](https://www.linkedin.com/in/lucasyanzy/)
-- ⚡ Fun fact: I founded a lake protection foundation and led a biodiversity study across 20 wetland zones in Kunming!
+- **Currently** working as Global Business Lead at Tutturo LLC
+- **Studying** Finance and Computer Science at Rutgers University *(B.S., expected May 2029)*
+- **Learning** Advanced Finance, AI Tool Integration, and Full-Stack Development
+- **Looking to collaborate** on open-source hardware (like my [Magic Glove](https://github.com/LucasYanzy/Magic-Glove) project) and AI-driven applications
+- **Ask me about** Python, Java, C++ (Vibe Coding), and hardware integration with Arduino
+- **Reach me** at [LucasYanzy@outlook.com](mailto:LucasYanzy@outlook.com) or on [LinkedIn](https://www.linkedin.com/in/lucasyanzy/)
+- **Fun fact:** I founded a lake protection foundation and led a biodiversity study across 20 wetland zones in Kunming
 
-## 🛠️ Tech Stack / 技术栈
+## Tech Stack / 技术栈
 
 <p align="center">
   <img src="assets/skills.svg" alt="Skills: Python, Java, C++, JavaScript, HTML5, CSS3, Arduino, AI Tools, Git, GitHub, Office 365, English and Mandarin" width="100%" />
@@ -31,7 +31,7 @@
 
 <sub>Tiles tagged <i>vibe</i> are built with a Vibe Coding (AI-assisted) workflow.</sub>
 
-## 💼 Experience & Leadership / 经历
+## Experience & Leadership / 经历
 
 - **Global Business Lead** · Tutturo LLC &nbsp; `Oct 2025 → Present`<br />
   <sub>Early-stage startup: global operations, brand design and corporate website. 8th place at the Rutgers Sharktank competition.</sub>
@@ -42,7 +42,7 @@
 - **Founder & Project Manager** · Yunnan DianChi Lake Protection Foundation &nbsp; `May 2020 → Jun 2025`<br />
   <sub>56 student volunteers, 5,000+ community members reached, biodiversity study across 20 wetland zones.</sub>
 
-## 📈 GitHub Stats / 动态
+## GitHub Stats / 动态
 
 <p align="center">
   <img src="https://github-readme-stats.vercel.app/api?username=LucasYanzy&show_icons=true&bg_color=0a0a0f&title_color=00f3ff&text_color=c9d1d9&icon_color=00f3ff&ring_color=bd00ff&border_color=0b3a40&border_radius=12" alt="LucasYanzy's GitHub stats" width="49%" />
@@ -57,4 +57,4 @@
   <img src="assets/footer.svg" alt="Thanks for visiting" width="100%" />
 </p>
 
-<p align="center"><sub>🙌 Special thanks to the developers of these widgets: <a href="https://github.com/anuraghazra">@anuraghazra</a> (github-readme-stats), <a href="https://github.com/DenverCoder1">@DenverCoder1</a> (streak-stats &amp; typing-svg)</sub></p>
+<p align="center"><sub>Special thanks to the developers of these widgets: <a href="https://github.com/anuraghazra">@anuraghazra</a> (github-readme-stats), <a href="https://github.com/DenverCoder1">@DenverCoder1</a> (streak-stats &amp; typing-svg)</sub></p>
