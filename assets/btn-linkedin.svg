@@ -1,1 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="138" height="40" viewBox="0 0 138 40" role="img" aria-label="LinkedIn"><title>LinkedIn</title><rect x="1" y="1" width="136" height="38" rx="19" fill="#0a0a0f"/><rect x=".75" y=".75" width="136.5" height="38.5" rx="19.25" fill="none" stroke="#00f3ff" stroke-opacity="0.38" stroke-width="1.2"/><g transform="translate(17 10) scale(.8333)"><path fill="#00f3ff" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></g><text x="45" y="24.6" font-family="-apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="500" letter-spacing="1.4" fill="#fff">LINKEDIN</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="126" height="38" viewBox="0 0 126 38" role="img" aria-label="LinkedIn">
+<title>LinkedIn</title>
+<defs><clipPath id="c"><rect width="126" height="38" rx="9"/></clipPath></defs>
+<g clip-path="url(#c)">
+<rect width="126" height="38" fill="#14181f"/>
+<rect width="42" height="38" fill="#0A66C2"/>
+<rect x="42" width="1" height="38" fill="#fff" fill-opacity=".14"/>
+<g transform="translate(12.0 10.0) scale(.75)"><path fill="#fff" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></g>
+<text x="56" y="23.9" font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="14" font-weight="600" fill="#fff">LinkedIn</text>
+</g>
+<rect x=".5" y=".5" width="125" height="37" rx="8.5" fill="none" stroke="#fff" stroke-opacity=".14"/>
+</svg>
