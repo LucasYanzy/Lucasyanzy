@@ -25,11 +25,15 @@
 
 ## Tech Stack / 技术栈
 
-<p align="center">
-  <img src="assets/skills.svg" alt="Skills: Python, Java, C++, JavaScript, HTML5, CSS3, Arduino, AI Tools, Git, GitHub, Office 365, English and Mandarin" width="100%" />
-</p>
+**Languages**
 
-<sub>Tiles tagged <i>vibe</i> are built with a Vibe Coding (AI-assisted) workflow.</sub>
+<img src="https://skillicons.dev/icons?i=py,java,cpp,js,html,css&theme=dark&perline=6" alt="Python, Java, C++, JavaScript, HTML5, CSS3" />
+
+**Tools & Technologies**
+
+<img src="https://skillicons.dev/icons?i=arduino,git,github&theme=dark&perline=3" alt="Arduino, Git, GitHub" />
+
+<sub>Also: AI tools and prompt engineering, Office 365 (Excel, PowerPoint, Word). English (fluent), Mandarin (native). C++, JavaScript, HTML and CSS are written in a Vibe Coding workflow.</sub>
 
 ## Experience & Leadership / 经历
 
