@@ -57,6 +57,16 @@
   <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=LucasYanzy&layout=compact&langs_count=8&bg_color=0a0a0f&title_color=00f3ff&text_color=c9d1d9&border_color=0b3a40&border_radius=12&card_width=495" alt="Top languages" width="49%" />
 </p>
 
+## Contributions / 贡献
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/output/github-snake-dark.svg" />
+    <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/output/github-snake.svg" />
+    <img alt="Contribution graph with a snake eating the contribution dots" src="https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/output/github-snake-dark.svg" width="100%" />
+  </picture>
+</p>
+
 <p align="center">
   <img src="assets/footer.svg" alt="Thanks for visiting" width="100%" />
 </p>
