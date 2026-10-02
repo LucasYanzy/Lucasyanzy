@@ -1,6 +1,6 @@
 # LUCAS YAN
 +1 (848) 437 0914 | +86 157 5299 5980 | LucasYanzy@outlook.com | zy508@rutgers.edu
-https://lucasyanzy.github.io/intro/index.html
+https://lucasyanzy.github.io/Lucasyanzy/
 
 ## EDUCATION
 
