@@ -4,7 +4,7 @@
 
 <img src="https://readme-typing-svg.demolab.com?font=Inter&weight=500&size=22&duration=3200&pause=1200&color=00F3FF&center=true&vCenter=true&width=760&height=48&lines=Finance+%C3%97+Computer+Science+%40+Rutgers;Global+Business+Lead+%40+Tutturo+LLC;Hardware+%26+AI+Enthusiast;%E9%87%91%E8%9E%8D%E4%B8%8E%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%A7%91%E5%AD%A6%E4%BA%A4%E5%8F%89%E9%A2%86%E5%9F%9F%E5%88%9B%E6%96%B0%E8%80%85" alt="Finance × Computer Science @ Rutgers · Global Business Lead @ Tutturo LLC · Hardware & AI Enthusiast" />
 
-<a href="https://lucasyanzy.github.io/LucasYanzy/intro.html"><img src="assets/btn-portfolio.svg" height="40" alt="Portfolio" /></a>
+<a href="https://lucasyanzy.github.io/Lucasyanzy/"><img src="assets/btn-portfolio.svg" height="40" alt="Portfolio" /></a>
 <a href="https://www.linkedin.com/in/lucasyanzy/"><img src="assets/btn-linkedin.svg" height="40" alt="LinkedIn" /></a>
 <a href="mailto:LucasYanzy@outlook.com"><img src="assets/btn-email.svg" height="40" alt="Email" /></a>
 <a href="https://instagram.com/LucasYanzy"><img src="assets/btn-instagram.svg" height="40" alt="Instagram" /></a>
