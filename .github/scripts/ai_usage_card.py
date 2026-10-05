@@ -20,6 +20,10 @@ import urllib.request
 
 USER_ID = os.environ.get("TOKENTRACKER_USER_ID", "28d52253-68ed-4de0-978b-8e70fe5eb800")
 BASE = "https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg"
+PROFILE = "https://srctyff5.us-east.insforge.app/functions/tokentracker-leaderboard-profile"
+PROVIDER_NAMES = {"claude": "Claude", "codex": "Codex", "other": "Other", "gemini": "Gemini", "cursor": "Cursor",
+                  "copilot": "Copilot", "opencode": "OpenCode", "kimi": "Kimi", "deepseek": "DeepSeek"}
+MAX_PROVIDERS = 4
 NAME = os.environ.get("CARD_NAME", "Lucas Yan")
 OUT_DIR = os.environ.get("OUT_DIR", "dist")
 
@@ -47,10 +51,38 @@ def parse_badge(svg):
     return value
 
 
+def fetch_providers():
+    """All-time provider split from the public profile endpoint (period=total), largest first.
+    `percent` is a fraction of total tokens. More than MAX_PROVIDERS rows fold into "Other"."""
+    qs = urllib.parse.urlencode({"user_id": USER_ID, "period": "total"})
+    req = urllib.request.Request(f"{PROFILE}?{qs}", headers={"User-Agent": "profile-readme-card/1.0"})
+    with urllib.request.urlopen(req, timeout=20) as r:
+        profile = json.load(r)
+    if (profile.get("period") or {}).get("kind") != "total":
+        raise ValueError("profile endpoint did not return the all-time period")
+    rows = []
+    for row in profile.get("by_provider") or []:
+        src = str(row.get("source") or "other").lower()
+        pct = float(row.get("percent") or 0) * 100.0
+        if pct > 0:
+            rows.append({"name": PROVIDER_NAMES.get(src, src.replace("-", " ").title()), "pct": pct})
+    rows.sort(key=lambda r: r["pct"], reverse=True)
+    if len(rows) > MAX_PROVIDERS:
+        keep, rest = rows[: MAX_PROVIDERS - 1], rows[MAX_PROVIDERS - 1:]
+        other = sum(r["pct"] for r in rest)
+        existing = next((r for r in keep if r["name"] == "Other"), None)
+        if existing:
+            existing["pct"] += other
+        else:
+            keep.append({"name": "Other", "pct": other})
+        rows = sorted(keep, key=lambda r: r["pct"], reverse=True)
+    return rows
+
+
 def collect():
     if os.environ.get("AI_USAGE_SAMPLE"):
         return {"tokens": "14.36B", "cost": "$7,513", "rank": "#519", "tokens_month": "886.93M", "cost_month": "$336",
-                "providers": [{"name": "Claude", "pct": 82}, {"name": "Codex", "pct": 13}, {"name": "Other", "pct": 5}]}
+                "providers": [{"name": "Codex", "pct": 42.3}, {"name": "Other", "pct": 35.3}, {"name": "Claude", "pct": 22.4}]}
     data = {}
     for key, metric, period, required in [
         ("tokens", "tokens", "total", True), ("cost", "cost", "total", True), ("rank", "rank", "total", True),
@@ -62,6 +94,12 @@ def collect():
             if required:
                 raise
             print(f"::warning::optional metric {key} unavailable: {e}")
+    try:
+        providers = fetch_providers()
+        if providers:
+            data["providers"] = providers
+    except Exception as e:  # noqa: BLE001
+        print(f"::warning::top providers unavailable, card drawn without them: {e}")
     return data
 
 
@@ -103,7 +141,9 @@ def rolling(value, x0, y0, fs, fill, uid):
 
 def provider_pct(p):
     v = p["pct"]
-    return "<1%" if v < 1 else f"{round(v):d}%"
+    if v < 0.1:
+        return "<0.1%"
+    return f"{v:.1f}".rstrip("0").rstrip(".") + "%"
 
 
 def render(data, now):
