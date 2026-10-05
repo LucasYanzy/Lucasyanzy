@@ -49,7 +49,8 @@ def parse_badge(svg):
 
 def collect():
     if os.environ.get("AI_USAGE_SAMPLE"):
-        return {"tokens": "14.36B", "cost": "$7,513", "rank": "#519", "tokens_month": "886.93M", "cost_month": "$412"}
+        return {"tokens": "14.36B", "cost": "$7,513", "rank": "#519", "tokens_month": "886.93M", "cost_month": "$336",
+                "providers": [{"name": "Claude", "pct": 82}, {"name": "Codex", "pct": 13}, {"name": "Other", "pct": 5}]}
     data = {}
     for key, metric, period, required in [
         ("tokens", "tokens", "total", True), ("cost", "cost", "total", True), ("rank", "rank", "total", True),
@@ -100,92 +101,110 @@ def rolling(value, x0, y0, fs, fill, uid):
     return "".join(defs), g
 
 
+def provider_pct(p):
+    v = p["pct"]
+    return "<1%" if v < 1 else f"{round(v):d}%"
+
+
 def render(data, now):
-    W, H, PAD = 880, 288, 36
-    o, a = [], None
+    """Calm, premium dashboard card: hairlines instead of boxes, large numerals, one provider bar."""
+    W, PAD = 880, 40
+    prov = data.get("providers") or []
+    H = 346 if prov else 252
+    o = []
     a = o.append
     a(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-labelledby="t d">')
     summary = f'{NAME}: {data["tokens"]} tokens, {data["cost"]} cost, rank {data["rank"]} on TokenTracker'
+    if prov:
+        summary += ". Top providers: " + ", ".join(f'{p["name"]} {provider_pct(p)}' for p in prov)
     a(f'<title id="t">AI Coding Usage</title><desc id="d">{html.escape(summary)}</desc>')
-    a(f'''<defs>
-  <clipPath id="clip"><rect width="{W}" height="{H}" rx="20"/></clipPath>
-  <filter id="soft" filterUnits="userSpaceOnUse" x="-300" y="-300" width="1480" height="900"><feGaussianBlur stdDeviation="60"/></filter>
-  <filter id="glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="3"/></filter>
-  <linearGradient id="av" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{CYAN}"/><stop offset="1" stop-color="{PURPLE}"/></linearGradient>
-  <linearGradient id="ring" x1="0" x2="1"><stop offset="0" stop-color="{CYAN}"/><stop offset="1" stop-color="{PURPLE}"/></linearGradient>
-  <linearGradient id="orbit" x1="0" x2="1"><stop offset="0" stop-color="{CYAN}" stop-opacity="0"/><stop offset=".3" stop-color="{CYAN}" stop-opacity=".8"/><stop offset=".7" stop-color="{PURPLE}" stop-opacity=".8"/><stop offset="1" stop-color="{PURPLE}" stop-opacity="0"/></linearGradient>
-  <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{CYAN}" stop-opacity=".5"/><stop offset=".5" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="{PURPLE}" stop-opacity=".5"/></linearGradient>
-  <linearGradient id="sheen" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".10"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-</defs>''')
+    bar_x, bar_w, bar_y, bar_h = PAD, W - 2 * PAD, 288, 10
+    segs = ['#00f3ff;#38bdf8', '#bd00ff;#7c3aed', '#64748b;#475569', '#94a3b8;#64748b', '#334155;#1e293b']
+    grads = "".join(
+        f'<linearGradient id="seg{i}" x1="0" x2="1"><stop offset="0" stop-color="{c.split(";")[0]}"/><stop offset="1" stop-color="{c.split(";")[1]}"/></linearGradient>'
+        for i, c in enumerate(segs))
+    a(f"""<defs>
+  <clipPath id="clip"><rect width="{W}" height="{H}" rx="22"/></clipPath>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1424"/><stop offset="1" stop-color="#070a12"/></linearGradient>
+  <radialGradient id="g1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(90 -20) scale(520 260)"><stop offset="0" stop-color="{CYAN}" stop-opacity=".16"/><stop offset="1" stop-color="{CYAN}" stop-opacity="0"/></radialGradient>
+  <radialGradient id="g2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate({W} {H}) scale(460 240)"><stop offset="0" stop-color="{PURPLE}" stop-opacity=".13"/><stop offset="1" stop-color="{PURPLE}" stop-opacity="0"/></radialGradient>
+  <linearGradient id="accent" x1="0" x2="1"><stop offset="0" stop-color="{CYAN}"/><stop offset="1" stop-color="{PURPLE}"/></linearGradient>
+  <linearGradient id="hl" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".38"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="sheen" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  {grads}
+  <clipPath id="barclip"><rect x="{bar_x}" y="{bar_y}" width="{bar_w}" height="{bar_h}" rx="{bar_h/2}">
+    <animate attributeName="width" values="0;{bar_w};{bar_w}" keyTimes="0;.09;1" dur="{CYCLE}s" repeatCount="indefinite" calcMode="spline" keySplines=".16 .84 .3 1;0 0 1 1"/></rect></clipPath>
+  <clipPath id="bartrack"><rect x="{bar_x}" y="{bar_y}" width="{bar_w}" height="{bar_h}" rx="{bar_h/2}"/></clipPath>
+</defs>""")
     a('<g clip-path="url(#clip)">')
-    a(f'<rect width="{W}" height="{H}" fill="#04060a"/>')
-    a('<g filter="url(#soft)">'
-      f'<ellipse cx="170" cy="30" rx="300" ry="90" fill="{CYAN}" fill-opacity=".24"/>'
-      '<ellipse cx="470" cy="170" rx="300" ry="80" fill="#046ebe" fill-opacity=".28"/>'
-      f'<ellipse cx="760" cy="290" rx="320" ry="90" fill="{PURPLE}" fill-opacity=".26"/></g>')
+    a(f'<rect width="{W}" height="{H}" fill="url(#bg)"/>')
+    a(f'<rect width="{W}" height="{H}" fill="url(#g1)"><animate attributeName="opacity" values=".75;1;.75" dur="9s" repeatCount="indefinite"/></rect>')
+    a(f'<rect width="{W}" height="{H}" fill="url(#g2)"/>')
+    a(f'<rect x="28" y="0" width="{W-56}" height="1" fill="url(#hl)"/>')
 
-    # orbit rings + planets
-    cx, cy = W / 2, H / 2
-    a(f'<g transform="rotate(-6 {cx} {cy})" fill="none">')
-    for rx, ry, op in [(300, 64, .55), (440, 104, .38), (600, 150, .24)]:
-        a(f'<ellipse cx="{cx}" cy="{cy}" rx="{rx}" ry="{ry}" stroke="url(#orbit)" stroke-width="1.2" stroke-opacity="{op}"/>')
-    for rx, ry, r, col, dur, off, rev in [(300, 64, 3, CYAN, 26, 6, 0), (440, 104, 3.6, PURPLE, 36, 20, 1), (600, 150, 3, CYAN, 48, 30, 0)]:
-        sw = 0 if rev else 1
-        path = f"M{cx+rx} {cy} A{rx} {ry} 0 1 {sw} {cx-rx} {cy} A{rx} {ry} 0 1 {sw} {cx+rx} {cy}"
-        for rad, flt, op in [(r * 2.8, ' filter="url(#glow)"', .75), (r, '', 1)]:
-            a(f'<circle r="{rad:.1f}" fill="{col}" fill-opacity="{op}"{flt}><animateMotion dur="{dur}s" begin="-{off}s" repeatCount="indefinite" path="{path}"/></circle>')
-    a('</g>')
-    random.seed(33)
-    for _ in range(26):
-        x, y = random.uniform(14, W - 14), random.uniform(10, H - 10)
-        a(f'<circle cx="{x:.1f}" cy="{y:.1f}" r="{random.choice([.8, 1, 1.3, 1.6])}" fill="#fff" fill-opacity="{random.uniform(.2, .5):.2f}"/>')
-
-    # header: avatar, title, status
-    ax, ay = PAD + 40, 72
-    a(f'<circle cx="{ax}" cy="{ay}" r="46" fill="none" stroke="url(#ring)" stroke-width="1.6" stroke-dasharray="3 7" stroke-linecap="round" opacity=".85">'
-      f'<animateTransform attributeName="transform" type="rotate" from="0 {ax} {ay}" to="360 {ax} {ay}" dur="14s" repeatCount="indefinite"/></circle>')
-    a(f'<circle cx="{ax}" cy="{ay}" r="34" fill="url(#av)"/>')
-    a(f'<text x="{ax}" y="{ay+12}" text-anchor="middle" font-family="{SANS}" font-size="34" font-weight="700" fill="#04060a">{html.escape(NAME[:1].upper())}</text>')
-    a(f'<text x="{PAD+100}" y="66" font-family="{SANS}" font-size="30" font-weight="700" fill="#fff">{html.escape(NAME)}</text>')
-    a(f'<text x="{PAD+100}" y="92" font-family="{SANS}" font-size="15" fill="#fff" fill-opacity=".55">AI Coding Usage · All time</text>')
+    # ---- header
+    ax, ay = PAD + 30, 58
+    a(f'<circle cx="{ax}" cy="{ay}" r="30" fill="none" stroke="url(#accent)" stroke-width="1.6"/>')
+    a(f'<circle cx="{ax}" cy="{ay}" r="25" fill="#0f1a2e"/>')
+    a(f'<text x="{ax}" y="{ay+9}" text-anchor="middle" font-family="{SANS}" font-size="25" font-weight="700" fill="url(#accent)">{html.escape(NAME[:1].upper())}</text>')
+    a(f'<text x="{PAD+78}" y="54" font-family="{SANS}" font-size="26" font-weight="700" fill="#f8fafc">{html.escape(NAME)}</text>')
+    a(f'<text x="{PAD+78}" y="78" font-family="{SANS}" font-size="14" fill="#94a3b8">AI coding usage · All time</text>')
     right = W - PAD
-    a(f'<text x="{right}" y="62" text-anchor="end" font-family="{SANS}" font-size="16" font-weight="600" fill="{CYAN}">TokenTracker</text>')
-    stamp = f"Updated {now.day} {now.strftime('%b')} {now.year}"
-    a(f'<text x="{right}" y="88" text-anchor="end" font-family="{SANS}" font-size="13" fill="#fff" fill-opacity=".55">{stamp}</text>')
-    dx = right - len(stamp) * 6.7 - 20
-    a(f'<circle cx="{dx:.1f}" cy="83.5" r="3.4" fill="#34d399"/>'
-      f'<circle cx="{dx:.1f}" cy="83.5" r="3.4" fill="none" stroke="#34d399" stroke-width="1.4"><animate attributeName="r" values="3.4;10;3.4" dur="2.6s" repeatCount="indefinite"/>'
-      '<animate attributeName="stroke-opacity" values=".9;0;.9" dur="2.6s" repeatCount="indefinite"/></circle>')
+    a(f'<text x="{right}" y="50" text-anchor="end" font-family="{SANS}" font-size="15" font-weight="600" fill="#e2e8f0">TokenTracker</text>')
+    stamp = f"Live · {now.day} {now.strftime('%b')} {now.year}"
+    a(f'<text x="{right}" y="74" text-anchor="end" font-family="{SANS}" font-size="13" fill="#94a3b8">{stamp}</text>')
+    dx = right - len(stamp) * 6.6 - 14
+    a(f'<circle cx="{dx:.1f}" cy="70" r="3.2" fill="#34d399"/>'
+      f'<circle cx="{dx:.1f}" cy="70" r="3.2" fill="none" stroke="#34d399" stroke-width="1.3"><animate attributeName="r" values="3.2;9;3.2" dur="2.8s" repeatCount="indefinite"/>'
+      '<animate attributeName="stroke-opacity" values=".8;0;.8" dur="2.8s" repeatCount="indefinite"/></circle>')
+    a(f'<rect x="{PAD}" y="104" width="{W-2*PAD}" height="1" fill="#fff" fill-opacity=".08"/>')
 
-    # stat tiles
-    tw, gap, ty, th = 250, 25, 128, 128
-    tiles = [
-        ("Tokens", data["tokens"], "#ffffff", f'{data["tokens_month"]} this month' if "tokens_month" in data else ""),
-        ("Cost", data["cost"], "#ffffff", f'{data["cost_month"]} this month' if "cost_month" in data else ""),
-        ("Rank", data["rank"], CYAN, "TokenTracker leaderboard"),
+    # ---- metrics (hairline columns, no boxes)
+    cw = (W - 2 * PAD) / 3
+    cols = [
+        ("Tokens", data["tokens"], "#f8fafc", f'{data["tokens_month"]} this month' if "tokens_month" in data else ""),
+        ("Cost", data["cost"], "#f8fafc", f'{data["cost_month"]} this month' if "cost_month" in data else ""),
+        ("Rank", data["rank"], CYAN, "on the TokenTracker leaderboard"),
     ]
     all_defs = []
-    for i, (label, value, color, sub) in enumerate(tiles):
-        tx = PAD + i * (tw + gap)
-        a(f'<rect x="{tx+.5}" y="{ty+.5}" width="{tw-1}" height="{th-1}" rx="16" fill="#070b12" fill-opacity=".78" stroke="{CYAN}" stroke-opacity=".2"/>')
-        a(f'<rect x="{tx+.5}" y="{ty+.5}" width="{tw-1}" height="{th-1}" rx="16" fill="#fff" fill-opacity=".03"/>')
-        a(f'<text x="{tx+26}" y="{ty+34}" font-family="{SANS}" font-size="14" fill="#fff" fill-opacity=".6">{label}</text>')
-        defs, g = rolling(value, tx + 26, ty + 88, 46, color, f"r{i}_")
+    for i, (label, value, color, sub) in enumerate(cols):
+        cx0 = PAD + i * cw + (0 if i == 0 else 30)
+        if i:
+            a(f'<rect x="{PAD + i*cw:.1f}" y="128" width="1" height="92" fill="#fff" fill-opacity=".08"/>')
+        a(f'<text x="{cx0:.1f}" y="146" font-family="{SANS}" font-size="13.5" fill="#94a3b8">{label}</text>')
+        defs, g = rolling(value, cx0, 200, 52, color, f"r{i}_")
         all_defs.append(defs)
         a(g)
         if sub:
-            a(f'<text x="{tx+26}" y="{ty+114}" font-family="{SANS}" font-size="12.5" fill="#fff" fill-opacity=".5">{html.escape(sub)}</text>')
-    # sheen sweep across the tiles
-    a(f'<clipPath id="tiles"><rect x="{PAD}" y="{ty}" width="{W-2*PAD}" height="{th}" rx="16"/></clipPath>')
-    a(f'<g clip-path="url(#tiles)"><rect x="-240" y="{ty}" width="200" height="{th}" fill="url(#sheen)" transform="skewX(-18)">'
-      f'<animate attributeName="x" values="-240;{W+40};{W+40}" keyTimes="0;.28;1" dur="9s" repeatCount="indefinite"/></rect></g>')
+            a(f'<text x="{cx0:.1f}" y="226" font-family="{SANS}" font-size="13" fill="#64748b">{html.escape(sub)}</text>')
 
-    a(f'<rect x=".75" y=".75" width="{W-1.5}" height="{H-1.5}" rx="19.5" fill="none" stroke="url(#edge)" stroke-width="1.5"/>')
+    # ---- providers
+    if prov:
+        a(f'<rect x="{PAD}" y="248" width="{W-2*PAD}" height="1" fill="#fff" fill-opacity=".08"/>')
+        a(f'<text x="{PAD}" y="276" font-family="{SANS}" font-size="13.5" fill="#94a3b8">Top providers</text>')
+        a(f'<g clip-path="url(#bartrack)"><rect x="{bar_x}" y="{bar_y}" width="{bar_w}" height="{bar_h}" fill="#fff" fill-opacity=".07"/></g>')
+        a('<g clip-path="url(#barclip)">')
+        x, gap = float(bar_x), 4.0
+        for i, p in enumerate(prov):
+            w = bar_w * p["pct"] / 100.0
+            w = max(w, 8.0)
+            a(f'<rect x="{x:.1f}" y="{bar_y}" width="{max(w - gap, 4):.1f}" height="{bar_h}" rx="{bar_h/2}" fill="url(#seg{min(i, len(segs)-1)})"/>')
+            x += w
+        a('</g>')
+        a(f'<g clip-path="url(#bartrack)"><rect x="-120" y="{bar_y}" width="110" height="{bar_h}" fill="url(#sheen)" transform="skewX(-20)">'
+          f'<animate attributeName="x" values="-120;{W+40};{W+40}" keyTimes="0;.22;1" dur="{CYCLE}s" begin="1.1s" repeatCount="indefinite"/></rect></g>')
+        lx = float(PAD)
+        for i, p in enumerate(prov):
+            pct = provider_pct(p)
+            a(f'<circle cx="{lx+5:.1f}" cy="321" r="4.5" fill="url(#seg{min(i, len(segs)-1)})"/>')
+            a(f'<text x="{lx+16:.1f}" y="326" font-family="{SANS}" font-size="14" fill="#e2e8f0">{html.escape(p["name"])}'
+              f'<tspan dx="8" fill="#94a3b8" style="font-variant-numeric:tabular-nums">{pct}</tspan></text>')
+            lx += 16 + len(p["name"]) * 8.2 + len(pct) * 8.0 + 8 + 34
+
+    a(f'<rect x=".5" y=".5" width="{W-1}" height="{H-1}" rx="21.5" fill="none" stroke="#fff" stroke-opacity=".09"/>')
     a('</g></svg>')
     svg = "\n".join(o)
-    # clipPaths for the rolling digits must live in <defs>; hoist them
-    svg = svg.replace("</defs>", "".join(all_defs) + "</defs>", 1)
-    return svg
+    return svg.replace("</defs>", "".join(all_defs) + "</defs>", 1)
 
 
 def main():
