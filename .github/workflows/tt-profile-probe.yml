@@ -12,16 +12,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - name: Structure of the public leaderboard profile response
+      - name: Which period values does the profile endpoint accept?
         run: |
           uid="28d52253-68ed-4de0-978b-8e70fe5eb800"
           base="https://srctyff5.us-east.insforge.app/functions/tokentracker-leaderboard-profile"
-          curl -sS -m 20 -D /tmp/h.txt "$base?user_id=$uid" -o /tmp/p.json
-          head -1 /tmp/h.txt; grep -i '^content-type' /tmp/h.txt
-          echo "valid json: $(jq -e . /tmp/p.json >/dev/null 2>&1 && echo yes || echo no)   bytes: $(wc -c < /tmp/p.json)"
-          echo "--- top-level keys and types:"
-          jq -r 'if type=="object" then to_entries[] | "\(.key): \(.value|type)\(if (.value|type)=="array" then " ["+(.value|length|tostring)+"]" elif (.value|type)=="object" then " {"+(.value|keys|length|tostring)+" keys}" else "" end)" else "root is \(type)" end' /tmp/p.json
-          echo "--- distinct key paths (array indexes collapsed), first 120:"
-          jq -r '[paths(scalars)|map(if type=="number" then "[]" else . end)|join(".")]|unique[]' /tmp/p.json | head -120
-          echo "--- provider / source / model related values (first 40):"
-          jq -c '.. | objects | select(has("provider") or has("source") or has("providers") or has("by_provider") or has("top_providers")) | {provider,source,providers,by_provider,top_providers}' /tmp/p.json 2>/dev/null | head -40
+          for q in "" "period=total" "period=all" "period=month" "period=week" "period=year" "range=total" "period=total&include=all"; do
+            code=$(curl -sS -m 20 -o /tmp/p.json -w "%{http_code}" "$base?user_id=$uid&$q")
+            echo "=== [$q] -> HTTP $code"
+            jq -c '{period: .period, tokens: .totals.total_tokens, cost: .totals.estimated_cost_usd, providers: (.by_provider // [] | map({s: .source, t: .total_tokens, p: ((.percent*1000|round)/10)}))}' /tmp/p.json 2>/dev/null | cut -c1-420
+          done
