@@ -46,6 +46,21 @@
 - **Founder & Project Manager** · Yunnan DianChi Lake Protection Foundation &nbsp; `May 2020 → Jun 2025`<br />
   <sub>56 student volunteers, 5,000+ community members reached, biodiversity study across 20 wetland zones.</sub>
 
+## AI Coding Usage / AI 编程用量
+
+<p align="center">
+  <a href="https://github.com/xiufengsun/TokenTracker">
+    <img src="https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/usage/ai-usage.svg" alt="AI coding usage on TokenTracker: tokens, cost and leaderboard rank" width="100%" />
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=28d52253-68ed-4de0-978b-8e70fe5eb800&metric=tokens&period=total&style=flat-square&color=0891b2" alt="Total tokens" /></a>
+  <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=28d52253-68ed-4de0-978b-8e70fe5eb800&metric=cost&period=total&style=flat-square&color=0891b2" alt="Total cost" /></a>
+  <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=28d52253-68ed-4de0-978b-8e70fe5eb800&metric=rank&period=total&style=flat-square&color=0891b2" alt="Leaderboard rank" /></a>
+  <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=28d52253-68ed-4de0-978b-8e70fe5eb800&metric=tokens&period=month&style=flat-square&color=0891b2&label=this+month" alt="Tokens this month" /></a>
+</p>
+
 ## GitHub Stats / 动态
 
 <p align="center">
