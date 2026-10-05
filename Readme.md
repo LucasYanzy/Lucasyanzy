@@ -54,13 +54,6 @@
   </a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=28d52253-68ed-4de0-978b-8e70fe5eb800&metric=tokens&period=total&style=flat-square&color=0891b2" alt="Total tokens" /></a>
-  <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=28d52253-68ed-4de0-978b-8e70fe5eb800&metric=cost&period=total&style=flat-square&color=0891b2" alt="Total cost" /></a>
-  <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=28d52253-68ed-4de0-978b-8e70fe5eb800&metric=rank&period=total&style=flat-square&color=0891b2" alt="Leaderboard rank" /></a>
-  <a href="https://github.com/xiufengsun/TokenTracker"><img src="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg?user_id=28d52253-68ed-4de0-978b-8e70fe5eb800&metric=tokens&period=month&style=flat-square&color=0891b2&label=this+month" alt="Tokens this month" /></a>
-</p>
-
 ## GitHub Stats / 动态
 
 <p align="center">
