@@ -1,0 +1,24 @@
+name: AI usage probe (temporary)
+
+on:
+  push:
+    paths: [".github/workflows/ai-usage-probe.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Fetch badges and print raw responses
+        run: |
+          base="https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg"
+          uid="28d52253-68ed-4de0-978b-8e70fe5eb800"
+          for q in "metric=tokens&period=total" "metric=cost&period=total" "metric=rank&period=total" "metric=tokens&period=month"; do
+            echo "=================== $q"
+            curl -sS -m 20 -D - "$base?user_id=$uid&$q" -o /tmp/body.svg | head -12
+            echo "--- body ($(wc -c < /tmp/body.svg) bytes):"
+            head -c 3000 /tmp/body.svg; echo
+          done
