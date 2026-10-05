@@ -9,7 +9,7 @@
 <a href="mailto:LucasYanzy@outlook.com"><img src="assets/btn-email.svg" height="38" alt="Email" /></a>
 <a href="https://instagram.com/LucasYanzy"><img src="assets/btn-instagram.svg" height="38" alt="Instagram" /></a>
 
-<img src="https://komarev.com/ghpvc/?username=LucasYanzy&label=Profile+views&color=0891b2&style=flat-square" alt="Profile views" />
+<img src="https://komarev.com/ghpvc/?username=LucasYanzy&label=Profile+views&color=0891b2&style=flat-square&base=183" alt="Profile views" />
 
 </div>
 
