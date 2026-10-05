@@ -1,0 +1,44 @@
+name: Update AI usage card
+
+on:
+  schedule:
+    - cron: "43 */6 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/ai-usage.yml"
+      - ".github/scripts/ai_usage_card.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ai-usage
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      # A TokenTracker hiccup must not turn the run red or replace the last good card:
+      # on failure we warn and simply skip publishing.
+      - name: Render the card from TokenTracker
+        id: render
+        continue-on-error: true
+        run: python3 .github/scripts/ai_usage_card.py
+
+      - name: Publish to the usage branch
+        if: steps.render.outcome == 'success'
+        run: |
+          cd dist
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -b usage
+          git add .
+          git commit -q -m "Update AI usage $(date -u '+%F %H:%M UTC')"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" usage
