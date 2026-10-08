@@ -18,14 +18,18 @@ jobs:
           python3 - <<'PY'
           import re, subprocess
           html = open('/tmp/pr.html', encoding='utf-8', errors='replace').read()
-          tags = re.findall(r'<img[^>]*?src="https://camo\.githubusercontent\.com/[^"]+"[^>]*>', html)
-          print("camo images found:", len(tags))
-          for tag in tags:
-              url = re.search(r'src="([^"]+)"', tag).group(1).replace('&amp;', '&')
-              alt = re.search(r'alt="([^"]*)"', tag)
-              alt = alt.group(1)[:30] if alt else '?'
-              if len(alt) > 2:
-                  continue
+          urls = []
+          for u in re.findall(r'https:(?:\\u002F|\\/|/){2}camo\.githubusercontent\.com(?:\\u002F|\\/|/)[0-9a-f]+(?:\\u002F|\\/|/)[0-9a-f]+', html):
+              u = u.replace('\\u002F', '/').replace('\\/', '/')
+              if u not in urls:
+                  urls.append(u)
+          print("distinct camo urls found:", len(urls))
+          for url in urls:
+              try:
+                  origin = bytes.fromhex(url.rsplit('/', 1)[1]).decode()
+              except Exception:
+                  origin = '?'
+              label = re.sub(r'^https://', '', origin)[:70]
               for attempt in (1, 2):
                   out = subprocess.run(
                       ['curl', '-sS', '-m', '25', '-A', 'Mozilla/5.0', '-o', '/tmp/c.bin', '-D', '/tmp/c.h',
@@ -37,7 +41,7 @@ jobs:
                           ctype = line.strip()
                   body = open('/tmp/c.bin', 'rb').read()
                   nums = re.findall(rb'>([^<>]{1,40})</text>', body)[:6] if b'<svg' in body else []
-                  print(f"- candidate {alt} try {attempt}: {out.stdout.strip() or out.stderr.strip()} | {ctype}")
+                  print(f"- {label} try {attempt}: {out.stdout.strip() or out.stderr.strip()} | {ctype}")
                   if nums:
                       print("    text:", [n.decode('utf-8', 'replace') for n in nums])
                   elif b'<svg' not in body:
