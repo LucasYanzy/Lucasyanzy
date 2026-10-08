@@ -10,26 +10,45 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
-      - name: What does each candidate counter return?
+      - name: Fetch every image of the rendered profile through GitHub's camo proxy
         run: |
-          show() {
-            echo "=================== $1"
-            code=$(curl -sS -m 25 -L -A "Mozilla/5.0 (compatible; GitHubCamo)" -D /tmp/h.txt -o /tmp/b.bin -w "%{http_code}" "$2")
-            echo "HTTP $code   type: $(grep -i '^content-type' /tmp/h.txt | tail -1 | tr -d '\r')   bytes: $(wc -c < /tmp/b.bin)"
-            grep -iE '^(cache-control|age|server|location):' /tmp/h.txt | tr -d '\r' | head -5
-            if grep -qi '<svg' /tmp/b.bin; then
-              echo "aria-label/title: $(grep -oE 'aria-label="[^"]*"|<title>[^<]*</title>' /tmp/b.bin | head -2 | tr '\n' ' ')"
-              echo "text nodes: $(grep -oE '>[^<>]{1,40}</text>' /tmp/b.bin | head -6 | tr '\n' ' ')"
-            else
-              head -c 300 /tmp/b.bin | tr -c '[:print:]\n' '.'; echo
-            fi
-          }
-          show "komarev (current, base=183)" "https://komarev.com/ghpvc/?username=LucasYanzy&label=Profile+views&color=0891b2&style=flat-square&base=183"
-          show "komarev (no base)"           "https://komarev.com/ghpvc/?username=LucasYanzy&label=Profile+views&color=0891b2&style=flat-square"
-          show "hits.sh"                     "https://hits.sh/github.com/LucasYanzy/Lucasyanzy.svg?style=flat-square&label=Profile+views&color=0891b2"
-          show "visitorbadge.io"             "https://api.visitorbadge.io/api/visitors?path=LucasYanzy%2FLucasyanzy&label=Profile%20views&countColor=%230891b2&style=flat-square"
-          show "visitor-badge.laobi.icu"     "https://visitor-badge.laobi.icu/badge?page_id=LucasYanzy.Lucasyanzy&left_text=Profile%20views"
-          show "goatcounter pixel (own)"     "https://lucasyanzy.goatcounter.com/count?p=/readme&t=Profile+README"
-          show "goatcounter public counter"  "https://lucasyanzy.goatcounter.com/counter/%2Freadme.json"
+          curl -sS -m 30 -L -A "Mozilla/5.0" -o /tmp/profile.html -w "profile page HTTP %{http_code}, %{size_download} bytes\n" "https://github.com/LucasYanzy"
+          python3 - <<'PY'
+          import re, subprocess
+          html = open('/tmp/profile.html', encoding='utf-8', errors='replace').read()
+          imgs = re.findall(r'<img[^>]*?src="(https://camo\.githubusercontent\.com/[^"]+)"[^>]*>', html)
+          tags = re.findall(r'<img[^>]*?src="https://camo\.githubusercontent\.com/[^"]+"[^>]*>', html)
+          print("camo images found:", len(imgs))
+          for tag, url in zip(tags, imgs):
+              alt = re.search(r'alt="([^"]*)"', tag)
+              alt = alt.group(1)[:48] if alt else '?'
+              out = subprocess.run(
+                  ['curl', '-sS', '-m', '20', '-A', 'Mozilla/5.0', '-o', '/tmp/c.bin', '-D', '/tmp/c.h',
+                   '-w', '%{http_code} %{time_total}s %{size_download}B', url],
+                  capture_output=True, text=True)
+              ctype = ''
+              for line in open('/tmp/c.h', errors='replace'):
+                  if line.lower().startswith('content-type'):
+                      ctype = line.strip()
+              body = open('/tmp/c.bin', 'rb').read()
+              nums = re.findall(rb'>([^<>]{1,40})</text>', body)[:6] if b'<svg' in body else []
+              print(f"- [{alt}] -> {out.stdout.strip() or out.stderr.strip()} | {ctype}")
+              if nums:
+                  print("    text:", [n.decode('utf-8', 'replace') for n in nums])
+          PY
+      - name: Stability, timing and the extra-count option of candidate services
+        run: |
+          for i in 1 2 3 4 5; do
+            curl -sS -m 25 -o /tmp/k.svg -w "komarev try $i: HTTP %{http_code} %{time_total}s  " "https://komarev.com/ghpvc/?username=LucasYanzy&label=Profile+views&color=0891b2&style=flat-square&base=183"
+            grep -oE '>[0-9]+</text>' /tmp/k.svg | head -1
+          done
+          for i in 1 2; do
+            curl -sS -m 25 -o /tmp/h.svg -w "hits.sh extraCount try $i: HTTP %{http_code} %{time_total}s  " "https://hits.sh/github.com/LucasYanzy/probe-extra.svg?style=flat-square&label=Profile+views&color=0891b2&extraCount=183"
+            grep -oE 'aria-label="[^"]*"' /tmp/h.svg | head -1
+          done
+          echo "--- goatcounter script host"
+          curl -sS -m 20 -o /dev/null -w "gc.zgo.at/count.js HTTP %{http_code} %{time_total}s\n" "https://gc.zgo.at/count.js"
+          echo "--- goatcounter public counter body"
+          curl -sS -m 20 "https://lucasyanzy.goatcounter.com/counter/%2Freadme.json" | sed -e 's/<[^>]*>/ /g' | tr -s ' \n' | head -c 600; echo
