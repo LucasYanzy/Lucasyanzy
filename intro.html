@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lucas Yan | About & Portfolio</title>
     <meta name="description"
-        content="About Lucas Yan - Finance / SCM & CS Student at Rutgers. Profile, technical stack, and professional highlights.">
+        content="About Lucas Yan - Finance and Computer Science student at Rutgers University. Education, experience, projects and skills.">
 
     <!-- Open Graph / LinkedIn -->
     <meta property="og:type" content="website">
@@ -16,7 +16,27 @@
 
     <!-- Professional Links -->
     <link rel="me" href="https://www.linkedin.com/in/lucasyanzy/">
+    <meta name="theme-color" content="#050505">
+    <script>document.documentElement.classList.add('js');</script>
     <style>
+        /* Same self-hosted fonts as the main page */
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 100 900;
+            font-display: swap;
+            src: url('assets/fonts/inter-latin-wght-normal.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Outfit';
+            font-style: normal;
+            font-weight: 100 900;
+            font-display: swap;
+            src: url('assets/fonts/outfit-latin-wght-normal.woff2') format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+
         :root {
             --bg-color: #050505;
             /* 深空黑 */
@@ -31,7 +51,8 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
             line-height: 1.6;
             margin: 0;
             padding: 0;
@@ -67,6 +88,7 @@
         }
 
         .name-block h1 {
+            font-family: 'Outfit', 'Inter', sans-serif;
             font-size: 3.5rem;
             margin: 0;
             font-weight: 700;
@@ -111,6 +133,7 @@
         }
 
         h3.section-title {
+            font-family: 'Outfit', 'Inter', sans-serif;
             font-size: 1.5rem;
             margin-top: 0;
             margin-bottom: 25px;
@@ -275,7 +298,7 @@
         }
 
         .edu-card:hover {
-            transform: translateY(-5px) scale(1.02);
+            transform: translateY(-3px);
             background: rgba(255, 255, 255, 0.06);
             border-color: rgba(0, 243, 255, 0.3);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -349,6 +372,32 @@
             white-space: nowrap;
         }
 
+        /* Header entrance */
+        header > * { animation: rise 1s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+        header > .header-socials-container { animation-delay: 0.2s; }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: none; }
+        }
+
+        /* Cards fade up as they enter the viewport (only when JS is running) */
+        .js section[data-reveal] {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .js section[data-reveal].in { opacity: 1; transform: none; }
+
+        a:focus-visible { outline: 2px solid var(--accent-cyan); outline-offset: 4px; border-radius: 6px; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation: none !important;
+                transition-duration: 0.01ms !important;
+            }
+            .js section[data-reveal] { opacity: 1; transform: none; }
+        }
+
         @media (max-width: 768px) {
             .name-block h1 {
                 font-size: 2.5rem;
@@ -407,11 +456,11 @@
                         </svg>
                     </a>
                 </div>
-
+            </div>
         </header>
 
         <!-- Education Block (New Cards) -->
-        <section>
+        <section data-reveal>
             <h3 class="section-title">Education Journey / 教育经历</h3>
             <div class="timeline">
                 <!-- Rutgers University -->
@@ -447,7 +496,7 @@
         </section>
 
         <!-- Professional Experience Block -->
-        <section>
+        <section data-reveal>
             <h3 class="section-title">Professional Experience / 职业经历</h3>
             <div class="timeline">
                 <!-- Tutturo LLC -->
@@ -508,7 +557,7 @@
         </section>
 
         <!-- Projects & Leadership Block -->
-        <section>
+        <section data-reveal>
             <h3 class="section-title">Projects & Leadership / 项目经历</h3>
             <div class="timeline">
                 <!-- IEEE -->
@@ -549,7 +598,7 @@
         </section>
 
         <!-- Skills & About Block -->
-        <section>
+        <section data-reveal>
             <h3 class="section-title">About & Highlights / 关于我</h3>
             <div class="bilingual-block">
                 <span class="en">As a student specializing in the intersection of Finance and Computer Science, I possess a high degree of enthusiasm for professional practice and data-driven decision making within the industry.</span>
@@ -576,54 +625,74 @@
     </div>
 
     <script>
-        const canvas = document.getElementById('binary-bg');
-        const ctx = canvas.getContext('2d');
+        (function () {
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        let width, height;
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        // 字符集：只有 0 和 1
-        const binary = "01";
-        const fontSize = 16;
-        const columns = Math.floor(width / fontSize);
-
-        const drops = [];
-        for (let i = 0; i < columns; i++) {
-            drops[i] = Math.random() * -100;
-        }
-
-        function draw() {
-            // 关键：背景使用带透明度的黑色，形成拖尾效果
-            ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
-            ctx.fillRect(0, 0, width, height);
-
-            // 字体颜色：暗灰色 (如果您觉得太暗，可以改亮一点，比如 #555)
-            ctx.fillStyle = '#2a2a2a';
-            ctx.font = fontSize + "px monospace";
-
-            for (let i = 0; i < columns; i++) {
-                // 随机生成 0 或 1
-                const text = binary.charAt(Math.floor(Math.random() * binary.length));
-
-                // 绘制
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                // 随机重置
-                if (drops[i] * fontSize > height && Math.random() > 0.975) {
-                    drops[i] = 0;
+            try {
+                // Cards fade up as they enter the viewport
+                const cards = Array.from(document.querySelectorAll('[data-reveal]'));
+                if (!('IntersectionObserver' in window) || reduceMotion) {
+                    cards.forEach((el) => el.removeAttribute('data-reveal'));
+                } else {
+                    const io = new IntersectionObserver((entries) => {
+                        entries.forEach((entry) => {
+                            if (!entry.isIntersecting) return;
+                            const el = entry.target;
+                            io.unobserve(el);
+                            el.classList.add('in');
+                            setTimeout(() => { el.removeAttribute('data-reveal'); el.classList.remove('in'); }, 1100);
+                        });
+                    }, { threshold: 0.08, rootMargin: '0px 0px -5% 0px' });
+                    cards.forEach((el) => io.observe(el));
                 }
-
-                drops[i]++;
+            } catch (err) {
+                document.documentElement.classList.remove('js');
             }
-        }
 
-        setInterval(draw, 35);
+            // Background: slow rain of 0 and 1
+            const canvas = document.getElementById('binary-bg');
+            const ctx = canvas.getContext('2d');
+            const fontSize = 16;
+            let width = 0;
+            let height = 0;
+            let drops = [];
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                const columns = Math.floor(width / fontSize);
+                while (drops.length < columns) drops.push(Math.random() * -100);
+                drops.length = columns;
+                ctx.fillStyle = 'rgb(5, 5, 5)';
+                ctx.fillRect(0, 0, width, height);
+            }
+            window.addEventListener('resize', resize);
+            resize();
+
+            function draw() {
+                // A translucent black wash leaves the fading trail behind each digit
+                ctx.fillStyle = 'rgba(5, 5, 5, 0.05)';
+                ctx.fillRect(0, 0, width, height);
+                ctx.fillStyle = '#2a2a2a';
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < drops.length; i++) {
+                    ctx.fillText(Math.random() > 0.5 ? '1' : '0', i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }
+
+            if (reduceMotion) {
+                for (let i = 0; i < 40; i++) draw();
+                return;
+            }
+            let timer = setInterval(draw, 35);
+            document.addEventListener('visibilitychange', () => {
+                clearInterval(timer);
+                if (!document.hidden) timer = setInterval(draw, 35);
+            });
+        })();
     </script>
     <!-- Anonymous, cookie-free visit statistics (GoatCounter) -->
     <script data-goatcounter="https://lucasyanzy.goatcounter.com/count"
