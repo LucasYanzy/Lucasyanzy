@@ -293,32 +293,6 @@
             text-align: center;
             padding: 0 20px;
             position: relative;
-            overflow: hidden;
-        }
-
-        /* Slow aurora behind the hero: two blurred colour fields that drift */
-        #home::before,
-        #home::after {
-            content: '';
-            position: absolute;
-            inset: -25% -15%;
-            z-index: -1;
-            pointer-events: none;
-            will-change: transform;
-        }
-        #home::before {
-            background:
-                radial-gradient(38% 46% at 26% 42%, rgba(0, 243, 255, 0.17), transparent 70%),
-                radial-gradient(34% 44% at 76% 60%, rgba(188, 0, 255, 0.15), transparent 70%);
-            animation: drift 26s ease-in-out infinite alternate;
-        }
-        #home::after {
-            background: radial-gradient(30% 38% at 62% 28%, rgba(0, 243, 255, 0.08), transparent 70%);
-            animation: drift 34s ease-in-out -12s infinite alternate-reverse;
-        }
-        @keyframes drift {
-            from { transform: translate3d(-3%, -2%, 0) scale(1); }
-            to   { transform: translate3d(4%, 3%, 0) scale(1.12); }
         }
 
         .hero-content > * {
@@ -447,56 +421,6 @@
             50% { transform: translateY(4px); }
         }
 
-        /* --- Highlights strip --- */
-        #highlights {
-            padding: 0 0 10px;
-        }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            overflow: hidden;
-        }
-        .stat {
-            position: relative;
-            padding: 34px 28px;
-        }
-        .stat + .stat::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 24%;
-            bottom: 24%;
-            width: 1px;
-            background: var(--border);
-        }
-        .stat-num {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 600;
-            font-size: clamp(2rem, 4vw, 3rem);
-            line-height: 1;
-            background: linear-gradient(135deg, #ffffff, var(--primary));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-variant-numeric: tabular-nums;
-        }
-        .stat-label {
-            margin-top: 12px;
-            color: var(--text-en);
-            font-size: 0.88rem;
-            line-height: 1.4;
-        }
-        .stat-cn {
-            color: var(--text-cn);
-            font-size: 0.78rem;
-            letter-spacing: 0.5px;
-        }
-
         /* --- Cards: a spotlight and a border highlight that follow the cursor --- */
         .card {
             background: var(--card-bg);
@@ -510,8 +434,7 @@
             overflow: hidden;
         }
 
-        .card::before,
-        .skill-card::before {
+        .card::before {
             content: '';
             position: absolute;
             inset: 0;
@@ -521,8 +444,7 @@
             pointer-events: none;
         }
 
-        .card::after,
-        .skill-card::after {
+        .card::after {
             content: '';
             position: absolute;
             inset: 0;
@@ -538,8 +460,7 @@
             pointer-events: none;
         }
 
-        .card:hover::before, .card:hover::after,
-        .skill-card:hover::before, .skill-card:hover::after {
+        .card:hover::before, .card:hover::after {
             opacity: 1;
         }
 
@@ -655,6 +576,12 @@
             padding-top: 6px;
         }
 
+        .school-name {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary);
+        }
+
         .stat-chip {
             display: inline-flex;
             align-items: baseline;
@@ -697,62 +624,116 @@
             line-height: 1.5;
         }
 
-        /* --- Skills Section (grid) --- */
-        .skills-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-            max-width: 1000px;
+        /* --- Skills Section (Carousel) --- */
+        .skills-carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
             margin: 0 auto;
+            padding: 20px 50px;
+            overflow: hidden;
+        }
+
+        .skills-carousel-track-wrapper {
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .skills-carousel-track {
+            display: flex;
+            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .skill-card {
-            position: relative;
-            overflow: hidden;
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 26px 24px;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            transition: var(--transition);
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
-            gap: 14px;
-            transition: var(--transition);
+            align-items: center;
+            gap: 10px;
+            width: calc(33.333% - 20px);
+            margin: 0 10px;
+            flex-shrink: 0;
+            box-sizing: border-box;
         }
 
         .skill-card:hover {
+            border-color: var(--primary);
             background: var(--card-hover-bg);
-            transform: translateY(-3px);
-            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px var(--primary-glow);
+        }
+
+        .carousel-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 2.5rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: var(--transition);
+            opacity: 0.7;
+        }
+
+        .carousel-btn:hover {
+            opacity: 1;
+            color: #fff;
+            text-shadow: 0 0 10px var(--primary-glow);
+        }
+
+        .carousel-btn.prev { left: 0; }
+        .carousel-btn.next { right: 0; }
+        
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 25px;
+        }
+        
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .dot.active {
+            background: var(--primary);
+            box-shadow: 0 0 8px var(--primary-glow);
+        }
+
+        @media (max-width: 768px) {
+            .skill-card { width: calc(50% - 20px); }
+        }
+        @media (max-width: 480px) {
+            .skill-card { width: calc(100% - 20px); }
+            .skills-carousel-container { padding: 20px 30px; }
         }
 
         .skill-icon {
-            display: grid;
-            place-items: center;
-            width: 44px;
-            height: 44px;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: rgba(0, 243, 255, 0.05);
+            font-size: 1.5rem;
             color: var(--primary);
-            transition: var(--transition);
-        }
-        .skill-card:hover .skill-icon {
-            background: rgba(0, 243, 255, 0.12);
-            border-color: var(--border-hover);
+            margin-bottom: 5px;
         }
 
         .skill-card h4 {
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1rem;
             margin: 0;
             color: var(--text-main);
         }
 
-        .skill-card .bilingual { margin-bottom: 0; gap: 3px; }
-        .skill-card .bilingual .en { font-size: 0.85rem; }
-        .skill-card .bilingual .cn { font-size: 0.78rem; }
+        .skill-card .bilingual .en { font-size: 0.8rem; }
+        .skill-card .bilingual .cn { font-size: 0.75rem; }
 
         /* --- Projects Section --- */
         .project-grid {
@@ -918,15 +899,10 @@
         @media (max-width: 900px) {
             .container { padding: 0 25px; }
             section { padding: 80px 0; }
-            #highlights { padding: 0 0 10px; }
             .hero-content h2 { font-size: 1.2rem; letter-spacing: 3px; }
             .timeline-header { flex-direction: column; }
             .section-title { font-size: 24px; margin-bottom: 40px; }
             .project-grid { grid-template-columns: 1fr; }
-            .skills-grid { grid-template-columns: repeat(2, 1fr); }
-            .stats { grid-template-columns: repeat(2, 1fr); }
-            .stat:nth-child(3)::before { display: none; }
-            .stat:nth-child(n+3) { border-top: 1px solid var(--border); }
 
             .nav-toggle { display: block; }
             .nav-links {
@@ -956,7 +932,6 @@
             .hero-kicker { padding: 6px 14px; font-size: 0.68rem; letter-spacing: 1.5px; white-space: nowrap; }
             .hero-tag .en { font-size: 1.05rem; letter-spacing: 1px; }
             .explore-btn { padding: 14px 24px; font-size: 0.92rem; letter-spacing: 0.5px; gap: 10px; }
-            .skills-grid { grid-template-columns: 1fr; }
             .contact-content { padding: 44px 22px; }
             .contact-links { gap: 34px; }
             .card { padding: 26px; }
@@ -1017,28 +992,6 @@
 
         <div class="container">
 
-            <!-- Highlights: figures taken from the resume -->
-            <section id="highlights" aria-label="Highlights">
-                <div class="stats" data-reveal>
-                    <div class="stat">
-                        <div class="stat-num" data-count="56">56</div>
-                        <div class="stat-label">Student volunteers led<br><span class="stat-cn">带领的学生志愿者</span></div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-num" data-count="5000" data-suffix="+">5,000+</div>
-                        <div class="stat-label">Community members reached<br><span class="stat-cn">覆盖的社区成员</span></div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-num" data-count="20">20</div>
-                        <div class="stat-label">Wetland zones surveyed<br><span class="stat-cn">生物多样性调查湿地点</span></div>
-                    </div>
-                    <div class="stat">
-                        <div class="stat-num" data-count="26" data-suffix="h">26h</div>
-                        <div class="stat-label">Build-a-thon, Magic Glove<br><span class="stat-cn">26 小时工程赛</span></div>
-                    </div>
-                </div>
-            </section>
-
             <!-- Education / 教育经历 -->
             <section id="education">
                 <h2 class="section-title" data-reveal>Education Journey / 教育经历</h2>
@@ -1084,32 +1037,40 @@
                             <div class="timeline-header">
                                 <div>
                                     <h3>High School Diploma</h3>
-                                    <div class="timeline-org">Kunming No.1 High School International Department</div>
+                                    <div class="timeline-org">Kunming World Youth Academy (KWYA) & Kunming No.1 High School International Department</div>
                                 </div>
                                 <span class="timeline-loc">Kunming, China</span>
                             </div>
                             <div class="timeline-content">
-                                <div class="stat-chip"><span>GPA</span><strong>3.5 / 4.0</strong></div>
-                                <ul>
-                                    <li>
-                                        <div class="bilingual">
-                                            <span class="en">Club President of Environmental Protection</span>
-                                            <span class="cn">环保社社长</span>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="bilingual">
-                                            <span class="en">Debate Star</span>
-                                            <span class="cn">辩论之星</span>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="bilingual">
-                                            <span class="en">Track and Field Club</span>
-                                            <span class="cn">田径队</span>
-                                        </div>
-                                    </li>
-                                </ul>
+                                <div style="margin-bottom: 20px;">
+                                    <strong class="school-name">Kunming World Youth Academy (KWYA) | 昆明世青国际学校</strong>
+                                    <ul>
+                                        <li>
+                                            <div class="bilingual">
+                                                <span class="en">Debate Star & Best Chinese Writer</span>
+                                                <span class="cn">辩论之星 & 最佳中文创作者</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <strong class="school-name">Kunming No.1 High School International Department | 昆明一中国际部</strong>
+                                    <div class="stat-chip"><span>GPA</span><strong>3.5 / 4.0</strong></div>
+                                    <ul>
+                                        <li>
+                                            <div class="bilingual">
+                                                <span class="en">Long-distance runner / Track and Field Team Member</span>
+                                                <span class="cn">长跑运动员 / 田径队成员</span>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="bilingual">
+                                                <span class="en">Club President of Environmental Protection</span>
+                                                <span class="cn">环保社社长</span>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1219,56 +1180,63 @@
             </section>
 
             <!-- Skills / 技能专长 -->
-            <section id="skills">
+            <section id="skills" style="padding-bottom: 0px;">
                 <h2 class="section-title" data-reveal>Skills & Expertise / 技能专长</h2>
                 
-                <div class="skills-grid" id="skillsGrid">
-                    <div class="skill-card" data-reveal>
-                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
-                        <h4>Python</h4>
-                        <div class="bilingual"><span class="en">Data & Automation</span><span class="cn">数据与自动化</span></div>
+                <div class="skills-carousel-container" id="skillsCarousel">
+                    <button class="carousel-btn prev" id="prevSkill" type="button" aria-label="Previous skills">❮</button>
+                    <div class="skills-carousel-track-wrapper">
+                        <div class="skills-carousel-track" id="skillsTrack">
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
+                                <h4>Python</h4>
+                                <div class="bilingual"><span class="en">Data & Automation</span><span class="cn">数据与自动化</span></div>
+                            </div>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg></div>
+                                <h4>Java</h4>
+                                <div class="bilingual"><span class="en">System Logic</span><span class="cn">系统逻辑</span></div>
+                            </div>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg></div>
+                                <h4>C++ (VibeCoding)</h4>
+                                <div class="bilingual"><span class="en">Hardware Control</span><span class="cn">硬件底层控制</span></div>
+                            </div>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M7 10h4M7 14h4M13 12h4"></path></svg></div>
+                                <h4>Arduino IDE</h4>
+                                <div class="bilingual"><span class="en">System Integration</span><span class="cn">嵌入式系统集成</span></div>
+                            </div>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6"></rect><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg></div>
+                                <h4>Hardware Integration</h4>
+                                <div class="bilingual"><span class="en">Sensors to software</span><span class="cn">硬件与软件联调</span></div>
+                            </div>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg></div>
+                                <h4>AI Tools Proficiency</h4>
+                                <div class="bilingual"><span class="en">Prompt Engineering</span><span class="cn">AI辅助开发</span></div>
+                            </div>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
+                                <h4>Search & Data Integration</h4>
+                                <div class="bilingual"><span class="en">Research & data gathering</span><span class="cn">信息检索与数据整合</span></div>
+                            </div>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg></div>
+                                <h4>Office 365</h4>
+                                <div class="bilingual"><span class="en">PowerPoint, Excel, Word</span><span class="cn">数据处理与可视化</span></div>
+                            </div>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
+                                <h4>Languages</h4>
+                                <div class="bilingual"><span class="en">English (Fluent), Mandarin (Native)</span><span class="cn">英语流利 · 中文母语</span></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="skill-card" data-reveal>
-                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg></div>
-                        <h4>Java</h4>
-                        <div class="bilingual"><span class="en">System Logic</span><span class="cn">系统逻辑</span></div>
-                    </div>
-                    <div class="skill-card" data-reveal>
-                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg></div>
-                        <h4>C++ (VibeCoding)</h4>
-                        <div class="bilingual"><span class="en">Hardware Control</span><span class="cn">硬件底层控制</span></div>
-                    </div>
-                    <div class="skill-card" data-reveal>
-                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M7 10h4M7 14h4M13 12h4"></path></svg></div>
-                        <h4>Arduino IDE</h4>
-                        <div class="bilingual"><span class="en">System Integration</span><span class="cn">嵌入式系统集成</span></div>
-                    </div>
-                    <div class="skill-card" data-reveal>
-                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6"></rect><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg></div>
-                        <h4>Hardware Integration</h4>
-                        <div class="bilingual"><span class="en">Sensors to software</span><span class="cn">硬件与软件联调</span></div>
-                    </div>
-                    <div class="skill-card" data-reveal>
-                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg></div>
-                        <h4>AI Tools Proficiency</h4>
-                        <div class="bilingual"><span class="en">Prompt Engineering</span><span class="cn">AI辅助开发</span></div>
-                    </div>
-                    <div class="skill-card" data-reveal>
-                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
-                        <h4>Search & Data Integration</h4>
-                        <div class="bilingual"><span class="en">Research & data gathering</span><span class="cn">信息检索与数据整合</span></div>
-                    </div>
-                    <div class="skill-card" data-reveal>
-                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg></div>
-                        <h4>Office 365</h4>
-                        <div class="bilingual"><span class="en">PowerPoint, Excel, Word</span><span class="cn">数据处理与可视化</span></div>
-                    </div>
-                    <div class="skill-card" data-reveal>
-                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
-                        <h4>Languages</h4>
-                        <div class="bilingual"><span class="en">English (Fluent), Mandarin (Native)</span><span class="cn">英语流利 · 中文母语</span></div>
-                    </div>
+                    <button class="carousel-btn next" id="nextSkill" type="button" aria-label="Next skills">❯</button>
                 </div>
+                <div class="carousel-dots" id="skillsDots"></div>
             </section>
 
             <!-- Projects / 项目案例 -->
@@ -1389,150 +1357,158 @@
             function init() {
                 initBackground();
                 initReveal();
-                initCounters();
                 initScrollEffects();
                 initPointerLight();
+                initCarousel();
                 initMobileNav();
                 initScrollbar();
             }
 
-            // --- Background: drifting particle network that brightens near the pointer ---
+            // --- Background: the original particle network (a single still frame for reduced-motion users) ---
             function initBackground() {
-                const canvas = document.getElementById('bg-canvas');
-                const ctx = canvas.getContext('2d');
-                const mouse = { x: null, y: null, radius: 250 };
-                let width = 0;
-                let height = 0;
-                let particles = [];
+            // --- 30FPS Advanced Nebula Background ---
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            let width, height;
+            let particles = [];
+            const mouse = { x: null, y: null, radius: 250 };
 
-                window.addEventListener('pointermove', (e) => {
-                    if (e.pointerType === 'touch') return;
-                    mouse.x = e.clientX;
-                    mouse.y = e.clientY;
-                }, { passive: true });
-                document.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+            window.addEventListener('mousemove', (e) => {
+                mouse.x = e.clientX;
+                mouse.y = e.clientY;
+            });
 
-                function initParticles() {
-                    particles = [];
-                    const count = Math.min(Math.floor((width * height) / 10000), 120);
-                    for (let i = 0; i < count; i++) {
-                        const z = Math.random(); // depth: 0 is back, 1 is front
-                        particles.push({
-                            x: Math.random() * width,
-                            y: Math.random() * height,
-                            vx: (Math.random() - 0.5) * (0.3 + z * 0.4),
-                            vy: (Math.random() - 0.5) * (0.3 + z * 0.4),
-                            baseRadius: 0.8 + z * 1.2,
-                            radius: 0,
-                            z: z
-                        });
-                    }
+            window.addEventListener('mouseout', () => {
+                mouse.x = null;
+                mouse.y = null;
+            });
+
+            function resize() {
+                width = canvas.width = window.innerWidth;
+                height = canvas.height = window.innerHeight;
+                initParticles();
+            }
+
+            window.addEventListener('resize', resize);
+            resize();
+
+            function initParticles() {
+                particles = [];
+                // Adding more particles for depth, with parallax layers
+                const count = Math.min(Math.floor((width * height) / 10000), 120);
+                for (let i = 0; i < count; i++) {
+                    const z = Math.random(); // Depth factor
+                    particles.push({
+                        x: Math.random() * width,
+                        y: Math.random() * height,
+                        vx: (Math.random() - 0.5) * (0.3 + z * 0.4),
+                        vy: (Math.random() - 0.5) * (0.3 + z * 0.4),
+                        baseRadius: 0.8 + z * 1.2,
+                        radius: 0,
+                        z: z // 0 is back, 1 is front
+                    });
+                }
+            }
+
+            let lastTime = 0;
+            const fps = 30;
+            const interval = 1000 / fps;
+
+            function animate(timestamp) {
+                if (!reduceMotion) requestAnimationFrame(animate);
+
+                const delta = timestamp - lastTime;
+                if (delta < interval) return;
+                lastTime = timestamp - (delta % interval);
+
+                ctx.clearRect(0, 0, width, height);
+
+                // 1. Ambient Nebula Glow
+                if (mouse.x !== null) {
+                    const nebula = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 600);
+                    nebula.addColorStop(0, 'rgba(0, 243, 255, 0.08)');
+                    nebula.addColorStop(0.5, 'rgba(144, 78, 149, 0.03)');
+                    nebula.addColorStop(1, 'transparent');
+                    ctx.fillStyle = nebula;
+                    ctx.fillRect(0, 0, width, height);
                 }
 
-                function resize() {
-                    const widthChanged = window.innerWidth !== width;
-                    width = canvas.width = window.innerWidth;
-                    height = canvas.height = window.innerHeight;
-                    // Mobile browsers fire resize while the address bar slides; keep the particles then.
-                    if (widthChanged || !particles.length) initParticles();
-                    if (reduceMotion) draw(false);
-                }
+                // 2. Draw Connections with Pulse effect
+                const time = Date.now() * 0.001;
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const d = Math.sqrt(dx * dx + dy * dy);
+                    
+                        if (d < 150) {
+                            const opacity = (1 - d / 150) * 0.2;
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(0, 243, 255, ${opacity})`;
+                            ctx.lineWidth = 0.5;
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
 
-                function draw(move) {
-                    ctx.clearRect(0, 0, width, height);
-
-                    if (mouse.x !== null) {
-                        const nebula = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 600);
-                        nebula.addColorStop(0, 'rgba(0, 243, 255, 0.08)');
-                        nebula.addColorStop(0.5, 'rgba(144, 78, 149, 0.03)');
-                        nebula.addColorStop(1, 'transparent');
-                        ctx.fillStyle = nebula;
-                        ctx.fillRect(0, 0, width, height);
-                    }
-
-                    const time = Date.now() * 0.001;
-                    for (let i = 0; i < particles.length; i++) {
-                        for (let j = i + 1; j < particles.length; j++) {
-                            const dx = particles[i].x - particles[j].x;
-                            const dy = particles[i].y - particles[j].y;
-                            const d = Math.sqrt(dx * dx + dy * dy);
-                            if (d < 150) {
-                                const opacity = (1 - d / 150) * 0.2;
+                            // Data Pulse Effect
+                            if (opacity > 0.1) {
+                                const pulsePos = (time * 0.5 + (i + j)) % 1;
+                                const px = particles[i].x + (particles[j].x - particles[i].x) * pulsePos;
+                                const py = particles[i].y + (particles[j].y - particles[i].y) * pulsePos;
                                 ctx.beginPath();
-                                ctx.strokeStyle = 'rgba(0, 243, 255, ' + opacity + ')';
-                                ctx.lineWidth = 0.5;
-                                ctx.moveTo(particles[i].x, particles[i].y);
-                                ctx.lineTo(particles[j].x, particles[j].y);
-                                ctx.stroke();
-
-                                if (opacity > 0.1 && move) {
-                                    const pulsePos = (time * 0.5 + (i + j)) % 1;
-                                    const px = particles[i].x + (particles[j].x - particles[i].x) * pulsePos;
-                                    const py = particles[i].y + (particles[j].y - particles[i].y) * pulsePos;
-                                    ctx.beginPath();
-                                    ctx.arc(px, py, 1, 0, Math.PI * 2);
-                                    ctx.fillStyle = 'rgba(255, 255, 255, ' + (opacity * 2) + ')';
-                                    ctx.fill();
-                                }
+                                ctx.arc(px, py, 1, 0, Math.PI * 2);
+                                ctx.fillStyle = `rgba(255, 255, 255, ${opacity * 2})`;
+                                ctx.fill();
                             }
                         }
                     }
+                }
 
-                    for (const p of particles) {
-                        if (move) {
-                            p.x += p.vx;
-                            p.y += p.vy;
+                // 3. Draw Particles
+                for (let p of particles) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+
+                    // Mouse interaction - Focus on brightness and depth rather than sensitivity
+                    p.radius = p.baseRadius;
+                    p.colorOpacity = 0.4 + p.z * 0.4;
+                    if (mouse.x !== null) {
+                        const dx = mouse.x - p.x;
+                        const dy = mouse.y - p.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < mouse.radius) {
+                            const force = (mouse.radius - dist) / mouse.radius;
+                            // Light movement attraction (very subtle)
+                            p.x += (dx / dist) * force * 0.8;
+                            p.y += (dy / dist) * force * 0.8;
+                            // Significant brightness boost
+                            p.radius = p.baseRadius + force * 1.5;
+                            p.colorOpacity = Math.min(1, p.colorOpacity + force * 0.6);
                         }
-
-                        p.radius = p.baseRadius;
-                        let alpha = 0.4 + p.z * 0.4;
-                        if (mouse.x !== null) {
-                            const dx = mouse.x - p.x;
-                            const dy = mouse.y - p.y;
-                            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-                            if (dist < mouse.radius) {
-                                const force = (mouse.radius - dist) / mouse.radius;
-                                if (move) {
-                                    p.x += (dx / dist) * force * 0.8;
-                                    p.y += (dy / dist) * force * 0.8;
-                                }
-                                p.radius = p.baseRadius + force * 1.5;
-                                alpha = Math.min(1, alpha + force * 0.6);
-                            }
-                        }
-
-                        ctx.beginPath();
-                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                        ctx.fillStyle = 'rgba(0, 243, 255, ' + alpha + ')';
-                        if (p.radius > 2) {
-                            ctx.shadowBlur = 10;
-                            ctx.shadowColor = '#00f3ff';
-                        }
-                        ctx.fill();
-                        ctx.shadowBlur = 0;
-
-                        if (p.x < -50) p.x = width + 50;
-                        if (p.x > width + 50) p.x = -50;
-                        if (p.y < -50) p.y = height + 50;
-                        if (p.y > height + 50) p.y = -50;
                     }
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                
+                    // Reactive coloring
+                    ctx.fillStyle = `rgba(0, 243, 255, ${p.colorOpacity})`;
+                
+                    if (p.radius > 2) {
+                        ctx.shadowBlur = 10;
+                        ctx.shadowColor = '#00f3ff';
+                    }
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+
+                    // Wrap edges
+                    if (p.x < -50) p.x = width + 50;
+                    if (p.x > width + 50) p.x = -50;
+                    if (p.y < -50) p.y = height + 50;
+                    if (p.y > height + 50) p.y = -50;
                 }
+            }
 
-                window.addEventListener('resize', resize);
-                resize();
-
-                if (reduceMotion) return;
-
-                const interval = 1000 / 30;
-                let last = 0;
-                function loop(ts) {
-                    requestAnimationFrame(loop);
-                    const delta = ts - last;
-                    if (delta < interval) return;
-                    last = ts - (delta % interval);
-                    draw(true);
-                }
-                requestAnimationFrame(loop);
+            requestAnimationFrame(animate);
             }
 
             // --- Staggered reveal as elements enter the viewport ---
@@ -1559,32 +1535,7 @@
                             el.style.removeProperty('--d');
                         }, 1300 + delay);
                     });
-                }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
-                els.forEach((el) => io.observe(el));
-            }
-
-            // --- Numbers in the highlights strip count up once ---
-            function initCounters() {
-                const els = Array.from(document.querySelectorAll('[data-count]'));
-                const format = (el, n) => Math.round(n).toLocaleString('en-US') + (el.dataset.suffix || '');
-                if (!els.length || !('IntersectionObserver' in window) || reduceMotion) return;
-                els.forEach((el) => { el.textContent = format(el, 0); });
-                const io = new IntersectionObserver((entries) => {
-                    entries.forEach((entry) => {
-                        if (!entry.isIntersecting) return;
-                        const el = entry.target;
-                        io.unobserve(el);
-                        const target = parseFloat(el.dataset.count);
-                        const duration = 1600;
-                        const start = performance.now();
-                        (function tick(now) {
-                            const t = Math.min(1, (now - start) / duration);
-                            const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-                            el.textContent = format(el, target * eased);
-                            if (t < 1) requestAnimationFrame(tick);
-                        })(start);
-                    });
-                }, { threshold: 0.6 });
+                }, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
                 els.forEach((el) => io.observe(el));
             }
 
@@ -1644,12 +1595,83 @@
             function initPointerLight() {
                 document.addEventListener('pointermove', (e) => {
                     if (e.pointerType === 'touch') return;
-                    const card = e.target.closest ? e.target.closest('.card, .skill-card') : null;
+                    const card = e.target.closest ? e.target.closest('.card') : null;
                     if (!card) return;
                     const r = card.getBoundingClientRect();
                     card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
                     card.style.setProperty('--my', (e.clientY - r.top) + 'px');
                 }, { passive: true });
+            }
+
+            // --- Skills carousel (original behaviour: slides on its own, pauses on hover) ---
+            function initCarousel() {
+            // --- Skills Carousel Logic ---
+            const skillsTrack = document.getElementById('skillsTrack');
+            const skillCards = Array.from(skillsTrack.children);
+            const prevSkill = document.getElementById('prevSkill');
+            const nextSkill = document.getElementById('nextSkill');
+            const skillsDots = document.getElementById('skillsDots');
+        
+            let currentSkillIndex = 0;
+            let cardsPerView = window.innerWidth > 768 ? 3 : (window.innerWidth > 480 ? 2 : 1);
+            let maxSkillIndex = Math.max(0, skillCards.length - cardsPerView);
+
+            function updateSkillCarousel() {
+                cardsPerView = window.innerWidth > 768 ? 3 : (window.innerWidth > 480 ? 2 : 1);
+                maxSkillIndex = Math.max(0, skillCards.length - cardsPerView);
+            
+                // Adjust dots display
+                while(skillsDots.firstChild) skillsDots.removeChild(skillsDots.firstChild);
+                for (let i = 0; i <= maxSkillIndex; i++) {
+                    const dot = document.createElement('div');
+                    dot.classList.add('dot');
+                    if (i === currentSkillIndex) dot.classList.add('active');
+                    dot.addEventListener('click', () => goToSkillSlide(i));
+                    skillsDots.appendChild(dot);
+                }
+            
+                if (currentSkillIndex > maxSkillIndex) currentSkillIndex = maxSkillIndex;
+            
+                requestAnimationFrame(() => {
+                    const cardWidth = skillsTrack.parentElement.clientWidth / cardsPerView;
+                    skillsTrack.style.transform = `translateX(-${currentSkillIndex * cardWidth}px)`;
+                });
+            }
+
+            function goToSkillSlide(index) {
+                currentSkillIndex = index;
+                updateSkillCarousel();
+                restartSkillAutoSlide();
+            }
+
+            function nextSkillSlide() {
+                currentSkillIndex = currentSkillIndex >= maxSkillIndex ? 0 : currentSkillIndex + 1;
+                updateSkillCarousel();
+            }
+
+            function prevSkillSlide() {
+                currentSkillIndex = currentSkillIndex <= 0 ? maxSkillIndex : currentSkillIndex - 1;
+                updateSkillCarousel();
+                restartSkillAutoSlide();
+            }
+
+            nextSkill.addEventListener('click', () => { nextSkillSlide(); restartSkillAutoSlide(); });
+            prevSkill.addEventListener('click', prevSkillSlide);
+            window.addEventListener('resize', updateSkillCarousel);
+
+            // Auto slide every 2 seconds
+            let autoSkillSlideInterval = reduceMotion ? null : setInterval(nextSkillSlide, 2000);
+            function restartSkillAutoSlide() {
+                clearInterval(autoSkillSlideInterval);
+                if (!reduceMotion) autoSkillSlideInterval = setInterval(nextSkillSlide, 2000);
+            }
+        
+            const skillsCarouselContainer = document.getElementById('skillsCarousel');
+            skillsCarouselContainer.addEventListener('mouseenter', () => clearInterval(autoSkillSlideInterval));
+            skillsCarouselContainer.addEventListener('mouseleave', restartSkillAutoSlide);
+
+            // Initial setup
+            setTimeout(updateSkillCarousel, 100);
             }
 
             // --- Phone navigation ---
