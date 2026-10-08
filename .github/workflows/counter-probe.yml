@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   probe:
@@ -14,7 +15,8 @@ jobs:
     steps:
       - name: Fetch the candidate badges of PR 22 through GitHub's camo proxy
         run: |
-          curl -sS -m 30 -L -A "Mozilla/5.0" -o /tmp/pr.html -w "PR page HTTP %{http_code}, %{size_download} bytes\n" "https://github.com/LucasYanzy/Lucasyanzy/pull/22"
+          curl -sS -m 30 -H "Accept: application/vnd.github.html+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -o /tmp/pr.json -w "PR api HTTP %{http_code}, %{size_download} bytes\n" "https://api.github.com/repos/LucasYanzy/Lucasyanzy/pulls/22"
+          python3 -c "import json; print(json.load(open('/tmp/pr.json')).get('body_html',''))" > /tmp/pr.html
           python3 - <<'PY'
           import re, subprocess
           html = open('/tmp/pr.html', encoding='utf-8', errors='replace').read()
