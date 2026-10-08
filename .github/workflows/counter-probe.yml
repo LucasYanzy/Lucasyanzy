@@ -2,7 +2,7 @@ name: Profile views counter probe (temporary)
 
 on:
   push:
-    paths: [".github/workflows/counter-probe.yml", "probe-counters.md"]
+    paths: [".github/workflows/counter-probe.yml", "Readme.md"]
 
 permissions:
   contents: read
@@ -15,8 +15,7 @@ jobs:
     steps:
       - name: Fetch the candidate badges of PR 22 through GitHub's camo proxy
         run: |
-          curl -sS -m 30 -H "Accept: application/vnd.github.html+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -o /tmp/pr.html -w "rendered markdown HTTP %{http_code}, %{size_download} bytes\n" "https://api.github.com/repos/LucasYanzy/Lucasyanzy/contents/probe-counters.md?ref=claude/nifty-allen-pkup8y"
-          head -c 700 /tmp/pr.html; echo
+          curl -sS -m 30 -H "Accept: application/vnd.github.html+json" -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -o /tmp/pr.html -w "rendered markdown HTTP %{http_code}, %{size_download} bytes\n" "https://api.github.com/repos/LucasYanzy/Lucasyanzy/readme?ref=claude/nifty-allen-pkup8y"
           python3 - <<'PY'
           import re, subprocess
           html = open('/tmp/pr.html', encoding='utf-8', errors='replace').read()
@@ -32,7 +31,7 @@ jobs:
               except Exception:
                   origin = '?'
               label = re.sub(r'^https://', '', origin)[:70]
-              for attempt in (1, 2):
+              for attempt in (1,):
                   out = subprocess.run(
                       ['curl', '-sS', '-m', '25', '-A', 'Mozilla/5.0', '-o', '/tmp/c.bin', '-D', '/tmp/c.h',
                        '-w', '%{http_code} %{time_total}s %{size_download}B', url],
