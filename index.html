@@ -426,6 +426,37 @@
             margin-top: 5px;
         }
 
+        .timeline-loc {
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            color: var(--text-cn);
+            white-space: nowrap;
+            padding-top: 6px;
+        }
+
+        .stat-chip {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 18px;
+            padding: 6px 16px;
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            background: rgba(0, 243, 255, 0.05);
+            font-size: 0.85rem;
+        }
+        .stat-chip span {
+            color: var(--text-cn);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+        }
+        .stat-chip strong {
+            color: var(--primary);
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
         .timeline-content ul {
             list-style: none;
             margin-top: 20px;
@@ -563,6 +594,13 @@
             gap: 40px;
         }
 
+        .project-meta {
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+            margin-bottom: 18px;
+        }
+
         .project-tags {
             display: flex;
             gap: 12px;
@@ -656,6 +694,14 @@
             transition: color 0.3s;
         }
         .contact-item:hover span { color: var(--primary); }
+        .contact-sub {
+            margin-top: -8px;
+            text-align: center;
+            line-height: 1.5;
+            font-size: 0.8rem;
+            color: var(--text-cn);
+            letter-spacing: 0.3px;
+        }
 
         /* --- Footer --- */
         footer {
@@ -705,11 +751,11 @@
                 <h1>Lucas Yan</h1>
                 <h2>闫智尧</h2>
                 <div class="bilingual" style="margin-bottom: 40px;">
-                    <span class="en" style="font-size: 1.2rem; letter-spacing: 2px;">Finance & Computer Science Innovator</span>
-                    <span class="cn" style="font-size: 1.1rem;">金融与计算机科学交叉领域创新者</span>
+                    <span class="en" style="font-size: 1.2rem; letter-spacing: 2px;">Finance & Computer Science at Rutgers University</span>
+                    <span class="cn" style="font-size: 1.1rem;">罗格斯大学 · 金融与计算机科学</span>
                 </div>
                 <a href="#education" class="explore-btn" id="explore-nav">
-                    <span>Explore My Universe / 探索我的宇宙</span>
+                    <span>View my background / 查看经历</span>
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 13l5 5 5-5M7 6l5 5 5-5"/></svg>
                 </a>
             </div>
@@ -723,13 +769,14 @@
                 <div class="timeline">
                     <!-- Rutgers -->
                     <div class="timeline-item">
-                        <div class="timeline-date">2025 - 2029 (Expected)</div>
+                        <div class="timeline-date">Expected May 2029</div>
                         <div class="card">
                             <div class="timeline-header">
                                 <div>
-                                    <h3>Bachelor of Science In Finance & Computer Science</h3>
-                                    <div class="timeline-org">Rutgers University, New Brunswick | Rutgers Business School (RBS)</div>
+                                    <h3>Bachelor of Science in Finance & Computer Science</h3>
+                                    <div class="timeline-org">Rutgers University</div>
                                 </div>
+                                <span class="timeline-loc">New Brunswick, NJ</span>
                             </div>
                             <div class="timeline-content">
                                 <div class="bilingual">
@@ -745,7 +792,7 @@
                                     </li>
                                     <li>
                                         <div class="bilingual">
-                                            <span class="en">Rutgers Entrepreneur Society Participant</span>
+                                            <span class="en">Rutgers Entrepreneur Society</span>
                                             <span class="cn">罗格斯大学创业协会参与者</span>
                                         </div>
                                     </li>
@@ -756,43 +803,37 @@
                     
                     <!-- High School Diploma -->
                     <div class="timeline-item">
-                        <div class="timeline-date">2021 - 2025</div>
+                        <div class="timeline-date">Aug 2021 - May 2025</div>
                         <div class="card">
                             <div class="timeline-header">
                                 <div>
                                     <h3>High School Diploma</h3>
-                                    <div class="timeline-org">Kunming World Youth Academy (KWYA) & Kunming No.1 High School International Department</div>
+                                    <div class="timeline-org">Kunming No.1 High School International Department</div>
                                 </div>
+                                <span class="timeline-loc">Kunming, China</span>
                             </div>
                             <div class="timeline-content">
-                                <div style="margin-bottom: 20px;">
-                                    <strong style="color: var(--primary); display: block; margin-bottom: 8px;">Kunming World Youth Academy (KWYA) | 昆明世青国际学校</strong>
-                                    <ul>
-                                        <li>
-                                            <div class="bilingual">
-                                                <span class="en">Debate Star & Best Chinese Writer</span>
-                                                <span class="cn">辩论之星 & 最佳中文创作者</span>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div>
-                                    <strong style="color: var(--primary); display: block; margin-bottom: 8px;">Kunming No.1 High School International Department | 昆明一中国际部</strong>
-                                    <ul>
-                                        <li>
-                                            <div class="bilingual">
-                                                <span class="en">Long-distance runner / Track and Field Team Member</span>
-                                                <span class="cn">长跑运动员 / 田径队成员</span>
-                                            </div>
-                                        </li>
-                                        <li>
-                                            <div class="bilingual">
-                                                <span class="en">Club President of Environmental Protection</span>
-                                                <span class="cn">环保社社长</span>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
+                                <div class="stat-chip"><span>GPA</span><strong>3.5 / 4.0</strong></div>
+                                <ul>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Club President of Environmental Protection</span>
+                                            <span class="cn">环保社社长</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Debate Star</span>
+                                            <span class="cn">辩论之星</span>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="bilingual">
+                                            <span class="en">Track and Field Club</span>
+                                            <span class="cn">田径队</span>
+                                        </div>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -812,6 +853,7 @@
                                     <h3>Global Business Lead</h3>
                                     <div class="timeline-org">Tutturo LLC</div>
                                 </div>
+                                <span class="timeline-loc">New Brunswick, NJ</span>
                             </div>
                             <div class="timeline-content">
                                 <ul>
@@ -841,6 +883,7 @@
                                     <h3>Project Management Member</h3>
                                     <div class="timeline-org">Rutgers Chinese Students and Scholars Association (CSSA)</div>
                                 </div>
+                                <span class="timeline-loc">New Brunswick, NJ</span>
                             </div>
                             <div class="timeline-content">
                                 <ul>
@@ -870,6 +913,7 @@
                                     <h3>Founder & Project Manager</h3>
                                     <div class="timeline-org">Yunnan DianChi Lake Protection & Improvement Foundation</div>
                                 </div>
+                                <span class="timeline-loc">Kunming, China</span>
                             </div>
                             <div class="timeline-content">
                                 <ul>
@@ -927,19 +971,29 @@
                                 <div class="bilingual"><span class="en">System Integration</span><span class="cn">嵌入式系统集成</span></div>
                             </div>
                             <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6"></rect><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg></div>
+                                <h4>Hardware Integration</h4>
+                                <div class="bilingual"><span class="en">Sensors to software</span><span class="cn">硬件与软件联调</span></div>
+                            </div>
+                            <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg></div>
-                                <h4>AI Tools</h4>
+                                <h4>AI Tools Proficiency</h4>
                                 <div class="bilingual"><span class="en">Prompt Engineering</span><span class="cn">AI辅助开发</span></div>
+                            </div>
+                            <div class="skill-card">
+                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
+                                <h4>Search & Data Integration</h4>
+                                <div class="bilingual"><span class="en">Research & data gathering</span><span class="cn">信息检索与数据整合</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg></div>
                                 <h4>Office 365</h4>
-                                <div class="bilingual"><span class="en">Excel & Data Visuals</span><span class="cn">数据处理与可视化</span></div>
+                                <div class="bilingual"><span class="en">PowerPoint, Excel, Word</span><span class="cn">数据处理与可视化</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
                                 <h4>Languages</h4>
-                                <div class="bilingual"><span class="en">English & Mandarin</span><span class="cn">中英双语流利</span></div>
+                                <div class="bilingual"><span class="en">English (Fluent), Mandarin (Native)</span><span class="cn">英语流利 · 中文母语</span></div>
                             </div>
                         </div>
                     </div>
@@ -955,10 +1009,11 @@
                     <!-- Project 1 -->
                     <a href="https://github.com/LucasYanzy/Magic-Glove" target="_blank" class="card project-card" style="text-decoration: none; color: inherit; position: relative;">
                         <div>
-                            <h3 style="margin-bottom: 20px; font-size: 1.4rem;">Magic Glove (IEEE Build-a-thon)</h3>
+                            <h3 style="margin-bottom: 6px; font-size: 1.4rem;">Magic Glove</h3>
+                            <div class="project-meta">2026 IEEE x RUHART Build-a-thon · Hardware Developer · Apr 2026</div>
                             <div class="bilingual">
-                                <span class="en">Awarded "Best Productivity / Automation Challenge Prize" by Rutgers IEEE for exceptional technical execution. Developed "Magic Glove," a wearable hardware controller utilizing C++ and Arduino IDE to translate natural hand movements into direct digital commands.</span>
-                                <span class="cn">荣获 Rutgers IEEE 26 小时工程赛 "最佳生产力与自动化挑战" 奖项。开发了 "Magic Glove"，一款利用 C++ 及 Arduino IDE 打造的可穿戴硬件控制器，实现自然手势到数字指令的实时转换。</span>
+                                <span class="en">Awarded "Best Productivity/Automation Challenge Prizes" by Rutgers IEEE during the 26-hour engineering competition. A wearable hardware controller built with C++ (VibeCoding) and Arduino IDE that translates natural hand movements into direct digital commands, replacing traditional mouse and keyboard inputs.</span>
+                                <span class="cn">在 Rutgers IEEE 26 小时工程赛中荣获 "最佳生产力与自动化挑战" 奖项。使用 C++ (VibeCoding) 与 Arduino IDE 开发的可穿戴硬件控制器，将自然手势转换为数字指令，替代传统鼠标与键盘输入。</span>
                             </div>
                         </div>
                         <div style="margin-top: 15px; font-size: 0.85rem; color: var(--primary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
@@ -976,16 +1031,17 @@
                     <!-- Project 2 -->
                     <div class="card project-card">
                         <div>
-                            <h3 style="margin-bottom: 20px; font-size: 1.4rem;">AI Web Portfolio</h3>
+                            <h3 style="margin-bottom: 6px; font-size: 1.4rem;">Independent Web Portfolio</h3>
+                            <div class="project-meta">AI Web Developer · Present</div>
                             <div class="bilingual">
-                                <span class="en">Designed, deployed, and managed a personal portfolio website hosted on GitHub Pages to showcase technical programming projects and professional background, highlighting UI aesthetics and interactivity.</span>
-                                <span class="cn">自主设计并部署响应式个人门户网站，托管于 GitHub Pages。全面展示各类硬核技术项目与职业背景履历，深度融入 AI 辅助开发理念，强调 UI 交互美学与现代 web 可访问性。</span>
+                                <span class="en">Designed, deployed, and managed a personal portfolio website hosted on GitHub Pages to showcase technical programming projects and professional background.</span>
+                                <span class="cn">自主设计、部署并维护托管于 GitHub Pages 的个人作品集网站，用于展示技术项目与职业背景。</span>
                             </div>
                         </div>
                         <div class="project-tags">
                             <span class="tag">HTML/CSS/JS</span>
-                            <span class="tag">UI/UX Design</span>
-                            <span class="tag">AI Integration</span>
+                            <span class="tag">GitHub Pages</span>
+                            <span class="tag">AI Tools</span>
                         </div>
                     </div>
                 </div>
@@ -996,16 +1052,17 @@
                 <h2 class="section-title">Get In Touch / 联系我</h2>
                 <div class="card contact-content">
                     <div class="bilingual" style="text-align: center; max-width: 600px; margin: 0 auto 10px;">
-                        <span class="en" style="font-size: 1.1rem;">Whether it's about Fintech, Hardware Development, or cross-disciplinary collaborations, I'm always open to discussing new opportunities. Let's build the future together.</span>
-                        <span class="cn" style="font-size: 1.05rem;">不论是关于金融科技、硬件开发，还是富有挑战的跨界项目合作，欢迎随时通过以下方式联系我。让我们共同创造未来。</span>
+                        <span class="en" style="font-size: 1.1rem;">Open to conversations about finance, software, hardware projects and anything in between. Email is the quickest way to reach me.</span>
+                        <span class="cn" style="font-size: 1.05rem;">金融、软件、硬件项目的交流都欢迎，邮件回复最快。</span>
                     </div>
                     
                     <div class="contact-links">
-                        <a href="mailto:zhiyao.yan@rutgers.edu" class="contact-item">
+                        <a href="mailto:LucasYanzy@outlook.com" class="contact-item">
                             <div class="contact-icon-wrapper">
                                 <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                             </div>
                             <span>Email</span>
+                            <small class="contact-sub">LucasYanzy@outlook.com<br>zy508@rutgers.edu</small>
                         </a>
                         <a href="https://www.linkedin.com/in/lucasyanzy/" target="_blank" class="contact-item">
                             <div class="contact-icon-wrapper">
@@ -1042,8 +1099,8 @@
 
     <footer>
         <div class="bilingual" style="margin-bottom: 0;">
-            <span class="en" style="font-size: 0.85rem;">© 2026 Lucas Yan. Designed for exploration at the intersection of Finance & CS.</span>
-            <span class="cn" style="font-size: 0.8rem;">© 2026 闫智尧 版权所有. 探索科技与金融的未来边界。</span>
+            <span class="en" style="font-size: 0.85rem;">© 2026 Lucas Yan</span>
+            <span class="cn" style="font-size: 0.8rem;">© 2026 闫智尧</span>
         </div>
     </footer>
 
