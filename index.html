@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lucas Yan | Finance & CS Portfolio</title>
     <meta name="description" content="Lucas Yan - Finance & Computer Science at Rutgers University. Explore my professional journey and technical projects.">
+    <meta name="theme-color" content="#030305">
+    <script>document.documentElement.classList.add('js');</script>
     
     <style>
         /* Self-hosted fonts (no dependency on Google Fonts, which stalls page load on some networks) */
@@ -28,19 +30,22 @@
         :root {
             --primary: #00f3ff;
             --secondary: #904e95;
+            --violet: #bc00ff;
             --primary-glow: rgba(0, 243, 255, 0.4);
             --secondary-glow: rgba(144, 78, 149, 0.4);
             --bg: #030305;
             --surface: #0a0a0f;
             --card-bg: rgba(15, 15, 20, 0.55);
-            --card-hover-bg: rgba(25, 25, 30, 0.8);
+            --card-hover-bg: rgba(20, 20, 27, 0.78);
             --text-main: #ffffff;
-            --text-en: rgba(255, 255, 255, 0.85);
+            --text-en: rgba(255, 255, 255, 0.86);
             --text-cn: rgba(200, 200, 210, 0.65);
-            --border: rgba(0, 243, 255, 0.15);
-            --border-hover: rgba(0, 243, 255, 0.5);
-            --nav-bg: rgba(3, 3, 5, 0.8);
+            --border: rgba(0, 243, 255, 0.14);
+            --border-hover: rgba(0, 243, 255, 0.45);
+            --nav-bg: rgba(3, 3, 5, 0.55);
+            --ease: cubic-bezier(0.22, 1, 0.36, 1);
             --transition: all 0.5s cubic-bezier(0.25, 1, 0.3, 1);
+            color-scheme: dark;
         }
 
         * {
@@ -57,10 +62,18 @@
         body {
             background-color: var(--bg);
             color: var(--text-main);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
             line-height: 1.7;
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+        }
+
+        ::selection { background: rgba(0, 243, 255, 0.25); color: #fff; }
+
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 4px;
+            border-radius: 6px;
         }
 
         /* --- Custom Scrollbar --- */
@@ -112,17 +125,36 @@
             width: 100%;
             z-index: 1000;
             padding: 20px 0;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(18px) saturate(140%);
+            -webkit-backdrop-filter: blur(18px) saturate(140%);
             background: var(--nav-bg);
-            border-bottom: 1px solid var(--border);
-            transition: var(--transition);
+            border-bottom: 1px solid transparent;
+            transition: padding 0.4s var(--ease), background 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        nav.scrolled {
+            padding: 12px 0;
+            background: rgba(3, 3, 5, 0.85);
+            border-bottom-color: var(--border);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
         }
 
         nav .container {
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        #progress {
+            position: absolute;
+            left: 0;
+            bottom: -1px;
+            width: 100%;
+            height: 2px;
+            transform-origin: left center;
+            transform: scaleX(var(--p, 0));
+            background: linear-gradient(90deg, var(--primary), var(--violet));
+            pointer-events: none;
         }
 
         .logo {
@@ -135,30 +167,72 @@
             text-transform: uppercase;
             transition: var(--transition);
         }
-        
+
         .logo:hover {
             color: var(--primary);
         }
 
         .nav-links {
             display: flex;
-            gap: 25px;
+            gap: 28px;
             list-style: none;
         }
 
         .nav-links a {
-            color: rgba(255, 255, 255, 0.7);
+            position: relative;
+            display: inline-block;
+            padding: 6px 0;
+            color: rgba(255, 255, 255, 0.68);
             text-decoration: none;
             font-size: 0.85rem;
             font-weight: 400;
             letter-spacing: 1px;
             text-transform: uppercase;
-            transition: var(--transition);
+            transition: color 0.4s ease;
         }
 
-        .nav-links a:hover {
-            color: var(--primary);
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: 1px;
+            background: var(--primary);
+            transform: scaleX(0);
+            transform-origin: left center;
+            transition: transform 0.5s var(--ease);
         }
+
+        .nav-links a:hover,
+        .nav-links a.active { color: #fff; }
+        .nav-links a:hover::after,
+        .nav-links a.active::after { transform: scaleX(1); }
+
+        .nav-toggle {
+            display: none;
+            position: relative;
+            width: 42px;
+            height: 42px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+        }
+        .nav-toggle span {
+            position: absolute;
+            left: 12px;
+            right: 12px;
+            height: 1.5px;
+            background: #fff;
+            transition: transform 0.4s var(--ease), opacity 0.3s ease, top 0.4s var(--ease);
+        }
+        .nav-toggle span:nth-child(1) { top: 14px; }
+        .nav-toggle span:nth-child(2) { top: 20px; }
+        .nav-toggle span:nth-child(3) { top: 26px; }
+        nav.open .nav-toggle span:nth-child(1) { top: 20px; transform: rotate(45deg); }
+        nav.open .nav-toggle span:nth-child(2) { opacity: 0; }
+        nav.open .nav-toggle span:nth-child(3) { top: 20px; transform: rotate(-45deg); }
 
         /* --- Layout --- */
         .container {
@@ -169,14 +243,6 @@
 
         section {
             padding: 120px 0;
-            opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1s cubic-bezier(0.25, 1, 0.3, 1), transform 1s cubic-bezier(0.25, 1, 0.3, 1);
-        }
-
-        section.visible {
-            opacity: 1;
-            transform: translateY(0);
         }
 
         .section-title {
@@ -188,7 +254,6 @@
             align-items: center;
             gap: 20px;
             color: var(--primary);
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
         }
 
         .section-title::after {
@@ -199,18 +264,101 @@
              opacity: 0.4;
         }
 
+        /* --- Reveal on scroll (only when JS is running; the class is set in <head>) --- */
+        .js [data-reveal] {
+            opacity: 0;
+            transform: translateY(26px);
+            transition: opacity 0.9s var(--ease), transform 0.9s var(--ease);
+            transition-delay: var(--d, 0ms);
+        }
+        .js [data-reveal].in {
+            opacity: 1;
+            transform: none;
+        }
+        .js .section-title[data-reveal]::after {
+            transform: scaleX(0);
+            transform-origin: left center;
+            transition: transform 1.3s var(--ease) 0.25s;
+        }
+        .js .section-title[data-reveal].in::after { transform: scaleX(1); }
+
         /* --- Hero Section --- */
         #home {
-            height: 100vh;
+            min-height: 100vh;
+            min-height: 100svh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            padding: 0;
-            opacity: 1;
-            transform: none;
+            padding: 0 20px;
             position: relative;
+            overflow: hidden;
+        }
+
+        /* Slow aurora behind the hero: two blurred colour fields that drift */
+        #home::before,
+        #home::after {
+            content: '';
+            position: absolute;
+            inset: -25% -15%;
+            z-index: -1;
+            pointer-events: none;
+            will-change: transform;
+        }
+        #home::before {
+            background:
+                radial-gradient(38% 46% at 26% 42%, rgba(0, 243, 255, 0.17), transparent 70%),
+                radial-gradient(34% 44% at 76% 60%, rgba(188, 0, 255, 0.15), transparent 70%);
+            animation: drift 26s ease-in-out infinite alternate;
+        }
+        #home::after {
+            background: radial-gradient(30% 38% at 62% 28%, rgba(0, 243, 255, 0.08), transparent 70%);
+            animation: drift 34s ease-in-out -12s infinite alternate-reverse;
+        }
+        @keyframes drift {
+            from { transform: translate3d(-3%, -2%, 0) scale(1); }
+            to   { transform: translate3d(4%, 3%, 0) scale(1.12); }
+        }
+
+        .hero-content > * {
+            animation: rise 1.1s var(--ease) backwards;
+        }
+        .hero-content > :nth-child(1) { animation-delay: 0.15s; }
+        .hero-content > :nth-child(2) { animation-delay: 0.3s; }
+        .hero-content > :nth-child(3) { animation-delay: 0.5s; }
+        .hero-content > :nth-child(4) { animation-delay: 0.65s; }
+        .hero-content > :nth-child(5) { animation-delay: 0.85s; }
+        @keyframes rise {
+            from { opacity: 0; transform: translateY(24px); filter: blur(8px); }
+            to   { opacity: 1; transform: none; filter: blur(0); }
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 7px 18px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+            border-radius: 99px;
+            background: rgba(0, 243, 255, 0.04);
+            color: var(--text-cn);
+            font-size: 0.78rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+        }
+        .hero-kicker::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+            animation: pulse 2.8s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            50% { opacity: 0.3; transform: scale(0.65); }
         }
 
         .hero-content h1 {
@@ -218,12 +366,20 @@
             font-size: clamp(3.5rem, 12vw, 7rem);
             font-weight: 800;
             margin-bottom: 5px;
-            background: linear-gradient(135deg, #ffffff 0%, var(--primary) 100%);
+            background: linear-gradient(115deg, #ffffff 0%, #ffffff 30%, var(--primary) 50%, #ffffff 70%, #ffffff 100%);
+            background-size: 260% 100%;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
             line-height: 1.1;
             letter-spacing: -2px;
+        }
+        .hero-content h1 {
+            animation: rise 1.1s var(--ease) 0.3s backwards, sheen 10s ease-in-out 1.6s infinite alternate;
+        }
+        @keyframes sheen {
+            from { background-position: 100% 0; }
+            to   { background-position: 0% 0; }
         }
 
         .hero-content h2 {
@@ -231,9 +387,13 @@
             font-weight: 300;
             color: var(--text-en);
             letter-spacing: 6px;
-            margin-bottom: 50px;
+            margin-bottom: 40px;
             text-transform: uppercase;
         }
+
+        .hero-tag { margin-bottom: 44px; }
+        .hero-tag .en { font-size: 1.2rem; letter-spacing: 2px; }
+        .hero-tag .cn { font-size: 1.05rem; }
 
         /* Animated Interactive Button */
         .explore-btn {
@@ -268,23 +428,76 @@
         .explore-btn:hover {
             color: #000;
             box-shadow: 0 0 40px var(--primary-glow);
-            transform: translateY(-3px) scale(1.05);
+            transform: translateY(-3px);
             border-color: transparent;
         }
 
         .explore-btn:hover::before {
             width: 100%;
         }
-        
+
         .explore-btn svg {
             transition: transform 0.3s ease;
+            animation: nudge 2.4s ease-in-out infinite;
         }
         .explore-btn:hover svg {
-            transform: translateX(5px);
             stroke: #000;
         }
+        @keyframes nudge {
+            50% { transform: translateY(4px); }
+        }
 
-        /* --- Grid/Cards with Strong Hover Interaction --- */
+        /* --- Highlights strip --- */
+        #highlights {
+            padding: 0 0 10px;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            overflow: hidden;
+        }
+        .stat {
+            position: relative;
+            padding: 34px 28px;
+        }
+        .stat + .stat::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 24%;
+            bottom: 24%;
+            width: 1px;
+            background: var(--border);
+        }
+        .stat-num {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: clamp(2rem, 4vw, 3rem);
+            line-height: 1;
+            background: linear-gradient(135deg, #ffffff, var(--primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-variant-numeric: tabular-nums;
+        }
+        .stat-label {
+            margin-top: 12px;
+            color: var(--text-en);
+            font-size: 0.88rem;
+            line-height: 1.4;
+        }
+        .stat-cn {
+            color: var(--text-cn);
+            font-size: 0.78rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* --- Cards: a spotlight and a border highlight that follow the cursor --- */
         .card {
             background: var(--card-bg);
             border: 1px solid var(--border);
@@ -297,26 +510,43 @@
             overflow: hidden;
         }
 
-        .card::before {
+        .card::before,
+        .skill-card::before {
             content: '';
             position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+            inset: 0;
+            background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 0%), rgba(0, 243, 255, 0.09), transparent 45%);
             opacity: 0;
-            transition: opacity 0.6s ease;
+            transition: opacity 0.5s ease;
             pointer-events: none;
         }
 
-        .card:hover::before {
+        .card::after,
+        .skill-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: 1px;
+            background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 0%), rgba(0, 243, 255, 0.7), rgba(188, 0, 255, 0.28) 40%, transparent 65%);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask-composite: xor;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .card:hover::before, .card:hover::after,
+        .skill-card:hover::before, .skill-card:hover::after {
             opacity: 1;
         }
 
         .card:hover {
             background: var(--card-hover-bg);
-            border-color: var(--border-hover);
-            box-shadow: 0 20px 50px rgba(0, 243, 255, 0.15), inset 0 0 20px rgba(0, 243, 255, 0.05);
-            transform: translateY(-8px) scale(1.01);
+            box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
+            transform: translateY(-3px);
         }
 
         /* --- Education/Experience Timeline --- */
@@ -332,10 +562,11 @@
             top: 10px;
             bottom: 10px;
             width: 2px;
-            background: linear-gradient(to bottom, var(--primary) 0%, #bc00ff 100%);
-            opacity: 0.2;
+            background: linear-gradient(to bottom, var(--primary) 0%, var(--violet) 100%);
+            opacity: 0.16;
         }
 
+        /* The bright line draws itself as the section is scrolled through */
         .timeline::after {
             content: '';
             position: absolute;
@@ -343,32 +574,18 @@
             top: 10px;
             bottom: 10px;
             width: 2px;
-            background: linear-gradient(to bottom, var(--primary) 0%, #bc00ff 100%);
-            -webkit-mask-image: linear-gradient(to bottom, 
-                transparent calc(var(--mouse-y, 50%) - 80px), 
-                black calc(var(--mouse-y, 50%) - 10px), 
-                black calc(var(--mouse-y, 50%) + 10px), 
-                transparent calc(var(--mouse-y, 50%) + 80px)
-            );
-            mask-image: linear-gradient(to bottom, 
-                transparent calc(var(--mouse-y, 50%) - 80px), 
-                black calc(var(--mouse-y, 50%) - 10px), 
-                black calc(var(--mouse-y, 50%) + 10px), 
-                transparent calc(var(--mouse-y, 50%) + 80px)
-            );
-            filter: blur(1px) drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .timeline:hover::after {
-            opacity: 1;
+            background: linear-gradient(to bottom, var(--primary) 0%, var(--violet) 100%);
+            box-shadow: 0 0 12px rgba(0, 243, 255, 0.45);
+            transform-origin: top center;
+            transform: scaleY(var(--tl, 0));
+            pointer-events: none;
         }
 
         .timeline-item {
             position: relative;
             margin-bottom: 60px;
         }
+        .timeline-item:last-child { margin-bottom: 0; }
 
         .timeline-item::before {
             content: '';
@@ -378,16 +595,19 @@
             width: 14px;
             height: 14px;
             background: var(--bg);
-            border: 2px solid var(--primary);
+            border: 2px solid rgba(0, 243, 255, 0.35);
             border-radius: 50%;
-            box-shadow: 0 0 15px var(--primary-glow);
             z-index: 1;
             transition: var(--transition);
+        }
+        .timeline-item.reached::before {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
         }
 
         .timeline-item:hover::before {
             background: var(--primary);
-            transform: scale(1.5);
+            transform: scale(1.4);
             box-shadow: 0 0 25px var(--primary);
         }
 
@@ -397,6 +617,7 @@
             font-size: 1.1rem;
             background: linear-gradient(90deg, var(--primary), #fff);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 12px;
             display: inline-block;
@@ -476,116 +697,62 @@
             line-height: 1.5;
         }
 
-        /* --- Skills Section (Carousel) --- */
-        .skills-carousel-container {
-            position: relative;
-            width: 100%;
-            max-width: 900px;
+        /* --- Skills Section (grid) --- */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 20px 50px;
-            overflow: hidden;
-        }
-
-        .skills-carousel-track-wrapper {
-            overflow: hidden;
-            width: 100%;
-        }
-
-        .skills-carousel-track {
-            display: flex;
-            transition: transform 0.5s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         .skill-card {
+            position: relative;
+            overflow: hidden;
             background: var(--card-bg);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            transition: var(--transition);
+            border-radius: 16px;
+            padding: 26px 24px;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            width: calc(33.333% - 20px);
-            margin: 0 10px;
-            flex-shrink: 0;
-            box-sizing: border-box;
+            align-items: flex-start;
+            gap: 14px;
+            transition: var(--transition);
         }
 
         .skill-card:hover {
-            border-color: var(--primary);
             background: var(--card-hover-bg);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px var(--primary-glow);
-        }
-
-        .carousel-btn {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--primary);
-            font-size: 2.5rem;
-            cursor: pointer;
-            z-index: 10;
-            transition: var(--transition);
-            opacity: 0.7;
-        }
-
-        .carousel-btn:hover {
-            opacity: 1;
-            color: #fff;
-            text-shadow: 0 0 10px var(--primary-glow);
-        }
-
-        .carousel-btn.prev { left: 0; }
-        .carousel-btn.next { right: 0; }
-        
-        .carousel-dots {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 25px;
-        }
-        
-        .dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-        
-        .dot.active {
-            background: var(--primary);
-            box-shadow: 0 0 8px var(--primary-glow);
-        }
-
-        @media (max-width: 768px) {
-            .skill-card { width: calc(50% - 20px); }
-        }
-        @media (max-width: 480px) {
-            .skill-card { width: calc(100% - 20px); }
-            .skills-carousel-container { padding: 20px 30px; }
+            transform: translateY(-3px);
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.35);
         }
 
         .skill-icon {
-            font-size: 1.5rem;
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: rgba(0, 243, 255, 0.05);
             color: var(--primary);
-            margin-bottom: 5px;
+            transition: var(--transition);
+        }
+        .skill-card:hover .skill-icon {
+            background: rgba(0, 243, 255, 0.12);
+            border-color: var(--border-hover);
         }
 
         .skill-card h4 {
-            font-size: 1rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
             margin: 0;
             color: var(--text-main);
         }
 
-        .skill-card .bilingual .en { font-size: 0.8rem; }
-        .skill-card .bilingual .cn { font-size: 0.75rem; }
+        .skill-card .bilingual { margin-bottom: 0; gap: 3px; }
+        .skill-card .bilingual .en { font-size: 0.85rem; }
+        .skill-card .bilingual .cn { font-size: 0.78rem; }
 
         /* --- Projects Section --- */
         .project-grid {
@@ -600,6 +767,18 @@
             color: var(--primary);
             margin-bottom: 18px;
         }
+
+        .project-link {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .project-link svg { transition: transform 0.4s var(--ease); }
+        .project-card:hover .project-link svg { transform: translate(3px, -3px); }
 
         .project-tags {
             display: flex;
@@ -620,8 +799,8 @@
             transition: var(--transition);
         }
         .card:hover .tag {
-            background: rgba(0, 243, 255, 0.15);
-            border-color: var(--primary);
+            background: rgba(0, 243, 255, 0.14);
+            border-color: var(--border-hover);
             color: #fff;
         }
 
@@ -633,6 +812,15 @@
             text-align: center;
             padding: 60px 40px;
         }
+        .contact-content:hover { transform: none; }
+
+        .contact-intro {
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto 10px;
+        }
+        .contact-intro .en { font-size: 1.1rem; }
+        .contact-intro .cn { font-size: 1.05rem; }
 
         .contact-links {
             display: flex;
@@ -675,25 +863,24 @@
             transition: var(--transition);
         }
 
-        .contact-item:hover {
-            transform: translateY(-8px);
+        a.contact-item:hover {
+            transform: translateY(-6px);
         }
-        .contact-item:hover .contact-icon-wrapper {
+        a.contact-item:hover .contact-icon-wrapper {
             background: rgba(0, 243, 255, 0.1);
             border-color: var(--primary);
             box-shadow: 0 10px 25px var(--primary-glow);
-            transform: scale(1.1);
+            transform: scale(1.08);
         }
-        .contact-item:hover svg {
+        a.contact-item:hover svg {
             stroke: #fff;
-            filter: drop-shadow(0 0 5px #fff);
         }
         .contact-item span {
             font-weight: 600;
             letter-spacing: 1px;
             transition: color 0.3s;
         }
-        .contact-item:hover span { color: var(--primary); }
+        a.contact-item:hover span { color: var(--primary); }
         .contact-sub {
             margin-top: -8px;
             text-align: center;
@@ -701,6 +888,17 @@
             font-size: 0.8rem;
             color: var(--text-cn);
             letter-spacing: 0.3px;
+        }
+        .contact-phone {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .contact-phone span {
+            font-size: 1.05rem;
+            color: var(--primary);
         }
 
         /* --- Footer --- */
@@ -712,16 +910,69 @@
             font-size: 0.9rem;
             background: linear-gradient(to top, rgba(0,243,255,0.02), transparent);
         }
+        footer .bilingual { margin-bottom: 0; }
+        footer .en { font-size: 0.85rem; }
+        footer .cn { font-size: 0.8rem; }
 
         /* --- Responsive --- */
         @media (max-width: 900px) {
-            .nav-links { display: none; }
             .container { padding: 0 25px; }
             section { padding: 80px 0; }
+            #highlights { padding: 0 0 10px; }
             .hero-content h2 { font-size: 1.2rem; letter-spacing: 3px; }
             .timeline-header { flex-direction: column; }
             .section-title { font-size: 24px; margin-bottom: 40px; }
             .project-grid { grid-template-columns: 1fr; }
+            .skills-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats { grid-template-columns: repeat(2, 1fr); }
+            .stat:nth-child(3)::before { display: none; }
+            .stat:nth-child(n+3) { border-top: 1px solid var(--border); }
+
+            .nav-toggle { display: block; }
+            .nav-links {
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                flex-direction: column;
+                gap: 0;
+                padding: 6px 25px 14px;
+                background: rgba(3, 3, 5, 0.96);
+                border-bottom: 1px solid var(--border);
+                opacity: 0;
+                transform: translateY(-8px);
+                pointer-events: none;
+                transition: opacity 0.35s ease, transform 0.45s var(--ease);
+            }
+            nav.open .nav-links {
+                opacity: 1;
+                transform: none;
+                pointer-events: auto;
+            }
+            .nav-links a { display: block; padding: 14px 0; }
+            .nav-links a::after { display: none; }
+        }
+        @media (max-width: 560px) {
+            .hero-kicker { padding: 6px 14px; font-size: 0.68rem; letter-spacing: 1.5px; white-space: nowrap; }
+            .hero-tag .en { font-size: 1.05rem; letter-spacing: 1px; }
+            .explore-btn { padding: 14px 24px; font-size: 0.92rem; letter-spacing: 0.5px; gap: 10px; }
+            .skills-grid { grid-template-columns: 1fr; }
+            .contact-content { padding: 44px 22px; }
+            .contact-links { gap: 34px; }
+            .card { padding: 26px; }
+        }
+
+        /* --- Respect reduced-motion preferences --- */
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            *, *::before, *::after {
+                animation: none !important;
+                transition-duration: 0.01ms !important;
+                transition-delay: 0ms !important;
+            }
+            .js [data-reveal] { opacity: 1; transform: none; }
+            .js .section-title[data-reveal]::after { transform: none; }
+            .timeline::after { transform: scaleY(1); }
         }
     </style>
 </head>
@@ -733,7 +984,8 @@
     <nav id="navbar">
         <div class="container">
             <a href="#home" class="logo">Lucas Yan</a>
-            <ul class="nav-links">
+            <button class="nav-toggle" id="navToggle" type="button" aria-label="Menu" aria-expanded="false" aria-controls="navLinks"><span></span><span></span><span></span></button>
+            <ul class="nav-links" id="navLinks">
                 <li><a href="#home">Home</a></li>
                 <li><a href="#education">Education</a></li>
                 <li><a href="#experience">Experience</a></li>
@@ -742,17 +994,19 @@
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
+        <div id="progress" aria-hidden="true"></div>
     </nav>
 
     <main>
         <!-- Home / 首页 -->
         <section id="home">
             <div class="hero-content">
+                <div class="hero-kicker">Rutgers University · Class of 2029</div>
                 <h1>Lucas Yan</h1>
                 <h2>闫智尧</h2>
-                <div class="bilingual" style="margin-bottom: 40px;">
-                    <span class="en" style="font-size: 1.2rem; letter-spacing: 2px;">Finance & Computer Science at Rutgers University</span>
-                    <span class="cn" style="font-size: 1.1rem;">罗格斯大学 · 金融与计算机科学</span>
+                <div class="bilingual hero-tag">
+                    <span class="en">Finance & Computer Science at Rutgers University</span>
+                    <span class="cn">罗格斯大学 · 金融与计算机科学</span>
                 </div>
                 <a href="#education" class="explore-btn" id="explore-nav">
                     <span>View my background / 查看经历</span>
@@ -762,13 +1016,35 @@
         </section>
 
         <div class="container">
-            
+
+            <!-- Highlights: figures taken from the resume -->
+            <section id="highlights" aria-label="Highlights">
+                <div class="stats" data-reveal>
+                    <div class="stat">
+                        <div class="stat-num" data-count="56">56</div>
+                        <div class="stat-label">Student volunteers led<br><span class="stat-cn">带领的学生志愿者</span></div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num" data-count="5000" data-suffix="+">5,000+</div>
+                        <div class="stat-label">Community members reached<br><span class="stat-cn">覆盖的社区成员</span></div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num" data-count="20">20</div>
+                        <div class="stat-label">Wetland zones surveyed<br><span class="stat-cn">生物多样性调查湿地点</span></div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-num" data-count="26" data-suffix="h">26h</div>
+                        <div class="stat-label">Build-a-thon, Magic Glove<br><span class="stat-cn">26 小时工程赛</span></div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Education / 教育经历 -->
             <section id="education">
-                <h2 class="section-title">Education Journey / 教育经历</h2>
+                <h2 class="section-title" data-reveal>Education Journey / 教育经历</h2>
                 <div class="timeline">
                     <!-- Rutgers -->
-                    <div class="timeline-item">
+                    <div class="timeline-item" data-reveal>
                         <div class="timeline-date">Expected May 2029</div>
                         <div class="card">
                             <div class="timeline-header">
@@ -802,7 +1078,7 @@
                     </div>
                     
                     <!-- High School Diploma -->
-                    <div class="timeline-item">
+                    <div class="timeline-item" data-reveal>
                         <div class="timeline-date">Aug 2021 - May 2025</div>
                         <div class="card">
                             <div class="timeline-header">
@@ -842,10 +1118,10 @@
 
             <!-- Experience / 职业经历 -->
             <section id="experience">
-                <h2 class="section-title">Professional Experience / 职业经历</h2>
+                <h2 class="section-title" data-reveal>Professional Experience / 职业经历</h2>
                 <div class="timeline">
                     <!-- Tutturo -->
-                    <div class="timeline-item">
+                    <div class="timeline-item" data-reveal>
                         <div class="timeline-date">2025.10 - Present</div>
                         <div class="card">
                             <div class="timeline-header">
@@ -875,7 +1151,7 @@
                     </div>
 
                     <!-- CSSA -->
-                    <div class="timeline-item">
+                    <div class="timeline-item" data-reveal>
                         <div class="timeline-date">2025.08 - Present</div>
                         <div class="card">
                             <div class="timeline-header">
@@ -905,7 +1181,7 @@
                     </div>
 
                     <!-- Foundation -->
-                    <div class="timeline-item">
+                    <div class="timeline-item" data-reveal>
                         <div class="timeline-date">2020.05 - 2025.06</div>
                         <div class="card">
                             <div class="timeline-header">
@@ -943,71 +1219,64 @@
             </section>
 
             <!-- Skills / 技能专长 -->
-            <section id="skills" style="padding-bottom: 0px;">
-                <h2 class="section-title">Skills & Expertise / 技能专长</h2>
+            <section id="skills">
+                <h2 class="section-title" data-reveal>Skills & Expertise / 技能专长</h2>
                 
-                <div class="skills-carousel-container" id="skillsCarousel">
-                    <button class="carousel-btn prev" id="prevSkill">❮</button>
-                    <div class="skills-carousel-track-wrapper">
-                        <div class="skills-carousel-track" id="skillsTrack">
-                            <div class="skill-card">
-                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
-                                <h4>Python</h4>
-                                <div class="bilingual"><span class="en">Data & Automation</span><span class="cn">数据与自动化</span></div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg></div>
-                                <h4>Java</h4>
-                                <div class="bilingual"><span class="en">System Logic</span><span class="cn">系统逻辑</span></div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg></div>
-                                <h4>C++ (VibeCoding)</h4>
-                                <div class="bilingual"><span class="en">Hardware Control</span><span class="cn">硬件底层控制</span></div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M7 10h4M7 14h4M13 12h4"></path></svg></div>
-                                <h4>Arduino IDE</h4>
-                                <div class="bilingual"><span class="en">System Integration</span><span class="cn">嵌入式系统集成</span></div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6"></rect><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg></div>
-                                <h4>Hardware Integration</h4>
-                                <div class="bilingual"><span class="en">Sensors to software</span><span class="cn">硬件与软件联调</span></div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg></div>
-                                <h4>AI Tools Proficiency</h4>
-                                <div class="bilingual"><span class="en">Prompt Engineering</span><span class="cn">AI辅助开发</span></div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
-                                <h4>Search & Data Integration</h4>
-                                <div class="bilingual"><span class="en">Research & data gathering</span><span class="cn">信息检索与数据整合</span></div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg></div>
-                                <h4>Office 365</h4>
-                                <div class="bilingual"><span class="en">PowerPoint, Excel, Word</span><span class="cn">数据处理与可视化</span></div>
-                            </div>
-                            <div class="skill-card">
-                                <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
-                                <h4>Languages</h4>
-                                <div class="bilingual"><span class="en">English (Fluent), Mandarin (Native)</span><span class="cn">英语流利 · 中文母语</span></div>
-                            </div>
-                        </div>
+                <div class="skills-grid" id="skillsGrid">
+                    <div class="skill-card" data-reveal>
+                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
+                        <h4>Python</h4>
+                        <div class="bilingual"><span class="en">Data & Automation</span><span class="cn">数据与自动化</span></div>
                     </div>
-                    <button class="carousel-btn next" id="nextSkill">❯</button>
+                    <div class="skill-card" data-reveal>
+                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg></div>
+                        <h4>Java</h4>
+                        <div class="bilingual"><span class="en">System Logic</span><span class="cn">系统逻辑</span></div>
+                    </div>
+                    <div class="skill-card" data-reveal>
+                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg></div>
+                        <h4>C++ (VibeCoding)</h4>
+                        <div class="bilingual"><span class="en">Hardware Control</span><span class="cn">硬件底层控制</span></div>
+                    </div>
+                    <div class="skill-card" data-reveal>
+                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M7 10h4M7 14h4M13 12h4"></path></svg></div>
+                        <h4>Arduino IDE</h4>
+                        <div class="bilingual"><span class="en">System Integration</span><span class="cn">嵌入式系统集成</span></div>
+                    </div>
+                    <div class="skill-card" data-reveal>
+                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6"></rect><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg></div>
+                        <h4>Hardware Integration</h4>
+                        <div class="bilingual"><span class="en">Sensors to software</span><span class="cn">硬件与软件联调</span></div>
+                    </div>
+                    <div class="skill-card" data-reveal>
+                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg></div>
+                        <h4>AI Tools Proficiency</h4>
+                        <div class="bilingual"><span class="en">Prompt Engineering</span><span class="cn">AI辅助开发</span></div>
+                    </div>
+                    <div class="skill-card" data-reveal>
+                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
+                        <h4>Search & Data Integration</h4>
+                        <div class="bilingual"><span class="en">Research & data gathering</span><span class="cn">信息检索与数据整合</span></div>
+                    </div>
+                    <div class="skill-card" data-reveal>
+                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg></div>
+                        <h4>Office 365</h4>
+                        <div class="bilingual"><span class="en">PowerPoint, Excel, Word</span><span class="cn">数据处理与可视化</span></div>
+                    </div>
+                    <div class="skill-card" data-reveal>
+                        <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
+                        <h4>Languages</h4>
+                        <div class="bilingual"><span class="en">English (Fluent), Mandarin (Native)</span><span class="cn">英语流利 · 中文母语</span></div>
+                    </div>
                 </div>
-                <div class="carousel-dots" id="skillsDots"></div>
             </section>
 
             <!-- Projects / 项目案例 -->
             <section id="projects">
-                <h2 class="section-title">Projects & Highlights / 项目与亮点</h2>
+                <h2 class="section-title" data-reveal>Projects & Highlights / 项目与亮点</h2>
                 <div class="project-grid">
                     <!-- Project 1 -->
-                    <a href="https://github.com/LucasYanzy/Magic-Glove" target="_blank" class="card project-card" style="text-decoration: none; color: inherit; position: relative;">
+                    <a href="https://github.com/LucasYanzy/Magic-Glove" target="_blank" class="card project-card" data-reveal style="text-decoration: none; color: inherit;">
                         <div>
                             <h3 style="margin-bottom: 6px; font-size: 1.4rem;">Magic Glove</h3>
                             <div class="project-meta">2026 IEEE x RUHART Build-a-thon · Hardware Developer · Apr 2026</div>
@@ -1016,7 +1285,7 @@
                                 <span class="cn">在 Rutgers IEEE 26 小时工程赛中荣获 "最佳生产力与自动化挑战" 奖项。使用 C++ (VibeCoding) 与 Arduino IDE 开发的可穿戴硬件控制器，将自然手势转换为数字指令，替代传统鼠标与键盘输入。</span>
                             </div>
                         </div>
-                        <div style="margin-top: 15px; font-size: 0.85rem; color: var(--primary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <div class="project-link">
                             <span>Visit Repo / 点击访问仓库</span>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
                         </div>
@@ -1029,7 +1298,7 @@
                     </a>
 
                     <!-- Project 2 -->
-                    <div class="card project-card">
+                    <div class="card project-card" data-reveal>
                         <div>
                             <h3 style="margin-bottom: 6px; font-size: 1.4rem;">Independent Web Portfolio</h3>
                             <div class="project-meta">AI Web Developer · Present</div>
@@ -1049,11 +1318,11 @@
 
             <!-- Contact / 联系方式 -->
             <section id="contact">
-                <h2 class="section-title">Get In Touch / 联系我</h2>
-                <div class="card contact-content">
-                    <div class="bilingual" style="text-align: center; max-width: 600px; margin: 0 auto 10px;">
-                        <span class="en" style="font-size: 1.1rem;">Open to conversations about finance, software, hardware projects and anything in between. Email is the quickest way to reach me.</span>
-                        <span class="cn" style="font-size: 1.05rem;">金融、软件、硬件项目的交流都欢迎，邮件回复最快。</span>
+                <h2 class="section-title" data-reveal>Get In Touch / 联系我</h2>
+                <div class="card contact-content" data-reveal>
+                    <div class="bilingual contact-intro">
+                        <span class="en">Open to conversations about finance, software, hardware projects and anything in between. Email is the quickest way to reach me.</span>
+                        <span class="cn">金融、软件、硬件项目的交流都欢迎，邮件回复最快。</span>
                     </div>
                     
                     <div class="contact-links">
@@ -1086,9 +1355,9 @@
                             <div class="contact-icon-wrapper">
                                 <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                             </div>
-                            <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-top: 10px;">
-                                <span style="font-size: 1.1rem; color: var(--primary);">+1 (848) 437 0914</span>
-                                <span style="font-size: 1.1rem; color: var(--primary);">+86 157 5299 5980</span>
+                            <div class="contact-phone">
+                                <span>+1 (848) 437 0914</span>
+                                <span>+86 157 5299 5980</span>
                             </div>
                         </div>
                     </div>
@@ -1098,306 +1367,344 @@
     </main>
 
     <footer>
-        <div class="bilingual" style="margin-bottom: 0;">
-            <span class="en" style="font-size: 0.85rem;">© 2026 Lucas Yan</span>
-            <span class="cn" style="font-size: 0.8rem;">© 2026 闫智尧</span>
+        <div class="bilingual">
+            <span class="en">© 2026 Lucas Yan</span>
+            <span class="cn">© 2026 闫智尧</span>
         </div>
     </footer>
 
     <script>
-        // --- 30FPS Advanced Nebula Background ---
-        const canvas = document.getElementById('bg-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let particles = [];
-        const mouse = { x: null, y: null, radius: 250 };
+        (function () {
+            const root = document.documentElement;
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
-        });
-
-        window.addEventListener('mouseout', () => {
-            mouse.x = null;
-            mouse.y = null;
-        });
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-            initParticles();
-        }
-
-        window.addEventListener('resize', resize);
-        resize();
-
-        function initParticles() {
-            particles = [];
-            // Adding more particles for depth, with parallax layers
-            const count = Math.min(Math.floor((width * height) / 10000), 120);
-            for (let i = 0; i < count; i++) {
-                const z = Math.random(); // Depth factor
-                particles.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    vx: (Math.random() - 0.5) * (0.3 + z * 0.4),
-                    vy: (Math.random() - 0.5) * (0.3 + z * 0.4),
-                    baseRadius: 0.8 + z * 1.2,
-                    radius: 0,
-                    z: z // 0 is back, 1 is front
-                });
-            }
-        }
-
-        let lastTime = 0;
-        const fps = 30;
-        const interval = 1000 / fps;
-
-        function animate(timestamp) {
-            requestAnimationFrame(animate);
-
-            const delta = timestamp - lastTime;
-            if (delta < interval) return;
-            lastTime = timestamp - (delta % interval);
-
-            ctx.clearRect(0, 0, width, height);
-
-            // 1. Ambient Nebula Glow
-            if (mouse.x !== null) {
-                const nebula = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 600);
-                nebula.addColorStop(0, 'rgba(0, 243, 255, 0.08)');
-                nebula.addColorStop(0.5, 'rgba(144, 78, 149, 0.03)');
-                nebula.addColorStop(1, 'transparent');
-                ctx.fillStyle = nebula;
-                ctx.fillRect(0, 0, width, height);
+            // If anything below fails, drop the "js" class so no content stays hidden by the reveal styles.
+            try {
+                init();
+            } catch (err) {
+                root.classList.remove('js');
+                console.error(err);
             }
 
-            // 2. Draw Connections with Pulse effect
-            const time = Date.now() * 0.001;
-            for (let i = 0; i < particles.length; i++) {
-                for (let j = i + 1; j < particles.length; j++) {
-                    const dx = particles[i].x - particles[j].x;
-                    const dy = particles[i].y - particles[j].y;
-                    const d = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (d < 150) {
-                        const opacity = (1 - d / 150) * 0.2;
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(0, 243, 255, ${opacity})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.moveTo(particles[i].x, particles[i].y);
-                        ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.stroke();
+            function init() {
+                initBackground();
+                initReveal();
+                initCounters();
+                initScrollEffects();
+                initPointerLight();
+                initMobileNav();
+                initScrollbar();
+            }
 
-                        // Data Pulse Effect
-                        if (opacity > 0.1) {
-                            const pulsePos = (time * 0.5 + (i + j)) % 1;
-                            const px = particles[i].x + (particles[j].x - particles[i].x) * pulsePos;
-                            const py = particles[i].y + (particles[j].y - particles[i].y) * pulsePos;
-                            ctx.beginPath();
-                            ctx.arc(px, py, 1, 0, Math.PI * 2);
-                            ctx.fillStyle = `rgba(255, 255, 255, ${opacity * 2})`;
-                            ctx.fill();
+            // --- Background: drifting particle network that brightens near the pointer ---
+            function initBackground() {
+                const canvas = document.getElementById('bg-canvas');
+                const ctx = canvas.getContext('2d');
+                const mouse = { x: null, y: null, radius: 250 };
+                let width = 0;
+                let height = 0;
+                let particles = [];
+
+                window.addEventListener('pointermove', (e) => {
+                    if (e.pointerType === 'touch') return;
+                    mouse.x = e.clientX;
+                    mouse.y = e.clientY;
+                }, { passive: true });
+                document.addEventListener('mouseleave', () => { mouse.x = null; mouse.y = null; });
+
+                function initParticles() {
+                    particles = [];
+                    const count = Math.min(Math.floor((width * height) / 10000), 120);
+                    for (let i = 0; i < count; i++) {
+                        const z = Math.random(); // depth: 0 is back, 1 is front
+                        particles.push({
+                            x: Math.random() * width,
+                            y: Math.random() * height,
+                            vx: (Math.random() - 0.5) * (0.3 + z * 0.4),
+                            vy: (Math.random() - 0.5) * (0.3 + z * 0.4),
+                            baseRadius: 0.8 + z * 1.2,
+                            radius: 0,
+                            z: z
+                        });
+                    }
+                }
+
+                function resize() {
+                    const widthChanged = window.innerWidth !== width;
+                    width = canvas.width = window.innerWidth;
+                    height = canvas.height = window.innerHeight;
+                    // Mobile browsers fire resize while the address bar slides; keep the particles then.
+                    if (widthChanged || !particles.length) initParticles();
+                    if (reduceMotion) draw(false);
+                }
+
+                function draw(move) {
+                    ctx.clearRect(0, 0, width, height);
+
+                    if (mouse.x !== null) {
+                        const nebula = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 600);
+                        nebula.addColorStop(0, 'rgba(0, 243, 255, 0.08)');
+                        nebula.addColorStop(0.5, 'rgba(144, 78, 149, 0.03)');
+                        nebula.addColorStop(1, 'transparent');
+                        ctx.fillStyle = nebula;
+                        ctx.fillRect(0, 0, width, height);
+                    }
+
+                    const time = Date.now() * 0.001;
+                    for (let i = 0; i < particles.length; i++) {
+                        for (let j = i + 1; j < particles.length; j++) {
+                            const dx = particles[i].x - particles[j].x;
+                            const dy = particles[i].y - particles[j].y;
+                            const d = Math.sqrt(dx * dx + dy * dy);
+                            if (d < 150) {
+                                const opacity = (1 - d / 150) * 0.2;
+                                ctx.beginPath();
+                                ctx.strokeStyle = 'rgba(0, 243, 255, ' + opacity + ')';
+                                ctx.lineWidth = 0.5;
+                                ctx.moveTo(particles[i].x, particles[i].y);
+                                ctx.lineTo(particles[j].x, particles[j].y);
+                                ctx.stroke();
+
+                                if (opacity > 0.1 && move) {
+                                    const pulsePos = (time * 0.5 + (i + j)) % 1;
+                                    const px = particles[i].x + (particles[j].x - particles[i].x) * pulsePos;
+                                    const py = particles[i].y + (particles[j].y - particles[i].y) * pulsePos;
+                                    ctx.beginPath();
+                                    ctx.arc(px, py, 1, 0, Math.PI * 2);
+                                    ctx.fillStyle = 'rgba(255, 255, 255, ' + (opacity * 2) + ')';
+                                    ctx.fill();
+                                }
+                            }
                         }
                     }
-                }
-            }
 
-            // 3. Draw Particles
-            for (let p of particles) {
-                p.x += p.vx;
-                p.y += p.vy;
+                    for (const p of particles) {
+                        if (move) {
+                            p.x += p.vx;
+                            p.y += p.vy;
+                        }
 
-                // Mouse interaction - Focus on brightness and depth rather than sensitivity
-                p.radius = p.baseRadius;
-                p.colorOpacity = 0.4 + p.z * 0.4;
-                if (mouse.x !== null) {
-                    const dx = mouse.x - p.x;
-                    const dy = mouse.y - p.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < mouse.radius) {
-                        const force = (mouse.radius - dist) / mouse.radius;
-                        // Light movement attraction (very subtle)
-                        p.x += (dx / dist) * force * 0.8;
-                        p.y += (dy / dist) * force * 0.8;
-                        // Significant brightness boost
-                        p.radius = p.baseRadius + force * 1.5;
-                        p.colorOpacity = Math.min(1, p.colorOpacity + force * 0.6);
+                        p.radius = p.baseRadius;
+                        let alpha = 0.4 + p.z * 0.4;
+                        if (mouse.x !== null) {
+                            const dx = mouse.x - p.x;
+                            const dy = mouse.y - p.y;
+                            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                            if (dist < mouse.radius) {
+                                const force = (mouse.radius - dist) / mouse.radius;
+                                if (move) {
+                                    p.x += (dx / dist) * force * 0.8;
+                                    p.y += (dy / dist) * force * 0.8;
+                                }
+                                p.radius = p.baseRadius + force * 1.5;
+                                alpha = Math.min(1, alpha + force * 0.6);
+                            }
+                        }
+
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                        ctx.fillStyle = 'rgba(0, 243, 255, ' + alpha + ')';
+                        if (p.radius > 2) {
+                            ctx.shadowBlur = 10;
+                            ctx.shadowColor = '#00f3ff';
+                        }
+                        ctx.fill();
+                        ctx.shadowBlur = 0;
+
+                        if (p.x < -50) p.x = width + 50;
+                        if (p.x > width + 50) p.x = -50;
+                        if (p.y < -50) p.y = height + 50;
+                        if (p.y > height + 50) p.y = -50;
                     }
                 }
 
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                
-                // Reactive coloring
-                ctx.fillStyle = `rgba(0, 243, 255, ${p.colorOpacity})`;
-                
-                if (p.radius > 2) {
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#00f3ff';
+                window.addEventListener('resize', resize);
+                resize();
+
+                if (reduceMotion) return;
+
+                const interval = 1000 / 30;
+                let last = 0;
+                function loop(ts) {
+                    requestAnimationFrame(loop);
+                    const delta = ts - last;
+                    if (delta < interval) return;
+                    last = ts - (delta % interval);
+                    draw(true);
                 }
-                ctx.fill();
-                ctx.shadowBlur = 0;
-
-                // Wrap edges
-                if (p.x < -50) p.x = width + 50;
-                if (p.x > width + 50) p.x = -50;
-                if (p.y < -50) p.y = height + 50;
-                if (p.y > height + 50) p.y = -50;
+                requestAnimationFrame(loop);
             }
-        }
 
-        requestAnimationFrame(animate);
-
-        // --- 视差滚动与进入动画感知 ---
-        const observerOptions = {
-            threshold: 0.15,
-            rootMargin: "0px 0px -50px 0px"
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    // Entry animation for sections
-                    entry.target.classList.add('visible');
+            // --- Staggered reveal as elements enter the viewport ---
+            function initReveal() {
+                const els = Array.from(document.querySelectorAll('[data-reveal]'));
+                if (!('IntersectionObserver' in window) || reduceMotion) {
+                    els.forEach((el) => el.removeAttribute('data-reveal'));
+                    return;
                 }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('section').forEach(section => {
-            observer.observe(section);
-        });
-
-        // --- 导航栏磨砂玻璃滚动交互 ---
-        window.addEventListener('scroll', () => {
-            const nav = document.getElementById('navbar');
-            if (window.scrollY > 50) {
-                nav.style.padding = '12px 0';
-                nav.style.background = 'rgba(3, 3, 5, 0.9)';
-                nav.style.boxShadow = '0 5px 20px rgba(0,0,0,0.5)';
-            } else {
-                nav.style.padding = '20px 0';
-                nav.style.background = 'rgba(3, 3, 5, 0.5)';
-                nav.style.boxShadow = 'none';
+                const io = new IntersectionObserver((entries) => {
+                    const batch = entries
+                        .filter((e) => e.isIntersecting)
+                        .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top || a.boundingClientRect.left - b.boundingClientRect.left);
+                    batch.forEach((entry, i) => {
+                        const el = entry.target;
+                        const delay = Math.min(i, 6) * 90;
+                        io.unobserve(el);
+                        el.style.setProperty('--d', delay + 'ms');
+                        el.classList.add('in');
+                        // Once settled, hand the element back to its normal styles so hover transitions are not slowed down.
+                        setTimeout(() => {
+                            el.removeAttribute('data-reveal');
+                            el.classList.remove('in');
+                            el.style.removeProperty('--d');
+                        }, 1300 + delay);
+                    });
+                }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+                els.forEach((el) => io.observe(el));
             }
-        });
 
-        // --- 时间轴颜色流动交互 ---
-        document.querySelectorAll('.timeline').forEach(timeline => {
-            timeline.addEventListener('mousemove', (e) => {
-                const rect = timeline.getBoundingClientRect();
-                const y = e.clientY - rect.top;
-                const percent = (y / rect.height) * 100;
-                timeline.style.setProperty('--mouse-y', `${percent}%`);
-            });
-        });
-        // --- 滚动条颜色缓慢变色与自动隐藏 ---
-        let scrollHideTimeout;
-        let scrollAlpha = 0;
-        let fadeInterval = null;
+            // --- Numbers in the highlights strip count up once ---
+            function initCounters() {
+                const els = Array.from(document.querySelectorAll('[data-count]'));
+                const format = (el, n) => Math.round(n).toLocaleString('en-US') + (el.dataset.suffix || '');
+                if (!els.length || !('IntersectionObserver' in window) || reduceMotion) return;
+                els.forEach((el) => { el.textContent = format(el, 0); });
+                const io = new IntersectionObserver((entries) => {
+                    entries.forEach((entry) => {
+                        if (!entry.isIntersecting) return;
+                        const el = entry.target;
+                        io.unobserve(el);
+                        const target = parseFloat(el.dataset.count);
+                        const duration = 1600;
+                        const start = performance.now();
+                        (function tick(now) {
+                            const t = Math.min(1, (now - start) / duration);
+                            const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+                            el.textContent = format(el, target * eased);
+                            if (t < 1) requestAnimationFrame(tick);
+                        })(start);
+                    });
+                }, { threshold: 0.6 });
+                els.forEach((el) => io.observe(el));
+            }
 
-        function updateScrollVisuals(scrollTop, docHeight) {
-            const scrollPercent = Math.min(scrollTop / docHeight, 1);
-            // 缓慢从青色 rgb(0,243,255) 渐变到 紫粉色 rgb(188,0,255)
-            const r = Math.floor(0 + (188 - 0) * scrollPercent);
-            const g = Math.floor(243 + (0 - 243) * scrollPercent);
-            const b = 255;
-            document.documentElement.style.setProperty('--scroll-color', `rgba(${r}, ${g}, ${b}, ${scrollAlpha})`);
-            document.documentElement.style.setProperty('--scroll-border', `rgba(255, 255, 255, ${scrollAlpha * 0.4})`);
-            document.documentElement.style.setProperty('--scroll-shadow', `rgba(0, 243, 255, ${scrollAlpha * 0.2})`);
-        }
+            // --- Scroll-linked: nav state, progress bar, active link, timeline line ---
+            function initScrollEffects() {
+                const nav = document.getElementById('navbar');
+                const progress = document.getElementById('progress');
+                const links = Array.from(document.querySelectorAll('.nav-links a'));
+                const sections = links
+                    .map((a) => document.querySelector(a.getAttribute('href')))
+                    .filter(Boolean);
+                const timelines = Array.from(document.querySelectorAll('.timeline')).map((el) => ({
+                    el: el,
+                    items: Array.from(el.querySelectorAll('.timeline-item'))
+                }));
+                let ticking = false;
 
-        window.addEventListener('scroll', () => {
-            const scrollTop = window.scrollY;
-            const docHeight = document.body.scrollHeight - window.innerHeight;
-            if (docHeight <= 0) return;
-            
-            clearInterval(fadeInterval);
-            scrollAlpha = 0.8;
-            updateScrollVisuals(scrollTop, docHeight);
-            
-            clearTimeout(scrollHideTimeout);
-            scrollHideTimeout = setTimeout(() => {
-                // Smooth fade out
-                fadeInterval = setInterval(() => {
-                    scrollAlpha -= 0.05;
-                    if (scrollAlpha <= 0) {
-                        scrollAlpha = 0;
-                        clearInterval(fadeInterval);
+                function update() {
+                    ticking = false;
+                    const y = window.scrollY;
+                    const vh = window.innerHeight;
+                    const max = document.documentElement.scrollHeight - vh;
+
+                    nav.classList.toggle('scrolled', y > 40);
+                    progress.style.setProperty('--p', max > 0 ? Math.min(1, y / max).toFixed(4) : '0');
+
+                    const probe = vh * 0.35;
+                    let current = sections[0];
+                    sections.forEach((s) => {
+                        if (s.getBoundingClientRect().top <= probe) current = s;
+                    });
+                    links.forEach((a) => {
+                        a.classList.toggle('active', !!current && a.getAttribute('href') === '#' + current.id);
+                    });
+
+                    timelines.forEach((t) => {
+                        const r = t.el.getBoundingClientRect();
+                        const p = (vh * 0.6 - r.top - 10) / Math.max(1, r.height - 20);
+                        t.el.style.setProperty('--tl', Math.max(0, Math.min(1, p)).toFixed(4));
+                        t.items.forEach((item) => {
+                            item.classList.toggle('reached', item.getBoundingClientRect().top < vh * 0.62);
+                        });
+                    });
+                }
+
+                window.addEventListener('scroll', () => {
+                    if (!ticking) {
+                        ticking = true;
+                        requestAnimationFrame(update);
                     }
-                    updateScrollVisuals(window.scrollY, docHeight);
-                }, 30);
-            }, 800);
-        });
-
-        // --- Skills Carousel Logic ---
-        const skillsTrack = document.getElementById('skillsTrack');
-        const skillCards = Array.from(skillsTrack.children);
-        const prevSkill = document.getElementById('prevSkill');
-        const nextSkill = document.getElementById('nextSkill');
-        const skillsDots = document.getElementById('skillsDots');
-        
-        let currentSkillIndex = 0;
-        let cardsPerView = window.innerWidth > 768 ? 3 : (window.innerWidth > 480 ? 2 : 1);
-        let maxSkillIndex = Math.max(0, skillCards.length - cardsPerView);
-
-        function updateSkillCarousel() {
-            cardsPerView = window.innerWidth > 768 ? 3 : (window.innerWidth > 480 ? 2 : 1);
-            maxSkillIndex = Math.max(0, skillCards.length - cardsPerView);
-            
-            // Adjust dots display
-            while(skillsDots.firstChild) skillsDots.removeChild(skillsDots.firstChild);
-            for (let i = 0; i <= maxSkillIndex; i++) {
-                const dot = document.createElement('div');
-                dot.classList.add('dot');
-                if (i === currentSkillIndex) dot.classList.add('active');
-                dot.addEventListener('click', () => goToSkillSlide(i));
-                skillsDots.appendChild(dot);
+                }, { passive: true });
+                window.addEventListener('resize', update);
+                update();
             }
-            
-            if (currentSkillIndex > maxSkillIndex) currentSkillIndex = maxSkillIndex;
-            
-            requestAnimationFrame(() => {
-                const cardWidth = skillsTrack.parentElement.clientWidth / cardsPerView;
-                skillsTrack.style.transform = `translateX(-${currentSkillIndex * cardWidth}px)`;
-            });
-        }
 
-        function goToSkillSlide(index) {
-            currentSkillIndex = index;
-            updateSkillCarousel();
-            restartSkillAutoSlide();
-        }
+            // --- Cards: remember where the pointer is so the spotlight can follow it ---
+            function initPointerLight() {
+                document.addEventListener('pointermove', (e) => {
+                    if (e.pointerType === 'touch') return;
+                    const card = e.target.closest ? e.target.closest('.card, .skill-card') : null;
+                    if (!card) return;
+                    const r = card.getBoundingClientRect();
+                    card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+                    card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+                }, { passive: true });
+            }
 
-        function nextSkillSlide() {
-            currentSkillIndex = currentSkillIndex >= maxSkillIndex ? 0 : currentSkillIndex + 1;
-            updateSkillCarousel();
-        }
+            // --- Phone navigation ---
+            function initMobileNav() {
+                const nav = document.getElementById('navbar');
+                const toggle = document.getElementById('navToggle');
+                const close = () => {
+                    nav.classList.remove('open');
+                    toggle.setAttribute('aria-expanded', 'false');
+                };
+                toggle.addEventListener('click', () => {
+                    const open = nav.classList.toggle('open');
+                    toggle.setAttribute('aria-expanded', String(open));
+                });
+                nav.querySelectorAll('.nav-links a').forEach((a) => a.addEventListener('click', close));
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+                document.addEventListener('click', (e) => { if (!nav.contains(e.target)) close(); });
+            }
 
-        function prevSkillSlide() {
-            currentSkillIndex = currentSkillIndex <= 0 ? maxSkillIndex : currentSkillIndex - 1;
-            updateSkillCarousel();
-            restartSkillAutoSlide();
-        }
+            // --- Scrollbar thumb that fades in while scrolling and shifts from cyan to violet ---
+            function initScrollbar() {
+                let hideTimeout;
+                let fadeInterval = null;
+                let alpha = 0;
 
-        nextSkill.addEventListener('click', () => { nextSkillSlide(); restartSkillAutoSlide(); });
-        prevSkill.addEventListener('click', prevSkillSlide);
-        window.addEventListener('resize', updateSkillCarousel);
+                function paint() {
+                    const docHeight = document.body.scrollHeight - window.innerHeight;
+                    if (docHeight <= 0) return;
+                    const pct = Math.min(window.scrollY / docHeight, 1);
+                    const r = Math.floor(188 * pct);
+                    const g = Math.floor(243 * (1 - pct));
+                    const style = document.documentElement.style;
+                    style.setProperty('--scroll-color', 'rgba(' + r + ', ' + g + ', 255, ' + alpha + ')');
+                    style.setProperty('--scroll-border', 'rgba(255, 255, 255, ' + (alpha * 0.4) + ')');
+                    style.setProperty('--scroll-shadow', 'rgba(0, 243, 255, ' + (alpha * 0.2) + ')');
+                }
 
-        // Auto slide every 2 seconds
-        let autoSkillSlideInterval = setInterval(nextSkillSlide, 2000);
-        function restartSkillAutoSlide() {
-            clearInterval(autoSkillSlideInterval);
-            autoSkillSlideInterval = setInterval(nextSkillSlide, 2000);
-        }
-        
-        const skillsCarouselContainer = document.getElementById('skillsCarousel');
-        skillsCarouselContainer.addEventListener('mouseenter', () => clearInterval(autoSkillSlideInterval));
-        skillsCarouselContainer.addEventListener('mouseleave', restartSkillAutoSlide);
-
-        // Initial setup
-        setTimeout(updateSkillCarousel, 100);
-
+                window.addEventListener('scroll', () => {
+                    clearInterval(fadeInterval);
+                    alpha = 0.8;
+                    paint();
+                    clearTimeout(hideTimeout);
+                    hideTimeout = setTimeout(() => {
+                        fadeInterval = setInterval(() => {
+                            alpha -= 0.05;
+                            if (alpha <= 0) {
+                                alpha = 0;
+                                clearInterval(fadeInterval);
+                            }
+                            paint();
+                        }, 30);
+                    }, 800);
+                }, { passive: true });
+            }
+        })();
     </script>
     <!-- Anonymous, cookie-free visit statistics (GoatCounter) -->
     <script data-goatcounter="https://lucasyanzy.goatcounter.com/count"
