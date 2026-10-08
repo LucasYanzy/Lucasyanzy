@@ -1,0 +1,35 @@
+name: Profile views counter probe (temporary)
+
+on:
+  push:
+    paths: [".github/workflows/counter-probe.yml"]
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: What does each candidate counter return?
+        run: |
+          show() {
+            echo "=================== $1"
+            code=$(curl -sS -m 25 -L -A "Mozilla/5.0 (compatible; GitHubCamo)" -D /tmp/h.txt -o /tmp/b.bin -w "%{http_code}" "$2")
+            echo "HTTP $code   type: $(grep -i '^content-type' /tmp/h.txt | tail -1 | tr -d '\r')   bytes: $(wc -c < /tmp/b.bin)"
+            grep -iE '^(cache-control|age|server|location):' /tmp/h.txt | tr -d '\r' | head -5
+            if grep -qi '<svg' /tmp/b.bin; then
+              echo "aria-label/title: $(grep -oE 'aria-label="[^"]*"|<title>[^<]*</title>' /tmp/b.bin | head -2 | tr '\n' ' ')"
+              echo "text nodes: $(grep -oE '>[^<>]{1,40}</text>' /tmp/b.bin | head -6 | tr '\n' ' ')"
+            else
+              head -c 300 /tmp/b.bin | tr -c '[:print:]\n' '.'; echo
+            fi
+          }
+          show "komarev (current, base=183)" "https://komarev.com/ghpvc/?username=LucasYanzy&label=Profile+views&color=0891b2&style=flat-square&base=183"
+          show "komarev (no base)"           "https://komarev.com/ghpvc/?username=LucasYanzy&label=Profile+views&color=0891b2&style=flat-square"
+          show "hits.sh"                     "https://hits.sh/github.com/LucasYanzy/Lucasyanzy.svg?style=flat-square&label=Profile+views&color=0891b2"
+          show "visitorbadge.io"             "https://api.visitorbadge.io/api/visitors?path=LucasYanzy%2FLucasyanzy&label=Profile%20views&countColor=%230891b2&style=flat-square"
+          show "visitor-badge.laobi.icu"     "https://visitor-badge.laobi.icu/badge?page_id=LucasYanzy.Lucasyanzy&left_text=Profile%20views"
+          show "goatcounter pixel (own)"     "https://lucasyanzy.goatcounter.com/count?p=/readme&t=Profile+README"
+          show "goatcounter public counter"  "https://lucasyanzy.goatcounter.com/counter/%2Freadme.json"
