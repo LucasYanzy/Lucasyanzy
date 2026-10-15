@@ -31,6 +31,7 @@ import time
 
 EXTERNSHIP_KEYS = ["externship", "价格对比", "比价", "price comparison", "price compare"]
 IB_KEYS = ["ibkr", "interactive brokers", "盈透", "ib持仓", "ib 持仓", "持仓", "portfolio", "positions"]
+AUTH_RE = re.compile(r"401 Unauthorized|invalid_api_key|Incorrect API key|not logged in|Please log ?in", re.I)
 LIMIT_RE = re.compile(r"hit your usage limit|usage_limit_reached|usage limit\. |rate limit reached", re.I)
 
 IB_TOPICS = [
@@ -234,7 +235,8 @@ class Runner:
         self.n = 0
 
     def base_cfg(self, writable=None):
-        cfg = ["-c", 'approval_policy="never"',
+        cfg = ["-c", 'forced_login_method="chatgpt"',
+               "-c", 'approval_policy="never"',
                "-c", 'sandbox_mode="workspace-write"',
                "-c", "sandbox_workspace_write.network_access=true",
                "-c", 'web_search="live"',
@@ -262,7 +264,8 @@ class Runner:
         cmd = self.codex + argv
         log("$ " + " ".join(a if len(a) < 120 else a[:117] + "..." for a in cmd), self.logfh)
         try:
-            proc = subprocess.Popen(cmd, cwd=cwd if cwd and os.path.isdir(cwd) else self.workdir,
+            env = {k: v for k, v in os.environ.items() if k not in ("OPENAI_API_KEY", "CODEX_API_KEY")}
+            proc = subprocess.Popen(cmd, cwd=cwd if cwd and os.path.isdir(cwd) else self.workdir, env=env,
                                     stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                                     stderr=subprocess.STDOUT, text=True, encoding="utf-8", errors="replace")
         except OSError as e:
@@ -288,6 +291,9 @@ class Runner:
             proc.wait()
         t.join(timeout=10)
         out = "".join(lines)
+        if AUTH_RE.search(out):
+            log("Codex 登录/鉴权失败（用的不是 ChatGPT 账号登录）。请先运行 `codex login` 选择 Sign in with ChatGPT，再重新启动脚本。", self.logfh)
+            raise SystemExit(2)
         if LIMIT_RE.search("".join(lines[-40:])):
             return "limit", out
         return ("ok" if proc.returncode == 0 else "fail"), out
@@ -443,6 +449,17 @@ def main():
     if not codex:
         sys.exit("找不到 codex 命令，退出。")
 
+    try:
+        env = {k: v for k, v in os.environ.items() if k not in ("OPENAI_API_KEY", "CODEX_API_KEY")}
+        st = subprocess.run(codex + ["login", "status"], capture_output=True, text=True, timeout=120, env=env)
+        status = (st.stdout + st.stderr).strip()
+    except Exception as e:
+        status = f"无法检查: {e}"
+    print(f"Codex 登录状态: {status}")
+    if "chatgpt" not in status.lower():
+        sys.exit("\n❌ Codex CLI 没有用 ChatGPT 账号登录，跑起来会 401。\n"
+                 "   请先运行:  codex logout && codex login   （浏览器里选 Sign in with ChatGPT）\n"
+                 "   登录后再运行:  python3 ~/codex_night.py --now")
     os.makedirs(args.workdir, exist_ok=True)
     logfh = open(os.path.join(args.workdir, "run.log"), "a", encoding="utf-8")
     with KeepAwake():
