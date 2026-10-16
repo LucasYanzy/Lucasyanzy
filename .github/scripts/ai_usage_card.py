@@ -3,7 +3,7 @@
 
 Standard library only. Reads tokens / cost / rank (all time) plus this month's
 tokens and cost for one public TokenTracker profile and writes dist/ai-usage.svg
-(an animated card in the portfolio's cyan/purple palette) and dist/ai-usage.json.
+(an animated dashboard card) and dist/ai-usage.json.
 
 Set AI_USAGE_SAMPLE=1 to render with fixed sample numbers (no network).
 """
@@ -17,6 +17,7 @@ import re
 import sys
 import urllib.parse
 import urllib.request
+import xml.etree.ElementTree as ET
 
 USER_ID = os.environ.get("TOKENTRACKER_USER_ID", "28d52253-68ed-4de0-978b-8e70fe5eb800")
 BASE = "https://srctyff5.us-east.insforge.app/functions/tokentracker-badge-svg"
@@ -65,16 +66,16 @@ def fetch_providers():
         src = str(row.get("source") or "other").lower()
         pct = float(row.get("percent") or 0) * 100.0
         if pct > 0:
-            rows.append({"name": PROVIDER_NAMES.get(src, src.replace("-", " ").title()), "pct": pct})
+            rows.append({"key": src, "name": PROVIDER_NAMES.get(src, src.replace("-", " ").title()), "pct": pct})
     rows.sort(key=lambda r: r["pct"], reverse=True)
     if len(rows) > MAX_PROVIDERS:
         keep, rest = rows[: MAX_PROVIDERS - 1], rows[MAX_PROVIDERS - 1:]
         other = sum(r["pct"] for r in rest)
-        existing = next((r for r in keep if r["name"] == "Other"), None)
+        existing = next((r for r in keep if r["key"] == "other"), None)
         if existing:
             existing["pct"] += other
         else:
-            keep.append({"name": "Other", "pct": other})
+            keep.append({"key": "other", "name": "Other", "pct": other})
         rows = sorted(keep, key=lambda r: r["pct"], reverse=True)
     return rows
 
@@ -82,7 +83,8 @@ def fetch_providers():
 def collect():
     if os.environ.get("AI_USAGE_SAMPLE"):
         return {"tokens": "14.36B", "cost": "$7,513", "rank": "#519", "tokens_month": "886.93M", "cost_month": "$336",
-                "providers": [{"name": "Codex", "pct": 42.3}, {"name": "Other", "pct": 35.3}, {"name": "Claude", "pct": 22.4}]}
+                "providers": [{"key": "codex", "name": "Codex", "pct": 42.6}, {"key": "other", "name": "Other", "pct": 33.7},
+                              {"key": "claude", "name": "Claude", "pct": 23.6}, {"key": "cursor", "name": "Cursor", "pct": 0.05}]}
     data = {}
     for key, metric, period, required in [
         ("tokens", "tokens", "total", True), ("cost", "cost", "total", True), ("rank", "rank", "total", True),
@@ -109,6 +111,20 @@ DIGIT = .62
 CYCLE = 16.0   # seconds per replay of the roll
 ROLL = 1.9     # seconds for the digits to settle
 
+# brand-ish colours per provider: (light end, dark end) of the bar gradient
+PROVIDER_COLORS = {
+    "claude": ("#f2a583", "#d97757"),
+    "codex": ("#9aa8ff", "#5f6fff"),
+    "cursor": ("#e2e8f0", "#94a3b8"),
+    "gemini": ("#7db0ff", "#a78bfa"),
+    "other": ("#94a3b8", "#64748b"),
+}
+FALLBACK_COLORS = [("#5eead4", "#2dd4bf"), ("#fcd34d", "#f59e0b"), ("#f9a8d4", "#ec4899"), ("#bef264", "#84cc16")]
+
+
+def text_width(value, fs):
+    return sum((DIGIT if ch.isdigit() else ADV.get(ch, .62)) * fs for ch in value)
+
 
 def rolling(value, x0, y0, fs, fill, uid):
     """Left-aligned number whose digits roll like a slot machine; other glyphs stay put.
@@ -134,7 +150,7 @@ def rolling(value, x0, y0, fs, fill, uid):
         else:
             body.append(f'<text x="{cx:.1f}" y="{y0:.1f}">{html.escape(ch)}</text>')
         x += adv
-    g = (f'<g font-family="{SANS}" font-weight="700" font-size="{fs}" text-anchor="middle" fill="{fill}" '
+    g = (f'<g font-family="{SANS}" font-weight="700" font-size="{fs:.1f}" text-anchor="middle" fill="{fill}" '
          f'style="font-variant-numeric:tabular-nums">{"".join(body)}</g>')
     return "".join(defs), g
 
@@ -146,105 +162,161 @@ def provider_pct(p):
     return f"{v:.1f}".rstrip("0").rstrip(".") + "%"
 
 
+def provider_icon(key, cx, cy, uid):
+    """A small 22px mark for a provider, drawn from plain shapes (no external images)."""
+    x, y = cx - 11, cy - 11
+    if key == "claude":
+        rays = []
+        for k in range(12):
+            ang = math.radians(k * 30 - 90)
+            r0, r1 = 2.4, (10.0 if k % 2 == 0 else 7.4)
+            rays.append(f'<line x1="{cx + r0*math.cos(ang):.2f}" y1="{cy + r0*math.sin(ang):.2f}" '
+                        f'x2="{cx + r1*math.cos(ang):.2f}" y2="{cy + r1*math.sin(ang):.2f}"/>')
+        return "", f'<g stroke="#e08b69" stroke-width="2.1" stroke-linecap="round">{"".join(rays)}</g>'
+    if key == "codex":
+        gid = f"{uid}ic"
+        defs = f'<linearGradient id="{gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#9aa8ff"/><stop offset="1" stop-color="#5566f5"/></linearGradient>'
+        body = (f'<rect x="{x}" y="{y}" width="22" height="22" rx="7" fill="url(#{gid})"/>'
+                f'<path d="M{cx-5.2:.1f} {cy-4.2:.1f} L{cx-0.8:.1f} {cy-0.2:.1f} L{cx-5.2:.1f} {cy+3.8:.1f}" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+                f'<line x1="{cx+1.6:.1f}" y1="{cy+4.4:.1f}" x2="{cx+6:.1f}" y2="{cy+4.4:.1f}" stroke="#fff" stroke-width="2" stroke-linecap="round"/>')
+        return defs, body
+    if key == "cursor":
+        gid = f"{uid}ic"
+        defs = f'<linearGradient id="{gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4b5266"/><stop offset="1" stop-color="#242833"/></linearGradient>'
+        pts = [(-4, -6), (-4, 5), (-1, 2.2), (1.4, 7), (3.6, 6), (1.2, 1.4), (5, 1.4)]
+        poly = " ".join(f"{cx+px:.1f},{cy+py:.1f}" for px, py in pts)
+        return defs, (f'<rect x="{x}" y="{y}" width="22" height="22" rx="7" fill="url(#{gid})" stroke="#fff" stroke-opacity=".14"/>'
+                      f'<polygon points="{poly}" fill="#fff"/>')
+    if key == "gemini":
+        gid = f"{uid}ic"
+        defs = f'<linearGradient id="{gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5b9bff"/><stop offset="1" stop-color="#b48cff"/></linearGradient>'
+        d = (f"M{cx} {cy-10.5} C{cx} {cy-3.5} {cx+3.5} {cy} {cx+10.5} {cy} C{cx+3.5} {cy} {cx} {cy+3.5} {cx} {cy+10.5} "
+             f"C{cx} {cy+3.5} {cx-3.5} {cy} {cx-10.5} {cy} C{cx-3.5} {cy} {cx} {cy-3.5} {cx} {cy-10.5} Z")
+        return defs, f'<path d="{d}" fill="url(#{gid})"/>'
+    # other / unknown: a quiet tile with three dots
+    dots = "".join(f'<circle cx="{cx+dx}" cy="{cy}" r="1.7" fill="#cbd5e1"/>' for dx in (-5.2, 0, 5.2))
+    return "", (f'<rect x="{x}" y="{y}" width="22" height="22" rx="7" fill="#fff" fill-opacity=".06" stroke="#fff" stroke-opacity=".14"/>{dots}')
+
+
 def render(data, now):
-    """Calm, premium dashboard card: hairlines instead of boxes, large numerals, one provider bar."""
-    W, PAD = 880, 40
+    """Dashboard card: name and brand on top; tokens / cost / rank as large numerals; top providers with
+    an icon, a thin bar and the share. Everything dynamic is escaped and the result is XML-checked in main()."""
+    W, PAD = 1060, 44
     prov = data.get("providers") or []
-    H = 346 if prov else 252
-    o = []
-    a = o.append
-    a(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-labelledby="t d">')
+    H = 300 + (30 if len(prov) > 3 else 0)
+    LABEL_Y = 180
+    VALUE_Y = LABEL_Y + (72 if len(prov) > 3 else 66)
+    SOFT, MUTED = "#8b93a7", "#7b8499"
     summary = f'{NAME}: {data["tokens"]} tokens, {data["cost"]} cost, rank {data["rank"]} on TokenTracker'
     if prov:
         summary += ". Top providers: " + ", ".join(f'{p["name"]} {provider_pct(p)}' for p in prov)
+
+    # --- layout: provider panel on the right, metrics share what is left
+    panel_w = 252
+    panel_x = W - PAD - panel_w if prov else W
+    avail = (panel_x - 34 - 30 if prov else W - PAD) - PAD   # keep a margin before the divider
+    values = [data["tokens"], data["cost"], data["rank"]]
+    gap = 68
+    fs = 54.0
+    need = sum(text_width(v, fs) for v in values) + 2 * gap
+    if need > avail:
+        fs = max(36.0, fs * avail / need)
+    widths = [max(text_width(v, fs), 90) for v in values]
+    xs = [float(PAD)]
+    for w in widths[:-1]:
+        xs.append(xs[-1] + w + gap)
+
+    o, a = [], None
+    a = o.append
+    a(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" role="img" aria-labelledby="t d">')
     a(f'<title id="t">AI Coding Usage</title><desc id="d">{html.escape(summary)}</desc>')
-    bar_x, bar_w, bar_y, bar_h = PAD, W - 2 * PAD, 288, 10
-    segs = ['#00f3ff;#38bdf8', '#bd00ff;#7c3aed', '#64748b;#475569', '#94a3b8;#64748b', '#334155;#1e293b']
-    grads = "".join(
-        f'<linearGradient id="seg{i}" x1="0" x2="1"><stop offset="0" stop-color="{c.split(";")[0]}"/><stop offset="1" stop-color="{c.split(";")[1]}"/></linearGradient>'
-        for i, c in enumerate(segs))
-    a(f"""<defs>
-  <clipPath id="clip"><rect width="{W}" height="{H}" rx="22"/></clipPath>
-  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d1424"/><stop offset="1" stop-color="#070a12"/></linearGradient>
-  <radialGradient id="g1" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(90 -20) scale(520 260)"><stop offset="0" stop-color="{CYAN}" stop-opacity=".16"/><stop offset="1" stop-color="{CYAN}" stop-opacity="0"/></radialGradient>
-  <radialGradient id="g2" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate({W} {H}) scale(460 240)"><stop offset="0" stop-color="{PURPLE}" stop-opacity=".13"/><stop offset="1" stop-color="{PURPLE}" stop-opacity="0"/></radialGradient>
-  <linearGradient id="accent" x1="0" x2="1"><stop offset="0" stop-color="{CYAN}"/><stop offset="1" stop-color="{PURPLE}"/></linearGradient>
-  <linearGradient id="hl" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".38"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-  <linearGradient id="sheen" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-  {grads}
-  <clipPath id="barclip"><rect x="{bar_x}" y="{bar_y}" width="{bar_w}" height="{bar_h}" rx="{bar_h/2}">
-    <animate attributeName="width" values="0;{bar_w};{bar_w}" keyTimes="0;.09;1" dur="{CYCLE}s" repeatCount="indefinite" calcMode="spline" keySplines=".16 .84 .3 1;0 0 1 1"/></rect></clipPath>
-  <clipPath id="bartrack"><rect x="{bar_x}" y="{bar_y}" width="{bar_w}" height="{bar_h}" rx="{bar_h/2}"/></clipPath>
-</defs>""")
-    a('<g clip-path="url(#clip)">')
-    a(f'<rect width="{W}" height="{H}" fill="url(#bg)"/>')
-    a(f'<rect width="{W}" height="{H}" fill="url(#g1)"><animate attributeName="opacity" values=".75;1;.75" dur="9s" repeatCount="indefinite"/></rect>')
-    a(f'<rect width="{W}" height="{H}" fill="url(#g2)"/>')
-    a(f'<rect x="28" y="0" width="{W-56}" height="1" fill="url(#hl)"/>')
 
-    # ---- header
-    ax, ay = PAD + 30, 58
-    a(f'<circle cx="{ax}" cy="{ay}" r="30" fill="none" stroke="url(#accent)" stroke-width="1.6"/>')
-    a(f'<circle cx="{ax}" cy="{ay}" r="25" fill="#0f1a2e"/>')
-    a(f'<text x="{ax}" y="{ay+9}" text-anchor="middle" font-family="{SANS}" font-size="25" font-weight="700" fill="url(#accent)">{html.escape(NAME[:1].upper())}</text>')
-    a(f'<text x="{PAD+78}" y="54" font-family="{SANS}" font-size="26" font-weight="700" fill="#f8fafc">{html.escape(NAME)}</text>')
-    a(f'<text x="{PAD+78}" y="78" font-family="{SANS}" font-size="14" fill="#94a3b8">AI coding usage · All time</text>')
-    right = W - PAD
-    a(f'<text x="{right}" y="50" text-anchor="end" font-family="{SANS}" font-size="15" font-weight="600" fill="#e2e8f0">TokenTracker</text>')
-    stamp = f"Live · {now.day} {now.strftime('%b')} {now.year}"
-    a(f'<text x="{right}" y="74" text-anchor="end" font-family="{SANS}" font-size="13" fill="#94a3b8">{stamp}</text>')
-    dx = right - len(stamp) * 6.6 - 14
-    a(f'<circle cx="{dx:.1f}" cy="70" r="3.2" fill="#34d399"/>'
-      f'<circle cx="{dx:.1f}" cy="70" r="3.2" fill="none" stroke="#34d399" stroke-width="1.3"><animate attributeName="r" values="3.2;9;3.2" dur="2.8s" repeatCount="indefinite"/>'
+    defs = [f"""
+  <clipPath id="clip"><rect width="{W}" height="{H}" rx="26"/></clipPath>
+  <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0c1020"/><stop offset="1" stop-color="#07090f"/></linearGradient>
+  <radialGradient id="glowA" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate({W*0.74:.0f} -30) scale(560 300)"><stop offset="0" stop-color="#7c6cff" stop-opacity=".30"/><stop offset=".55" stop-color="#4f46e5" stop-opacity=".08"/><stop offset="1" stop-color="#4f46e5" stop-opacity="0"/></radialGradient>
+  <radialGradient id="glowB" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(40 {H+20}) scale(460 220)"><stop offset="0" stop-color="{CYAN}" stop-opacity=".10"/><stop offset="1" stop-color="{CYAN}" stop-opacity="0"/></radialGradient>
+  <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".18"/><stop offset=".5" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity=".10"/></linearGradient>
+  <linearGradient id="hl" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+  <linearGradient id="rankGrad" gradientUnits="userSpaceOnUse" x1="{xs[2]:.1f}" y1="0" x2="{xs[2]+widths[2]:.1f}" y2="0"><stop offset="0" stop-color="#67e8f9"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+  <linearGradient id="brandGrad" gradientUnits="userSpaceOnUse" x1="{W-PAD-210}" y1="0" x2="{W-PAD-58}" y2="0"><stop offset="0" stop-color="#67e8f9"/><stop offset="1" stop-color="#a78bfa"/></linearGradient>
+  <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2d3346"/><stop offset="1" stop-color="#10131c"/></linearGradient>"""]
+
+    body = []
+    b = body.append
+    b('<g clip-path="url(#clip)">')
+    b(f'<rect width="{W}" height="{H}" fill="url(#bg)"/>')
+    b(f'<rect width="{W}" height="{H}" fill="url(#glowA)"><animate attributeName="opacity" values=".8;1;.8" dur="10s" repeatCount="indefinite"/></rect>')
+    b(f'<rect width="{W}" height="{H}" fill="url(#glowB)"/>')
+    b(f'<rect x="34" y="0" width="{W-68}" height="1" fill="url(#hl)"/>')
+
+    # --- header: name + status on the left, brand on the right
+    b(f'<text x="{PAD}" y="84" font-family="{SANS}" font-size="34" font-weight="700" letter-spacing="-.4" fill="#f8fafc">{html.escape(NAME)}</text>')
+    b('<circle cx="{0}" cy="107" r="3.4" fill="#34d399"/>'.format(PAD + 4))
+    b(f'<circle cx="{PAD+4}" cy="107" r="3.4" fill="none" stroke="#34d399" stroke-width="1.3"><animate attributeName="r" values="3.4;9;3.4" dur="2.8s" repeatCount="indefinite"/>'
       '<animate attributeName="stroke-opacity" values=".8;0;.8" dur="2.8s" repeatCount="indefinite"/></circle>')
-    a(f'<rect x="{PAD}" y="104" width="{W-2*PAD}" height="1" fill="#fff" fill-opacity=".08"/>')
+    stamp = f"Total usage · updated {now.day} {now.strftime('%b')} {now.year}"
+    b(f'<text x="{PAD+18}" y="112" font-family="{SANS}" font-size="15.5" fill="{SOFT}">{html.escape(stamp)}</text>')
 
-    # ---- metrics (hairline columns, no boxes)
-    cw = (W - 2 * PAD) / 3
-    cols = [
-        ("Tokens", data["tokens"], "#f8fafc", f'{data["tokens_month"]} this month' if "tokens_month" in data else ""),
-        ("Cost", data["cost"], "#f8fafc", f'{data["cost_month"]} this month' if "cost_month" in data else ""),
-        ("Rank", data["rank"], CYAN, "on the TokenTracker leaderboard"),
-    ]
+    tile = 46
+    tx, ty = W - PAD - tile, 40
+    b(f'<rect x="{tx}" y="{ty}" width="{tile}" height="{tile}" rx="13" fill="url(#tile)" stroke="#fff" stroke-opacity=".16"/>')
+    bolt = f"M{tx+26} {ty+9} L{tx+12.5} {ty+26.5} H{tx+22} L{tx+19.5} {ty+37.5} L{tx+33.5} {ty+19.5} H{tx+24} Z"
+    b(f'<path d="{bolt}" fill="#fff"/>')
+    brand_r = tx - 16
+    b(f'<text x="{brand_r}" y="62" text-anchor="end" font-family="{SANS}" font-size="13.5" font-weight="700" letter-spacing="3.4" fill="url(#brandGrad)">TOKENTRACKER</text>')
+    b(f'<text x="{brand_r}" y="83" text-anchor="end" font-family="{SANS}" font-size="13.5" fill="{MUTED}">tokentracker.cc</text>')
+
+    # --- metrics
+    labels = ["TOKENS", "COST", "RANK"]
+    fills = ["#f8fafc", "#f8fafc", "url(#rankGrad)"]
     all_defs = []
-    for i, (label, value, color, sub) in enumerate(cols):
-        cx0 = PAD + i * cw + (0 if i == 0 else 30)
+    for i in range(3):
         if i:
-            a(f'<rect x="{PAD + i*cw:.1f}" y="128" width="1" height="92" fill="#fff" fill-opacity=".08"/>')
-        a(f'<text x="{cx0:.1f}" y="146" font-family="{SANS}" font-size="13.5" fill="#94a3b8">{label}</text>')
-        defs, g = rolling(value, cx0, 200, 52, color, f"r{i}_")
-        all_defs.append(defs)
-        a(g)
-        if sub:
-            a(f'<text x="{cx0:.1f}" y="226" font-family="{SANS}" font-size="13" fill="#64748b">{html.escape(sub)}</text>')
+            b(f'<rect x="{xs[i]-gap/2:.1f}" y="{LABEL_Y-26}" width="1" height="{VALUE_Y-LABEL_Y+44}" fill="#fff" fill-opacity=".08"/>')
+        b(f'<text x="{xs[i]:.1f}" y="{LABEL_Y}" font-family="{SANS}" font-size="13.5" font-weight="600" letter-spacing="3.2" fill="{SOFT}">{labels[i]}</text>')
+        d, g = rolling(values[i], xs[i], VALUE_Y, fs, fills[i], f"r{i}_")
+        all_defs.append(d)
+        b(g)
 
-    # ---- providers
+    # --- top providers
     if prov:
-        a(f'<rect x="{PAD}" y="248" width="{W-2*PAD}" height="1" fill="#fff" fill-opacity=".08"/>')
-        a(f'<text x="{PAD}" y="276" font-family="{SANS}" font-size="13.5" fill="#94a3b8">Top providers</text>')
-        a(f'<g clip-path="url(#bartrack)"><rect x="{bar_x}" y="{bar_y}" width="{bar_w}" height="{bar_h}" fill="#fff" fill-opacity=".07"/></g>')
-        a('<g clip-path="url(#barclip)">')
-        x, gap = float(bar_x), 4.0
+        b(f'<rect x="{panel_x-34}" y="{LABEL_Y-26}" width="1" height="{H-(LABEL_Y-26)-34}" fill="#fff" fill-opacity=".08"/>')
+        b(f'<text x="{panel_x}" y="{LABEL_Y}" font-family="{SANS}" font-size="13.5" font-weight="600" letter-spacing="3.2" fill="{SOFT}">TOP PROVIDERS</text>')
+        bar_x = panel_x + 22 + 12 + 84
+        pct_x = panel_x + panel_w
+        bar_w = pct_x - 58 - bar_x
+        fallback = iter(FALLBACK_COLORS * 2)
         for i, p in enumerate(prov):
-            w = bar_w * p["pct"] / 100.0
-            w = max(w, 8.0)
-            a(f'<rect x="{x:.1f}" y="{bar_y}" width="{max(w - gap, 4):.1f}" height="{bar_h}" rx="{bar_h/2}" fill="url(#seg{min(i, len(segs)-1)})"/>')
-            x += w
-        a('</g>')
-        a(f'<g clip-path="url(#bartrack)"><rect x="-120" y="{bar_y}" width="110" height="{bar_h}" fill="url(#sheen)" transform="skewX(-20)">'
-          f'<animate attributeName="x" values="-120;{W+40};{W+40}" keyTimes="0;.22;1" dur="{CYCLE}s" begin="1.1s" repeatCount="indefinite"/></rect></g>')
-        lx = float(PAD)
-        for i, p in enumerate(prov):
-            pct = provider_pct(p)
-            a(f'<circle cx="{lx+5:.1f}" cy="321" r="4.5" fill="url(#seg{min(i, len(segs)-1)})"/>')
-            a(f'<text x="{lx+16:.1f}" y="326" font-family="{SANS}" font-size="14" fill="#e2e8f0">{html.escape(p["name"])}'
-              f'<tspan dx="8" fill="#94a3b8" style="font-variant-numeric:tabular-nums">{pct}</tspan></text>')
-            lx += 16 + len(p["name"]) * 8.2 + len(pct) * 8.0 + 8 + 34
+            key = str(p.get("key") or "other")
+            lo, hi = PROVIDER_COLORS.get(key) or next(fallback)
+            cy = LABEL_Y + 30 + i * 28
+            gid = f"pg{i}"
+            defs.append(f'<linearGradient id="{gid}" x1="0" x2="1"><stop offset="0" stop-color="{lo}"/><stop offset="1" stop-color="{hi}"/></linearGradient>')
+            idefs, icon = provider_icon(key, panel_x + 11, cy, f"pi{i}")
+            if idefs:
+                defs.append(idefs)
+            b(icon)
+            b(f'<text x="{panel_x+34}" y="{cy+5.5}" font-family="{SANS}" font-size="16" fill="#e6eaf2">{html.escape(p["name"])}</text>')
+            fill_w = max(bar_w * p["pct"] / 100.0, 3.0)
+            b(f'<rect x="{bar_x}" y="{cy-3}" width="{bar_w:.1f}" height="6" rx="3" fill="#fff" fill-opacity=".08"/>')
+            b(f'<rect x="{bar_x}" y="{cy-3}" width="{fill_w:.1f}" height="6" rx="3" fill="url(#{gid})">'
+              f'<animate attributeName="width" values="0;{fill_w:.1f};{fill_w:.1f}" keyTimes="0;.1;1" dur="{CYCLE}s" begin="{0.25 + i*0.14:.2f}s" '
+              f'repeatCount="indefinite" calcMode="spline" keySplines=".16 .84 .3 1;0 0 1 1"/></rect>')
+            b(f'<text x="{pct_x}" y="{cy+5.5}" text-anchor="end" font-family="{SANS}" font-size="15.5" fill="#c3cad9" '
+              f'style="font-variant-numeric:tabular-nums">{html.escape(provider_pct(p))}</text>')
 
-    a(f'<rect x=".5" y=".5" width="{W-1}" height="{H-1}" rx="21.5" fill="none" stroke="#fff" stroke-opacity=".09"/>')
-    a('</g></svg>')
-    svg = "\n".join(o)
-    return svg.replace("</defs>", "".join(all_defs) + "</defs>", 1)
+    b(f'<rect x=".5" y=".5" width="{W-1}" height="{H-1}" rx="25.5" fill="none" stroke="url(#edge)"/>')
+    b('</g></svg>')
+
+    a("<defs>" + "".join(defs) + "".join(all_defs) + "</defs>")
+    o.extend(body)
+    return "\n".join(o)
+
+
+def validate_svg(svg):
+    """The card is XML: one stray '<' or '&' makes browsers drop the whole image, so check before publishing."""
+    ET.fromstring(svg)
 
 
 def main():
@@ -252,6 +324,7 @@ def main():
     now = datetime.datetime.now(datetime.timezone.utc)
     os.makedirs(OUT_DIR, exist_ok=True)
     svg = render(data, now)
+    validate_svg(svg)  # never publish a card the browser could not parse
     with open(os.path.join(OUT_DIR, "ai-usage.svg"), "w", encoding="utf-8") as f:
         f.write(svg)
     with open(os.path.join(OUT_DIR, "ai-usage.json"), "w", encoding="utf-8") as f:
