@@ -141,9 +141,12 @@ DIM = "#7d879c"   # prefix and unit glyphs ($ # B M K) sit back so the digits ca
 # (light end, dark end) of each provider's bar gradient
 PROVIDER_COLORS = {
     "claude": ("#e8987a", "#d97757"),
-    "codex": ("#a89bff", "#4a63ff"),
+    "codex": ("#b1a7ff", "#4a55ff"),
     "cursor": ("#e2e8f0", "#94a3b8"),
-    "gemini": ("#7db0ff", "#a78bfa"),
+    "gemini": ("#66a6ff", "#3186ff"),
+    "deepseek": ("#7f9bff", "#4d6bfe"),
+    "kimi": ("#52a8ff", "#1783ff"),
+    "copilot": ("#5bc8f8", "#a78bfa"),
     "other": ("#a3adc2", "#6b7690"),
 }
 FALLBACK_COLORS = [("#5eead4", "#2dd4bf"), ("#fcd34d", "#f59e0b"), ("#f9a8d4", "#ec4899"), ("#bef264", "#84cc16")]
@@ -192,47 +195,32 @@ def provider_pct(p):
     return f"{v:.1f}".rstrip("0").rstrip(".") + "%"
 
 
+ICON_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "assets", "provider-icons")
+ICON_SIZE = 24
+
+
 def provider_icon(key, cx, cy, uid):
-    """A small 22px mark for a provider, drawn from plain shapes (no external images)."""
-    x, y = cx - 11, cy - 11
-    if key == "claude":
-        # Claude's spark: about fourteen thin rays of uneven length and spacing, open in the middle
-        angles = [0, 25, 51, 77, 99, 125, 151, 177, 201, 227, 253, 279, 305, 333]
-        lens = [10.6, 6.6, 9.4, 5.9, 10.2, 6.5, 9.2, 10.6, 6.2, 9.7, 6.8, 10.3, 6.4, 8.6]
-        rays = []
-        for ang, ln in zip(angles, lens):
-            t = math.radians(ang - 90)
-            rays.append(f'<line x1="{cx + 2.3*math.cos(t):.2f}" y1="{cy + 2.3*math.sin(t):.2f}" '
-                        f'x2="{cx + ln*math.cos(t):.2f}" y2="{cy + ln*math.sin(t):.2f}"/>')
-        return "", f'<g stroke="#d97757" stroke-width="1.6" stroke-linecap="round">{"".join(rays)}</g>'
-    if key == "codex":
-        # Codex: a soft gradient cloud holding a dark terminal prompt
-        gid = f"{uid}ic"
-        defs = (f'<linearGradient id="{gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#bba8ff"/>'
-                f'<stop offset=".55" stop-color="#7a78ff"/><stop offset="1" stop-color="#3a57ff"/></linearGradient>')
-        lobes = [f'<circle cx="{cx}" cy="{cy}" r="6.5"/>']
-        for k in range(7):
-            t = math.radians(k * 360 / 7 + 12)
-            lobes.append(f'<circle cx="{cx + 5.8*math.cos(t):.2f}" cy="{cy + 5.8*math.sin(t):.2f}" r="{3.4 + (k % 2) * 0.5}"/>')
-        body = (f'<g fill="url(#{gid})">{"".join(lobes)}</g>'
-                f'<path d="M{cx-4.3:.1f} {cy-3.4:.1f} L{cx-1.1:.1f} {cy-0.2:.1f} L{cx-4.3:.1f} {cy+3:.1f}" fill="none" stroke="#15163a" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>'
-                f'<line x1="{cx+0.8:.1f}" y1="{cy+3.4:.1f}" x2="{cx+5:.1f}" y2="{cy+3.4:.1f}" stroke="#15163a" stroke-width="2.1" stroke-linecap="round"/>')
-        return defs, body
-    if key == "cursor":
-        gid = f"{uid}ic"
-        defs = f'<linearGradient id="{gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4b5266"/><stop offset="1" stop-color="#242833"/></linearGradient>'
-        pts = [(-4, -6), (-4, 5), (-1, 2.2), (1.4, 7), (3.6, 6), (1.2, 1.4), (5, 1.4)]
-        poly = " ".join(f"{cx+px:.1f},{cy+py:.1f}" for px, py in pts)
-        return defs, (f'<rect x="{x}" y="{y}" width="22" height="22" rx="7" fill="url(#{gid})" stroke="#fff" stroke-opacity=".14"/>'
-                      f'<polygon points="{poly}" fill="#fff"/>')
-    if key == "gemini":
-        gid = f"{uid}ic"
-        defs = f'<linearGradient id="{gid}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5b9bff"/><stop offset="1" stop-color="#b48cff"/></linearGradient>'
-        d = (f"M{cx} {cy-10.5} C{cx} {cy-3.5} {cx+3.5} {cy} {cx+10.5} {cy} C{cx+3.5} {cy} {cx} {cy+3.5} {cx} {cy+10.5} "
-             f"C{cx} {cy+3.5} {cx-3.5} {cy} {cx-10.5} {cy} C{cx-3.5} {cy} {cx} {cy-3.5} {cx} {cy-10.5} Z")
-        return defs, f'<path d="{d}" fill="url(#{gid})"/>'
+    """The provider's official mark from assets/provider-icons (a 24x24 SVG), placed as a nested <svg>.
+    Ids inside the file are prefixed so several marks never collide; unknown providers get a quiet tile."""
+    x, y = cx - ICON_SIZE / 2, cy - ICON_SIZE / 2
+    path = os.path.join(ICON_DIR, f"{key}.svg")
+    if re.fullmatch(r"[a-z0-9_-]+", key) and os.path.isfile(path):
+        raw = open(path, encoding="utf-8").read()
+        m = re.search(r'<svg\b([^>]*)>(.*)</svg>', raw, re.S)
+        if m:
+            attrs, inner = m.group(1), re.sub(r"<title>.*?</title>", "", m.group(2), flags=re.S)
+            for old in re.findall(r'\bid="([^"]+)"', inner):
+                new = f"{uid}-{old}"
+                inner = inner.replace(f'id="{old}"', f'id="{new}"').replace(f"url(#{old})", f"url(#{new})").replace(f'href="#{old}"', f'href="#{new}"')
+            extra = ""
+            for name in ("fill", "fill-rule", "clip-rule"):
+                am = re.search(rf'\b{name}="([^"]+)"', attrs)
+                if am:
+                    extra += f' {name}="{"#e8ecf4" if am.group(1) == "currentColor" else am.group(1)}"'
+            inner = inner.replace("currentColor", "#e8ecf4")
+            return "", (f'<svg x="{x:.1f}" y="{y:.1f}" width="{ICON_SIZE}" height="{ICON_SIZE}" viewBox="0 0 24 24"{extra}>{inner}</svg>')
     dots = "".join(f'<circle cx="{cx+dx}" cy="{cy}" r="1.7" fill="#cbd5e1"/>' for dx in (-5.2, 0, 5.2))
-    return "", (f'<rect x="{x}" y="{y}" width="22" height="22" rx="7" fill="#fff" fill-opacity=".06" stroke="#fff" stroke-opacity=".14"/>{dots}')
+    return "", (f'<rect x="{x}" y="{y}" width="{ICON_SIZE}" height="{ICON_SIZE}" rx="7.5" fill="#fff" fill-opacity=".06" stroke="#fff" stroke-opacity=".14"/>{dots}')
 
 
 def render(data, now, avatar=None):
@@ -343,7 +331,7 @@ def render(data, now, avatar=None):
         b(f'<rect x="{panel_x-34}" y="{LABEL_Y-24}" width="1" height="{H-(LABEL_Y-24)-40}" fill="#fff" fill-opacity=".07"/>')
         b(f'<text x="{panel_x}" y="{LABEL_Y}" font-family="{SANS}" font-size="13" font-weight="600" letter-spacing="3.2" fill="{SOFT}">TOP PROVIDERS</text>')
         name_w = max(46.0, min(88.0, max(len(p["name"]) for p in prov) * 8.9))
-        bar_x = panel_x + 34 + name_w + 14
+        bar_x = panel_x + 36 + name_w + 14
         pct_x = panel_x + panel_w
         bar_w = pct_x - 60 - bar_x
         fallback = iter(FALLBACK_COLORS * 2)
@@ -353,11 +341,11 @@ def render(data, now, avatar=None):
             cy = LABEL_Y + 32 + i * 36
             gid = f"pg{i}"
             defs.append(f'<linearGradient id="{gid}" x1="0" x2="1"><stop offset="0" stop-color="{lo}"/><stop offset="1" stop-color="{hi}"/></linearGradient>')
-            idefs, icon = provider_icon(key, panel_x + 11, cy, f"pi{i}")
+            idefs, icon = provider_icon(key, panel_x + ICON_SIZE / 2, cy, f"pi{i}")
             if idefs:
                 defs.append(idefs)
             b(icon)
-            b(f'<text x="{panel_x+34}" y="{cy+5.5}" font-family="{SANS}" font-size="16" fill="#e8ecf4">{html.escape(p["name"])}</text>')
+            b(f'<text x="{panel_x+36}" y="{cy+5.5}" font-family="{SANS}" font-size="16" fill="#e8ecf4">{html.escape(p["name"])}</text>')
             fill_w = max(bar_w * p["pct"] / 100.0, 4.0)
             anim = (f'<animate attributeName="width" values="0;{fill_w:.1f};{fill_w:.1f}" keyTimes="0;.1;1" dur="{CYCLE}s" begin="{0.25 + i*0.14:.2f}s" '
                     f'repeatCount="indefinite" calcMode="spline" keySplines=".16 .84 .3 1;0 0 1 1"/>')
