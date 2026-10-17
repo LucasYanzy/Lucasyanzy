@@ -186,14 +186,17 @@ def find_codex(override=None):
     return [npx, "-y", "@openai/codex@latest"] if npx else None
 
 
-def detect_model():
-    """找最近成功出过回复的会话所用的模型（通常是 Codex App 里在用的）。"""
-    files = sorted(session_files(), key=os.path.getmtime, reverse=True)[:40]
+def model_candidates():
+    """最近成功出过回复、且没有报过「ChatGPT 账号不支持」的会话所用的模型，按新到旧排列。"""
+    files = sorted(session_files(), key=os.path.getmtime, reverse=True)[:80]
+    seen, out, bad = set(), [], set()
     for fp in files:
-        model, ok = None, False
+        models, ok, err = [], False, False
         try:
             with open(fp, encoding="utf-8", errors="replace") as f:
                 for raw in f:
+                    if "not supported when using Codex with a ChatGPT account" in raw:
+                        err = True
                     if '"model"' not in raw and '"assistant"' not in raw:
                         continue
                     try:
@@ -202,14 +205,19 @@ def detect_model():
                         continue
                     p = obj.get("payload") if isinstance(obj.get("payload"), dict) else {}
                     if obj.get("type") == "turn_context" and p.get("model"):
-                        model = p["model"]
+                        models.append(p["model"])
                     if p.get("type") == "message" and p.get("role") == "assistant":
                         ok = True
         except OSError:
             continue
-        if model and ok:
-            return model
-    return None
+        if err:
+            bad.update(models)
+            continue
+        for m in reversed(models):
+            if ok and m not in seen:
+                seen.add(m)
+                out.append(m)
+    return [m for m in out if m not in bad]
 
 
 def login_status(codex):
@@ -806,9 +814,9 @@ def main():
         log(f"===== 开启（{'循环模式' if args.loop else '单轮模式'}）=====")
         if start:
             sleep_until(start, log, "额度未恢复" if not args.at else "按指定时间")
-        model = args.model or detect_model()
-        log(f"使用模型: {model or 'Codex 默认'}" + ("（自动识别自最近成功的会话）" if model and not args.model else ""))
-        r = Runner(codex, model, log)
+        cands = [args.model] if args.model else model_candidates()
+        log(f"候选模型: {', '.join(cands) if cands else '（没识别到，用 Codex 默认）'}")
+        r = Runner(codex, cands[0] if cands else None, log)
         until = None
         if args.until:
             hh, mm = map(int, args.until.split(":"))
@@ -839,8 +847,14 @@ def main():
             try:
                 st = run_job(r, job)
             except ModelError:
-                log(f"❌ 模型 {r.model or '默认'} 不能用 ChatGPT 账号调用。请先更新 Codex CLI：npm i -g @openai/codex@latest，"
-                    "或手动指定 App 里用的模型：开启 --model <模型名>。已停止，避免空跑。")
+                if r.model in cands:
+                    cands.remove(r.model)
+                if cands:
+                    log(f"⚠️ 模型 {r.model} 不能用 ChatGPT 账号调用，换成 {cands[0]} 重试")
+                    r.model = cands[0]
+                    continue
+                log(f"❌ 模型 {r.model or '默认'} 不能用 ChatGPT 账号调用，也没有别的候选模型。"
+                    "请看 Codex App 里选的模型，然后运行：开启 --model <模型名>。已停止，避免空跑。")
                 break
             except QuotaHit as q:
                 reset = q.reset or (now() + dt.timedelta(minutes=30))
