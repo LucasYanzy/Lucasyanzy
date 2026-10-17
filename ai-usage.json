@@ -1,0 +1,25 @@
+{
+  "tokens": "16.92B",
+  "cost": "$7,791",
+  "rank": "#557",
+  "tokens_month": "3.38B",
+  "cost_month": "$903",
+  "providers": [
+    {
+      "key": "codex",
+      "name": "Codex",
+      "pct": 41.90392117760476
+    },
+    {
+      "key": "other",
+      "name": "Other",
+      "pct": 34.63818242807912
+    },
+    {
+      "key": "claude",
+      "name": "Claude",
+      "pct": 23.4454451631293
+    }
+  ],
+  "updated": "2026-10-17T20:55:01+00:00"
+}
