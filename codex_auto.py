@@ -571,8 +571,10 @@ def task_jobs(cat, state):
         if done.get(name) in ("DONE", "BLOCKED"):
             continue
         d = os.path.expanduser(t.get("dir") or os.path.join(BASE, "work", re.sub(r"\W+", "_", name)))
+        extra = [os.path.expanduser(x) for x in t.get("extra_dirs", [])]
         jobs.append({"key": f"t:{name}", "label": f"{cat['name']}: {name}", "type": "fresh", "cwd": d,
-                     "writable": [d], "text": f"# 任务：{name}\n工作目录 `{d}`。\n\n{t.get('prompt', '')}\n"})
+                     "writable": [d] + extra, "clone": t.get("clone"), "timeout_min": t.get("timeout_min", 90),
+                     "text": f"# 任务：{name}\n工作目录 `{d}`。\n\n{t.get('prompt', '')}\n"})
     return jobs, f"{len(jobs)} 个任务"
 
 
@@ -607,8 +609,12 @@ def record(state, job, status):
 
 
 def run_job(r, job):
+    if job.get("clone") and not os.path.isdir(job["cwd"]):  # 先把用户自己的仓库下载到本地
+        r.log(f"下载仓库 {job['clone']} → {job['cwd']}")
+        os.makedirs(os.path.dirname(job["cwd"]), exist_ok=True)
+        subprocess.run(["gh", "repo", "clone", job["clone"], job["cwd"]], env=clean_env())
     if job["type"] == "fresh":
-        return r.fresh(r.prompt(job["key"], job["text"]), job["cwd"], job["writable"])
+        return r.fresh(r.prompt(job["key"], job["text"]), job["cwd"], job["writable"], job.get("timeout_min", 90))
     s = job["session"]
     dump_transcript(s, job["transcript"])
     p = r.prompt(job["key"], job["text"])
@@ -617,6 +623,51 @@ def run_job(r, job):
     if st == "FAIL":
         st = r.fresh(p, job["cwd"], job["writable"] + [os.path.dirname(job["transcript"])])
     return st
+
+
+# ---------------------------------------------------------------- presets
+P = "~/Desktop/Project"
+NO_GIT_WRITE = ("\n**不要 git commit / push / pull / rebase / fork**（沙盒里 .git 是只读的，这些由用户醒来后自己做）。"
+                "改动留在工作区；把建议的分支名、commit 信息和 PR 描述写进 `PR_DESCRIPTION.md`。\n")
+TODAY_TASKS = [
+    {"name": "YesPlayMusic 升级 Electron 修复正在播放", "dir": f"{P}/YesPlayMusic", "clone": "LucasYanzy/YesPlayMusic",
+     "timeout_min": 240, "extra_dirs": ["~/Library/Caches/electron", "~/Library/Caches/electron-builder",
+                                        "~/Library/Caches/Yarn", "~/.npm", "~/.cache"],
+     "prompt": """
+背景：用户 Mac 是 macOS 27.0.1，YesPlayMusic 0.4.10（Electron 13）播放时，NotchNook/控制中心“正在播放”不显示它。
+macOS 走 Chromium Media Session（`src/utils/Player.js` 的 `_initMediaSession` / `_updateMediaSessionMetaData`；
+`src/background.js` 只在 Linux 关闭 MediaSessionService）。Electron 13 太旧，很可能是新系统上 Now Playing 集成失效。
+1. 把 Electron 升级到当前稳定版，并升级配套依赖（electron-builder、vue-cli-plugin-electron-builder 等），修掉破坏性变更
+   （remote 模块、contextIsolation/nodeIntegration、protocol API、ipc 等），保证 `yarn install` 成功、开发模式能启动。
+2. 确认 Media Session 在 macOS 上完整生效（标题/歌手/封面/播放暂停/上下首），补上 `playbackState` 与进度更新。
+3. 尝试编译 macOS arm64 安装包；失败就修到成功，记录产物路径。不要安装或替换 /Applications 里的 App。
+4. 写 `CODEX_AUTO_SUMMARY.md`：改了什么、怎么测试、产物在哪、已知问题。""" + NO_GIT_WRITE},
+    {"name": "Git 仓库体检", "dir": f"{P}/_git_health", "timeout_min": 60, "prompt": """
+只读检查 `~/Desktop/Project` 下所有 git 仓库（含子目录）：分支、未提交改动、未推送提交、与远程的差距（`git status -sb`、`git log --oneline @{u}..`、`git log --oneline ..@{u}`）。
+已知：RUCF、RUCF/github-copy、Study/RutgersIEEE26_副本 落后于远程；paperclip、TradingAgents 不是用户的仓库（需 fork）；Breathless（Breathless-Game/Breathless）本地可能没有。
+1. 写 `GIT_HEALTH.md` 表格：仓库 / 分支 / 状态 / 问题 / 建议操作。对落后的仓库，预判 `pull --rebase` 会不会冲突（比较改动的文件），列出可能冲突的文件。
+2. 写 `fix_git.sh`：用户审核后可以手动运行的修复脚本（pull --rebase --autostash、`gh repo fork --remote`、clone Breathless 等），每一步先 echo 说明，遇到错误就停；不含 force push、不删分支。**你自己不要运行它。**""" + NO_GIT_WRITE},
+    {"name": "NotchNook 日历与正在播放诊断", "dir": "~/codex-auto/work/notchnook", "timeout_min": 90, "prompt": """
+用户 Mac：macOS 27.0.1，NotchNook 1.6.2。①日历显示 "Nothing for today"，但系统日历 App 有日程，NotchNook 已有“完全访问”权限，已重启并 tccutil reset 过；②YesPlayMusic 播放时 NotchNook 不显示它。
+1. 只读诊断：`log show --last 2h --predicate 'process == "NotchNook"'` 中与 calendar/EventKit/MediaRemote/now playing/error 相关的条目；
+   `defaults read <NotchNook bundle id>` 中与日历、媒体相关的设置（选中了哪些日历、媒体来源限制等）。不要修改任何系统或 App 设置。
+2. 联网调研：NotchNook 是否有新版本或已知的 macOS 27 问题；开源替代 Boring Notch（TheBoredTeam/boring.notch）在 macOS 27 上的日历和 Now Playing 支持情况。
+3. 写 `REPORT.md`：根因判断、证据、用户可以手动执行的修复步骤（按顺序，附可直接复制的命令，修改设置前先备份）。"""},
+    {"name": "codex_auto 自检", "dir": "~/codex-auto", "timeout_min": 45, "prompt": """
+阅读 `~/codex-auto/run.log` 和 `~/codex-auto/state.json`，找出之前哪些任务 FAIL/PARTIAL 以及原因（鉴权、网络、沙盒权限、超时、命令错误等）。
+写 `~/codex-auto/DIAGNOSIS.md`：每个失败任务的原因和建议修复。若是 `codex_auto.py` 的 bug，把修复写成 `~/codex-auto/codex_auto.patch`（统一 diff），**不要直接改 codex_auto.py**。"""},
+]
+
+
+def apply_preset(name):
+    if name != "today":
+        sys.exit(f"未知预设: {name}")
+    queue = load_json(QUEUE_FILE, DEFAULT_QUEUE)
+    cats = [c for c in queue["categories"] if c.get("name") != "今日重点"]
+    cats.insert(0, {"name": "今日重点", "kind": "tasks", "enabled": True, "tasks": TODAY_TASKS})
+    queue["categories"] = cats
+    save_json(QUEUE_FILE, queue)
+    print(f"✅ 已把 {len(TODAY_TASKS)} 个「今日重点」任务放到队列最前面")
 
 
 # ---------------------------------------------------------------- install / status
@@ -660,7 +711,13 @@ def main():
     ap.add_argument("--at", help="手动指定开始时间 HH:MM（不填则自动识别）")
     ap.add_argument("--model")
     ap.add_argument("--codex", help="codex 程序路径")
+    ap.add_argument("--preset", help="today = 把今日重点任务放到队列最前面")
+    ap.add_argument("--until", help="到这个时间(HH:MM)就停，配合 --loop，例如 23:59")
     args = ap.parse_args()
+
+    if args.preset:
+        os.makedirs(BASE, exist_ok=True)
+        apply_preset(args.preset)
 
     if args.install:
         return install()
@@ -672,7 +729,7 @@ def main():
         save_json(QUEUE_FILE, DEFAULT_QUEUE)
     queue = load_json(QUEUE_FILE, DEFAULT_QUEUE)
     state = load_json(STATE_FILE, {})
-    codex = find_codex(args.codex)
+    codex = find_codex(args.codex)  # 注意：--preset 已在前面写入 queue.json
 
     print(f"现在: {now():%Y-%m-%d %H:%M}")
     print(f"Codex 程序: {' '.join(codex) if codex else '未找到'}")
@@ -717,11 +774,28 @@ def main():
         if start:
             sleep_until(start, log, "额度未恢复" if not args.at else "按指定时间")
         r = Runner(codex, args.model, log)
+        until = None
+        if args.until:
+            hh, mm = map(int, args.until.split(":"))
+            until = now().replace(hour=hh, minute=mm, second=0, microsecond=0)
+            if until <= now():
+                until += dt.timedelta(days=1)
+            log(f"本次最晚运行到 {fmt(until)}")
         attempted = set()  # 本次已经跑过的，先跳过，下次「开启」再回来
+        passes = 0
         while True:
+            if until and now() >= until:
+                log(f"⏰ 到达结束时间 {fmt(until)}，停止。")
+                break
             state = load_json(STATE_FILE, {})
             plan = build_queue(queue, state, all_sessions())
             jobs = [(cat, j) for cat, js, _ in plan for j in js if j["key"] not in attempted]
+            remaining = [(c, j) for c, js, _ in plan for j in js]
+            if not jobs and args.loop and remaining and passes < 2:  # 只剩部分完成的，再补做
+                passes += 1
+                attempted.clear()
+                log(f"🔁 还有 {len(remaining)} 个部分完成的任务，再补做一轮（第 {passes} 轮）")
+                continue
             if not jobs:
                 log("✅ 队列已全部完成！")
                 break
@@ -733,6 +807,9 @@ def main():
                 reset = q.reset or (now() + dt.timedelta(minutes=30))
                 if not args.loop:
                     log(f"🔋 额度已用完 ✔ 下次重置约 {fmt(reset)}。到时候再说「开启」会从这里继续。")
+                    break
+                if until and reset >= until:
+                    log(f"🔋 额度已用完 ✔ 下次重置 {fmt(reset)} 晚于结束时间，今天到此为止。")
                     break
                 sleep_until(reset + dt.timedelta(minutes=2), log, "额度用完")
                 continue
