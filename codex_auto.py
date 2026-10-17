@@ -45,6 +45,7 @@ STATE_FILE = os.path.join(BASE, "state.json")
 LOG_FILE = os.path.join(BASE, "run.log")
 
 AUTH_RE = re.compile(r"401 Unauthorized|invalid_api_key|Incorrect API key|not logged in|Please log ?in", re.I)
+MODEL_RE = re.compile(r"model is not supported|model_not_found|Unsupported model|does not exist or you do not have access", re.I)
 LIMIT_RE = re.compile(r"hit your usage limit|usage_limit_reached|usage limit\. |rate limit reached", re.I)
 TRY_AGAIN_RE = re.compile(r"try again at ([0-9]{1,2}:[0-9]{2}\s*[AP]M)", re.I)
 STATUS_RE = re.compile(r"STATUS:\s*(DONE|PARTIAL|BLOCKED)", re.I)
@@ -183,6 +184,32 @@ def find_codex(override=None):
                 return [f]
     npx = shutil.which("npx", path=env["PATH"])
     return [npx, "-y", "@openai/codex@latest"] if npx else None
+
+
+def detect_model():
+    """找最近成功出过回复的会话所用的模型（通常是 Codex App 里在用的）。"""
+    files = sorted(session_files(), key=os.path.getmtime, reverse=True)[:40]
+    for fp in files:
+        model, ok = None, False
+        try:
+            with open(fp, encoding="utf-8", errors="replace") as f:
+                for raw in f:
+                    if '"model"' not in raw and '"assistant"' not in raw:
+                        continue
+                    try:
+                        obj = json.loads(raw)
+                    except Exception:
+                        continue
+                    p = obj.get("payload") if isinstance(obj.get("payload"), dict) else {}
+                    if obj.get("type") == "turn_context" and p.get("model"):
+                        model = p["model"]
+                    if p.get("type") == "message" and p.get("role") == "assistant":
+                        ok = True
+        except OSError:
+            continue
+        if model and ok:
+            return model
+    return None
 
 
 def login_status(codex):
@@ -403,6 +430,10 @@ def sleep_until(t, log, why):
 
 
 # ---------------------------------------------------------------- codex runner
+class ModelError(Exception):
+    pass
+
+
 class QuotaHit(Exception):
     def __init__(self, reset=None):
         self.reset = reset
@@ -459,6 +490,8 @@ class Runner:
             proc.wait()
         t.join(timeout=10)
         out = "".join(lines)
+        if MODEL_RE.search(out):
+            raise ModelError(out[-300:])
         if AUTH_RE.search(out):
             self.log("❌ Codex 鉴权失败（不是 ChatGPT 账号登录）。请运行 `codex logout; codex login` 选 Sign in with ChatGPT。")
             raise SystemExit(2)
@@ -773,7 +806,9 @@ def main():
         log(f"===== 开启（{'循环模式' if args.loop else '单轮模式'}）=====")
         if start:
             sleep_until(start, log, "额度未恢复" if not args.at else "按指定时间")
-        r = Runner(codex, args.model, log)
+        model = args.model or detect_model()
+        log(f"使用模型: {model or 'Codex 默认'}" + ("（自动识别自最近成功的会话）" if model and not args.model else ""))
+        r = Runner(codex, model, log)
         until = None
         if args.until:
             hh, mm = map(int, args.until.split(":"))
@@ -803,6 +838,10 @@ def main():
             log(f"▶ [{cat['name']}] {job['label']}（队列剩余 {len(jobs)}）")
             try:
                 st = run_job(r, job)
+            except ModelError:
+                log(f"❌ 模型 {r.model or '默认'} 不能用 ChatGPT 账号调用。请先更新 Codex CLI：npm i -g @openai/codex@latest，"
+                    "或手动指定 App 里用的模型：开启 --model <模型名>。已停止，避免空跑。")
+                break
             except QuotaHit as q:
                 reset = q.reset or (now() + dt.timedelta(minutes=30))
                 if not args.loop:
@@ -814,10 +853,16 @@ def main():
                 sleep_until(reset + dt.timedelta(minutes=2), log, "额度用完")
                 continue
             log(f"  结果: {st}")
-            if st == "FAIL":
-                st = "PARTIAL"
-                time.sleep(20)
             attempted.add(job["key"])
+            if st == "FAIL":  # 失败不写进进度，下次还会重试
+                fails = getattr(r, "fails", 0) + 1
+                r.fails = fails
+                if fails >= 3:
+                    log("❌ 连续 3 个任务失败，停止运行，请查看上面的报错。")
+                    break
+                time.sleep(20)
+                continue
+            r.fails = 0
             record(state, job, st)
         log(f"结束。IB 结果: {os.path.join(BASE, 'ib_analysis')}；日志: {LOG_FILE}")
 
