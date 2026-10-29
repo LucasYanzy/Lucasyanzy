@@ -17,13 +17,13 @@
 
 ## About Me / 关于我
 
-- **Currently** working as Global Business Lead at Tutturo LLC
+- **Currently** Founder & President of the Rutgers Chinese Finance Club and Global Business Lead at Tutturo LLC
 - **Studying** Finance and Computer Science at Rutgers University *(B.S., expected May 2029)*
-- **Learning** Advanced Finance, AI Tool Integration, and Full-Stack Development
+- **Learning** Equity Research & Valuation, AI Tool Integration, and Full-Stack Development
 - **Looking to collaborate** on open-source hardware (like my [Magic Glove](https://github.com/LucasYanzy/Magic-Glove) project) and AI-driven applications
-- **Ask me about** Python, Java, C++ (Vibe Coding), and hardware integration with Arduino
+- **Ask me about** TMT hardware equity research, Python, Java, C++ (Vibe Coding), and hardware integration with Arduino
 - **Reach me** at [LucasYanzy@outlook.com](mailto:LucasYanzy@outlook.com) or on [LinkedIn](https://www.linkedin.com/in/lucasyanzy/)
-- **Fun fact:** I founded a lake protection foundation and led a biodiversity study across 20 wetland zones in Kunming
+- **Fun fact:** I launched a student-led conservation project with the Yunnan DianChi Lake foundation and led a biodiversity study across 20 wetland zones in Kunming
 
 ## Tech Stack / 技术栈
 
@@ -35,18 +35,24 @@
 
 <img src="https://skillicons.dev/icons?i=arduino,git,github&theme=dark&perline=3" alt="Arduino, Git, GitHub" />
 
-<sub>Also: AI tools and prompt engineering, Office 365 (Excel, PowerPoint, Word). English (fluent), Mandarin (native). C++, JavaScript, HTML and CSS are written in a Vibe Coding workflow.</sub>
+<sub>Finance: three-statement modeling, DCF valuation, comparable company analysis, equity research. Also: AI tools and prompt engineering, Office 365 (Excel, PowerPoint, Word). English (fluent), Mandarin (native). C++, JavaScript, HTML and CSS are written in a Vibe Coding workflow.</sub>
 
 ## Experience & Leadership / 经历
 
+- **Equity Research Intern, TMT Hardware** · Guolian Minsheng Securities &nbsp; `Jun 2026 → Aug 2026`<br />
+  <sub>AI data center power-demand forecasting, server BOM cost breakdowns, channel checks, and drafting research reports and valuation models.</sub>
+- **Founder & President** · Rutgers Chinese Finance Club &nbsp; `May 2026 → Present`<br />
+  <sub>Founded a 50+ member student organization connecting members with finance industry knowledge, networking and career resources.</sub>
 - **Global Business Lead** · Tutturo LLC &nbsp; `Oct 2025 → Present`<br />
   <sub>Early-stage startup: global operations, brand design and corporate website. 8th place at the Rutgers Sharktank competition.</sub>
-- **Project Management Member** · Rutgers CSSA &nbsp; `Aug 2025 → Present`<br />
+- **Core Project Manager** · Rutgers CSSA &nbsp; `Aug 2025 → Present`<br />
   <sub>Planning department: event logistics, redesigned competition framework and judging process.</sub>
 - **Hardware Developer** · 2026 IEEE × RUHART Build-a-thon &nbsp; `Apr 2026`<br />
-  <sub>Best Productivity/Automation Challenge Prize. Built [Magic Glove](https://github.com/LucasYanzy/Magic-Glove), a wearable controller that turns hand movements into digital commands.</sub>
-- **Founder & Project Manager** · Yunnan DianChi Lake Protection Foundation &nbsp; `May 2020 → Jun 2025`<br />
-  <sub>56 student volunteers, 5,000+ community members reached, biodiversity study across 20 wetland zones.</sub>
+  <sub>Best Productivity/Automation Challenge Prize among ~30 teams. Built [Magic Glove](https://github.com/LucasYanzy/Magic-Glove), an Arduino-based wearable controller that turns hand movements into mouse and keyboard commands.</sub>
+- **Founder & Project Manager, Student Environmental Project** · Yunnan DianChi Lake Protection & Improvement Foundation &nbsp; `May 2020 → Jun 2025`<br />
+  <sub>Student-led conservation project with the foundation: 56 volunteers, 5,000+ community members reached, biodiversity study across 20 wetland zones.</sub>
+- **Industry Programs** · Goldman Sachs, EY &nbsp; `Apr 2026 → Jul 2026`<br />
+  <sub>Goldman Sachs 2026 Possibilities Series (Apr to May); EY CHARGE 2026 (May to Jul).</sub>
 
 ## AI Coding Usage / AI 编程用量
 

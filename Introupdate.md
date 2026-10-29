@@ -1,48 +1,55 @@
-# LUCAS YAN
-+1 (848) 437 0914 | +86 157 5299 5980 | LucasYanzy@outlook.com | zy508@rutgers.edu
+# ZHIYAO (LUCAS) YAN
+Piscataway, NJ | (848) 437-0914 | zy508@rutgers.edu | linkedin.com/in/lucasyanzy | github.com/LucasYanzy
 https://lucasyanzy.github.io/Lucasyanzy/
 
 ## EDUCATION
 
-**Rutgers University** | New Brunswick, NJ
-*Bachelor of Science in Finance and Computer Science* | *Expected May 2029*
-* **Activities:** Bender Trust Stock Analyst Project Participant, Rutgers Entrepreneur Society
-
-**Kunming No.1 High School International Department** | Kunming, China
-*High School Diploma* | *Aug,2021 - May 2025*
-* **GPA:** 3.5 / 4.0
-* **Activities:** Club President of Environmental Protection, Debate Star, Track and Field Club
+**Rutgers University – New Brunswick** | New Brunswick, NJ
+*Bachelor of Science in Finance and Computer Science* | *May 2029*
+* **Activities:** Rutgers Entrepreneur Society (Sharktank, Scarlet Pitch)
 
 ## PROFESSIONAL EXPERIENCE
 
+**Guolian Minsheng Securities Co., Ltd.** | Shanghai, China
+*Equity Research Intern, TMT Hardware* | *Jun 2026 – Aug 2026*
+* Supported AI data center (AIDC) power-demand forecasting and server BOM cost breakdowns, compiling data on liquid-cooling components, power consumption, and shipment volumes across China and U.S. supply chains.
+* Ran channel checks across electronics markets and e-commerce platforms to monitor spot pricing; summarized key takeaways from earnings calls and expert-network interviews.
+* Assisted in drafting equity research reports and valuation models, analyzing hardware market trends, AI structural drivers, and company valuations.
+
 **Tutturo LLC** | New Brunswick, NJ
 *Global Business Lead* | *Oct 2025 – Present*
-* Directed global business operations for an early-stage startup; managed brand design and built the corporate website to align visual identity with the startup vision.
-* Pitched the business model at the Rutgers Sharktank competition, successfully securing 8th place overall among competing university teams.
+* Lead global business operations for an early-stage startup; manage brand design and built the corporate website.
+* Pitched the business model at the Rutgers Sharktank competition, placing 8th overall among university teams.
+
+## INDUSTRY PROGRAMS
+
+* Goldman Sachs – 2026 Possibilities Series | Apr 2026 – May 2026
+* EY (Ernst & Young) – EY CHARGE 2026 | May 2026 – Jul 2026
+
+## LEADERSHIP
+
+**Rutgers Chinese Finance Club** | New Brunswick, NJ
+*Founder & President* | *May 2026 – Present*
+* Founded and lead a 50+ member student organization connecting members with finance industry knowledge, networking opportunities, and career resources.
 
 **Rutgers Chinese Students and Scholars Association (CSSA)** | New Brunswick, NJ
-*Project Management Member* | *Aug 2025 – Present*
-* Optimized organizational efficiency and managed event logistics within the planning department.
-* Redesigned competition frameworks and streamlined the judging process to enhance event execution and team productivity.
+*Core Project Manager* | *Aug 2025 – Present*
+* Manage event logistics and improve operating efficiency within the planning department.
+* Redesigned competition frameworks and streamlined judging, improving event execution and team productivity.
 
 **Yunnan DianChi Lake Protection & Improvement Foundation** | Kunming, China
-*Founder & Project Manager* | *May 2020 – Jun 2025*
-* Mobilized and managed a team of 56 student volunteers to organize large-scale public engagement events and TV media campaigns, impacting over 5,000 community members across 6 years.
-* Establish and manage project that build up network with Fund form societies NGO as cooroporators
-* Directed a longitudinal biodiversity study across 20 wetland zones, documenting 300+ plant and 50+ animal species to construct a comprehensive local ecological database.
+*Founder & Project Manager, Student Environmental Project* | *May 2020 – Jun 2025*
+* Launched a student-led conservation project in partnership with the foundation; recruited and managed 56 volunteers to run public events and TV media campaigns reaching 5,000+ community members.
+* Directed a biodiversity study across 20 wetland zones, documenting 300+ plant and 50+ animal species in a local database.
 
-## PROJECTS & LEADERSHIP
+## PROJECTS
 
-**2026 IEEE x RUHART Build-a-thon** | New Brunswick, NJ
-*Hardware Developer* | *Apr 2026*
-* Awarded "Best Productivity/Automation Challenge Prizes" by Rutgers IEEE for exceptional technical execution during the 26-hour engineering competition.
-* Developed "Magic Glove," a wearable hardware controller utilizing C++ (VibeCoding) and Arduino IDE; engineered the system to translate natural hand movements into direct digital commands, effectively replacing traditional mouse and keyboard inputs.
-
-**Independent Web Portfolio** | Remote
-*AI Web Developer* | *Present*
-* Designed, deployed, and managed a personal portfolio website hosted on GitHub Pages to showcase technical programming projects and professional background.
+**Magic Glove – 2026 IEEE x RUHART Build-a-thon** | Apr 2026
+* Won the "Best Productivity/Automation Challenge Prize" among ~30 teams at Rutgers IEEE's 26-hour engineering competition.
+* Built an Arduino-based wearable controller that translates hand movements into mouse and keyboard commands; handled hardware integration and used AI-assisted coding for the control logic.
 
 ## SKILLS & LANGUAGES
 
-* **Technical Skills:** Python, Java, C++ (VibeCoding), Arduino IDE, Hardware Integration, AI Tools Proficiency, Search & Data Integration, Office 365(Powerpoint,Excle,Word).
-* **Languages:** English (Fluent), Mandarin (Native).
+* **Financial:** Three-Statement Modeling, DCF Valuation, Comparable Company Analysis, Equity Research
+* **Technical:** Python, Java, Arduino, Hardware Integration, GitHub, Microsoft Excel, PowerPoint, Word
+* **Languages:** English (Fluent), Mandarin (Native)
