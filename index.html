@@ -737,10 +737,63 @@
 
         /* --- Projects Section --- */
         .project-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-            gap: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            counter-reset: proj;
         }
+
+        /* One row per project: number, name, date and stack on the left; role and story on the right */
+        .project-row {
+            display: grid;
+            grid-template-columns: minmax(260px, 35%) minmax(0, 1fr);
+            column-gap: 44px;
+            align-items: start;
+            padding: 38px 44px;
+            text-decoration: none;
+            color: inherit;
+        }
+        .project-side { counter-increment: proj; min-width: 0; }
+        .project-side::before {
+            content: counter(proj, decimal-leading-zero);
+            display: block;
+            margin-bottom: 14px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 300;
+            font-size: 0.95rem;
+            letter-spacing: 3px;
+            color: var(--text-cn);
+        }
+        .project-side h3 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.7rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 10px;
+            color: var(--text-main);
+        }
+        .project-side .project-meta { margin-bottom: 0; line-height: 1.5; }
+        .project-side .project-tags { margin-top: 22px; gap: 10px; }
+        .project-body { display: flex; flex-direction: column; min-width: 0; }
+        .project-body .bilingual { margin-bottom: 0; }
+
+        .project-role {
+            margin-bottom: 20px;
+            padding: 14px 18px;
+            border-left: 2px solid var(--primary);
+            border-radius: 0 12px 12px 0;
+            background: rgba(0, 243, 255, 0.05);
+        }
+        .project-role-label {
+            margin-bottom: 6px;
+            font-size: 0.72rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--primary);
+        }
+        .project-role .bilingual { gap: 3px; }
+        .project-role .en { color: var(--text-main); font-weight: 500; font-size: 0.98rem; }
+        .project-role .cn { font-size: 0.9rem; }
 
         .project-meta {
             font-size: 0.85rem;
@@ -750,7 +803,7 @@
         }
 
         .project-link {
-            margin-top: 15px;
+            margin-top: 22px;
             font-size: 0.85rem;
             color: var(--primary);
             font-weight: 600;
@@ -902,7 +955,8 @@
             .hero-content h2 { font-size: 1.2rem; letter-spacing: 3px; }
             .timeline-header { flex-direction: column; }
             .section-title { font-size: 24px; margin-bottom: 40px; }
-            .project-grid { grid-template-columns: 1fr; }
+            .project-grid { gap: 20px; }
+            .project-row { grid-template-columns: 1fr; row-gap: 22px; padding: 28px 26px; }
 
             .nav-toggle { display: block; }
             .nav-links {
@@ -1347,85 +1401,99 @@
             <section id="projects">
                 <h2 class="section-title" data-reveal>Projects & Highlights / 项目与亮点</h2>
                 <div class="project-grid">
-                    <!-- Project 1 -->
-                    <a href="https://github.com/LucasYanzy/Magic-Glove" target="_blank" class="card project-card" data-reveal style="text-decoration: none; color: inherit;">
-                        <div>
-                            <h3 style="margin-bottom: 6px; font-size: 1.4rem;">Magic Glove</h3>
+                    <a href="https://github.com/LucasYanzy/Magic-Glove" target="_blank" rel="noopener" class="card project-card project-row" data-reveal>
+                        <div class="project-side">
+                            <h3>Magic Glove</h3>
                             <div class="project-meta">2026 IEEE x RUHART Build-a-thon · Hardware Developer · Apr 2026</div>
+                            <div class="project-tags">
+                                <span class="tag">C++</span>
+                                <span class="tag">Arduino</span>
+                                <span class="tag">Hardware</span>
+                                <span class="tag">Award Winner</span>
+                            </div>
+                        </div>
+                        <div class="project-body">
                             <div class="bilingual">
                                 <span class="en">Won the "Best Productivity/Automation Challenge Prize" among ~30 teams at Rutgers IEEE's 26-hour engineering competition. Built an Arduino-based wearable controller that translates hand movements into mouse and keyboard commands; handled the hardware integration and used AI-assisted coding for the control logic.</span>
                                 <span class="cn">在 Rutgers IEEE 26 小时工程赛中，于约 30 支队伍中荣获 "最佳生产力与自动化挑战" 奖项。基于 Arduino 打造可穿戴控制器，把手势转换为鼠标与键盘指令；负责硬件集成，并借助 AI 辅助编程完成控制逻辑。</span>
                             </div>
-                        </div>
-                        <div class="project-link">
-                            <span>Visit Repo / 点击访问仓库</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        </div>
-                        <div class="project-tags">
-                            <span class="tag">C++</span>
-                            <span class="tag">Arduino</span>
-                            <span class="tag">Hardware</span>
-                            <span class="tag">Award Winner</span>
+                            <div class="project-link">
+                                <span>Visit Repo / 点击访问仓库</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            </div>
                         </div>
                     </a>
 
-                    <!-- Project 2 -->
-                    <div class="card project-card" data-reveal>
-                        <div>
-                            <h3 style="margin-bottom: 6px; font-size: 1.4rem;">Independent Web Portfolio</h3>
+                    <a href="https://github.com/LucasYanzy/Lucasyanzy" target="_blank" rel="noopener" class="card project-card project-row" data-reveal>
+                        <div class="project-side">
+                            <h3>Independent Web Portfolio</h3>
                             <div class="project-meta">AI Web Developer · Present</div>
+                            <div class="project-tags">
+                                <span class="tag">HTML/CSS/JS</span>
+                                <span class="tag">GitHub Pages</span>
+                                <span class="tag">AI Tools</span>
+                            </div>
+                        </div>
+                        <div class="project-body">
                             <div class="bilingual">
                                 <span class="en">Designed, deployed, and managed a personal portfolio website hosted on GitHub Pages to showcase technical programming projects and professional background.</span>
                                 <span class="cn">自主设计、部署并维护托管于 GitHub Pages 的个人作品集网站，用于展示技术项目与职业背景。</span>
                             </div>
+                            <div class="project-link">
+                                <span>View Source / 查看源码</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            </div>
                         </div>
-                        <div class="project-tags">
-                            <span class="tag">HTML/CSS/JS</span>
-                            <span class="tag">GitHub Pages</span>
-                            <span class="tag">AI Tools</span>
-                        </div>
-                    </div>
+                    </a>
 
-                    <a href="https://github.com/Breathless-Game/Breathless" target="_blank" rel="noopener" class="card project-card" data-reveal style="text-decoration: none; color: inherit;">
-                        <div>
-                            <h3 style="margin-bottom: 6px; font-size: 1.4rem;">Breathless</h3>
+                    <a href="https://github.com/Breathless-Game/Breathless" target="_blank" rel="noopener" class="card project-card project-row" data-reveal>
+                        <div class="project-side">
+                            <h3>Breathless</h3>
                             <div class="project-meta">HackRU26 · Team project · Oct 2026</div>
+                            <div class="project-tags">
+                                <span class="tag">Three.js</span>
+                                <span class="tag">TypeScript</span>
+                                <span class="tag">Node.js</span>
+                                <span class="tag">Solana</span>
+                                <span class="tag">Presage</span>
+                            </div>
+                        </div>
+                        <div class="project-body">
+                            <div class="project-role">
+                                <div class="project-role-label">My role / 我的职责</div>
+                                <div class="bilingual"><span class="en">Weather and map system development · Modeling and the upgrade system · Core gameplay design and planning</span><span class="cn">天气与地图系统开发 · 建模与升级系统 · 玩法核心设计与策划</span></div>
+                            </div>
                             <div class="bilingual">
                                 <span class="en">A browser game you play by holding your real breath. A webcam, read through Presage's vital-signs SDK, detects the breath-hold: the diver only descends while you hold it, deeper water gives rarer fish, and breathing underwater means racing back to the surface or losing the catch. Fish can be minted as Solana NFTs.</span>
                                 <span class="cn">用真实憋气来玩的浏览器游戏。摄像头通过 Presage 检测是否在憋气：憋气时潜水员才会下潜，越深的水域鱼越稀有；水下一呼吸就得赶紧回到水面，否则网里的鱼全部丢失。收获的鱼可以铸造成 Solana NFT。</span>
                             </div>
-                        </div>
-                        <div class="project-link">
-                            <span>Visit Repo / 点击访问仓库</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        </div>
-                        <div class="project-tags">
-                            <span class="tag">Three.js</span>
-                            <span class="tag">TypeScript</span>
-                            <span class="tag">Node.js</span>
-                            <span class="tag">Solana</span>
-                            <span class="tag">Presage</span>
+                            <div class="project-link">
+                                <span>Visit Repo / 点击访问仓库</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            </div>
                         </div>
                     </a>
 
-                    <a href="https://github.com/LucasYanzy/DAshi" target="_blank" rel="noopener" class="card project-card" data-reveal style="text-decoration: none; color: inherit;">
-                        <div>
-                            <h3 style="margin-bottom: 6px; font-size: 1.4rem;">DAshi</h3>
+                    <a href="https://github.com/LucasYanzy/DAshi" target="_blank" rel="noopener" class="card project-card project-row" data-reveal>
+                        <div class="project-side">
+                            <h3>DAshi</h3>
                             <div class="project-meta">Open-source project · Python</div>
+                            <div class="project-tags">
+                                <span class="tag">Python</span>
+                                <span class="tag">CLI</span>
+                                <span class="tag">LLM Skills</span>
+                                <span class="tag">MIT</span>
+                            </div>
+                        </div>
+                        <div class="project-body">
                             <div class="bilingual">
                                 <span class="en">A zero-dependency Python charting engine for Chinese metaphysics (BaZi, Zi Wei Dou Shu, Liu Yao, Qi Men and more) with a classical-text knowledge base, packaged as 11 skills for LLMs. Anything with one right answer, from solar terms to star placement, is computed by code and checked against 117 regression anchors; the model only interprets.</span>
                                 <span class="cn">面向大模型的中国命理工具箱：零依赖的 Python 排盘引擎（八字、紫微斗数、六爻、奇门遁甲等）加上古籍知识库，打包为 11 个技能。节气、安星等有唯一正确答案的部分由代码计算，并有 117 条回归锚点校验，模型只负责解读。</span>
                             </div>
-                        </div>
-                        <div class="project-link">
-                            <span>Visit Repo / 点击访问仓库</span>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                        </div>
-                        <div class="project-tags">
-                            <span class="tag">Python</span>
-                            <span class="tag">CLI</span>
-                            <span class="tag">LLM Skills</span>
-                            <span class="tag">MIT</span>
+                            <div class="project-link">
+                                <span>Visit Repo / 点击访问仓库</span>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                            </div>
                         </div>
                     </a>
                 </div>
