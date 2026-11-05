@@ -865,6 +865,22 @@
             color: #fff;
         }
 
+        /* --- AI Usage Section --- */
+        .card.ai-usage-card {
+            display: block;
+            padding: 0;
+            text-decoration: none;
+        }
+        .ai-usage-card img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+        .ai-usage-note {
+            margin-top: 20px;
+            text-align: center;
+        }
+
         /* --- Contact Section --- */
         .contact-content {
             display: flex;
@@ -1047,6 +1063,7 @@
                 <li><a href="#experience">Experience</a></li>
                 <li><a href="#skills">Skills</a></li>
                 <li><a href="#projects">Projects</a></li>
+                <li><a href="#ai-usage">AI Usage</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
@@ -1523,6 +1540,18 @@
                             </div>
                         </div>
                     </a>
+                </div>
+            </section>
+
+            <!-- AI Coding Usage / AI 编程用量 -->
+            <section id="ai-usage">
+                <h2 class="section-title" data-reveal>AI Coding Usage / AI 编程用量</h2>
+                <a href="https://github.com/xiufengsun/TokenTracker" target="_blank" rel="noopener" class="card ai-usage-card" data-reveal>
+                    <img src="https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/usage/ai-usage.svg" alt="AI coding usage on TokenTracker: tokens, cost and leaderboard rank" width="1100" height="310" loading="lazy" />
+                </a>
+                <div class="bilingual ai-usage-note" data-reveal>
+                    <span class="en">Tokens, cost and leaderboard rank from TokenTracker, refreshed automatically every 6 hours.</span>
+                    <span class="cn">数据来自 TokenTracker（Token 用量、花费与排行榜名次），每 6 小时自动更新。</span>
                 </div>
             </section>
 
