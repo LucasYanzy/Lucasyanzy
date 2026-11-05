@@ -94,18 +94,44 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            opacity: 0.6;
+            opacity: 0.72;
             pointer-events: none;
         }
 
-        /* --- Decoding text: dim glyphs, a bright scan head, a flash as each character locks in --- */
+        /* --- Decoding text: glyphs blink in, a light beam sweeps across, each character locks in with a flash --- */
         .st-text { display: inline-block; }
-        .dc-glitch { animation: dc-glitch 0.36s steps(1, end) 1; }
+        .st-text.decoding { position: relative; }
+        .st-text.decoding::before,
+        .st-text.decoding::after {
+            content: '';
+            position: absolute;
+            top: -12%;
+            bottom: -12%;
+            pointer-events: none;
+            opacity: var(--beam, 0);
+        }
+        .st-text.decoding::before {           /* the trail behind the beam */
+            left: max(0px, calc(var(--scan, 0) * 100% - 70px));
+            width: min(70px, calc(var(--scan, 0) * 100%));
+            background: linear-gradient(90deg, rgba(0, 243, 255, 0), rgba(0, 243, 255, 0.14));
+            -webkit-mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent);
+            mask-image: linear-gradient(180deg, transparent, #000 30%, #000 70%, transparent);
+        }
+        .st-text.decoding::after {            /* the beam */
+            left: calc(var(--scan, 0) * 100%);
+            width: 2px;
+            border-radius: 1px;
+            background: linear-gradient(180deg, rgba(200, 255, 255, 0), #c8ffff 22%, #c8ffff 78%, rgba(200, 255, 255, 0));
+            box-shadow: 0 0 8px #00f3ff, 0 0 20px rgba(0, 243, 255, 0.75), 0 0 34px rgba(189, 0, 255, 0.35);
+        }
+        .dc-glitch { animation: dc-glitch 0.42s steps(1, end) 1; }
+        .dc-glitch-out { animation: dc-glitch-out 0.22s steps(1, end) 1; }
         .decoding span { position: relative; transition: none; }
-        .decoding span[class=""] { transition: color 0.35s ease, text-shadow 0.35s ease; }
-        .dc-dim { color: rgba(0, 243, 255, 0.38); }
+        .decoding span[class=""] { transition: color 0.45s ease, text-shadow 0.45s ease; }
+        .dc-off { color: transparent; text-shadow: none; }
+        .dc-dim { color: rgba(0, 243, 255, 0.34); }
         .dc-hot { color: #e9ffff; text-shadow: 0 0 6px rgba(0, 243, 255, 0.95), 0 0 16px rgba(0, 243, 255, 0.6); }
-        .dc-hit { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.9), 0 0 22px rgba(0, 243, 255, 0.75); }
+        .dc-hit { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.9), 0 0 22px rgba(0, 243, 255, 0.75), 0 0 36px rgba(189, 0, 255, 0.3); }
         .decoding span[data-g] { color: transparent; text-shadow: none; }
         .decoding span[data-g]::after {
             content: attr(data-g);
@@ -114,15 +140,21 @@
             top: 0;
             transform: translateX(-50%);
             line-height: normal;
-            color: rgba(0, 243, 255, 0.38);
+            color: rgba(0, 243, 255, 0.34);
         }
         .decoding span.dc-hot[data-g]::after { color: #e9ffff; text-shadow: 0 0 6px rgba(0, 243, 255, 0.95), 0 0 16px rgba(0, 243, 255, 0.6); }
         @keyframes dc-glitch {
             0%   { transform: translateX(-3px) skewX(-8deg); text-shadow: -2px 0 rgba(255, 40, 200, 0.75), 2px 0 rgba(0, 243, 255, 0.75); }
-            25%  { transform: translateX(2px); text-shadow: 2px 0 rgba(255, 40, 200, 0.7), -2px 0 rgba(0, 243, 255, 0.7); clip-path: inset(8% 0 45% 0); }
-            50%  { transform: translateX(-1px) skewX(4deg); text-shadow: -1px 0 rgba(255, 40, 200, 0.6), 1px 0 rgba(0, 243, 255, 0.6); clip-path: inset(52% 0 4% 0); }
-            75%  { transform: translateX(1px); text-shadow: 1px 0 rgba(255, 40, 200, 0.4), -1px 0 rgba(0, 243, 255, 0.4); clip-path: none; }
+            20%  { transform: translateX(2px); text-shadow: 2px 0 rgba(255, 40, 200, 0.7), -2px 0 rgba(0, 243, 255, 0.7); clip-path: inset(8% 0 45% 0); }
+            40%  { transform: translateX(-1px) skewX(4deg); text-shadow: -1px 0 rgba(255, 40, 200, 0.6), 1px 0 rgba(0, 243, 255, 0.6); clip-path: inset(52% 0 4% 0); }
+            60%  { transform: translateX(1px); text-shadow: 1px 0 rgba(255, 40, 200, 0.45), -1px 0 rgba(0, 243, 255, 0.45); clip-path: inset(30% 0 30% 0); }
+            80%  { transform: none; text-shadow: 1px 0 rgba(255, 40, 200, 0.3), -1px 0 rgba(0, 243, 255, 0.3); clip-path: none; }
             100% { transform: none; text-shadow: none; clip-path: none; }
+        }
+        @keyframes dc-glitch-out {
+            0%   { transform: translateX(2px) skewX(6deg); text-shadow: 2px 0 rgba(255, 40, 200, 0.6), -2px 0 rgba(0, 243, 255, 0.6); }
+            50%  { transform: translateX(-1px); text-shadow: -1px 0 rgba(255, 40, 200, 0.4), 1px 0 rgba(0, 243, 255, 0.4); }
+            100% { transform: none; text-shadow: none; }
         }
 
         /* --- Bilingual Text Classes --- */
@@ -1607,11 +1639,12 @@
                 initScrollbar();
             }
 
-            // --- Background: a living data network ---
-            // At rest it stays quiet: nodes drift on a slow flow field, wired to their nearest neighbours,
-            // with a few packets travelling edge to edge. The pointer is where it comes alive: nearby nodes
-            // are pulled towards it on springs and wire up to each other, a soft glow follows it, and the
-            // closest node sends packets out. A click or tap broadcasts a wave that wakes the graph hop by hop.
+            // --- Background: a night sky with a living data network ---
+            // At rest it stays quiet: twinkling stars, slow nebula clouds, the odd shooting star, and nodes
+            // wired to their nearest neighbours with a few packets travelling. The pointer is where it comes
+            // alive: nearby nodes are pulled towards it on springs and wire up to each other, stars around it
+            // brighten, a soft glow follows it, and the closest node sends packets out. A click or tap
+            // broadcasts a wave that wakes the graph hop by hop.
             function initBackground() {
                 const canvas = document.getElementById('bg-canvas');
                 const ctx = canvas.getContext('2d');
@@ -1624,7 +1657,8 @@
                 const QUERY_R = 220;
                 let W = 0, H = 0, dpr = 1;
                 let nodes = [], edges = [], adj = [], packets = [], waves = [];
-                let baseCount = 0, frame = 0, last = performance.now(), lastJitter = 0, lastEmit = 0;
+                let stars = [], clouds = [], meteors = [], nextMeteor = performance.now() + 2500;
+                let baseCount = 0, frame = 0, last = performance.now(), lastJitter = 0, lastEmit = 0, lastType = 'mouse';
                 let scrollY = window.scrollY, scrollVel = 0, px = 0, py = 0;
                 const pointer = { x: 0, y: 0, gx: 0, gy: 0, glow: 0, active: false, touchUntil: 0, movedAt: 0 };
 
@@ -1640,14 +1674,20 @@
                 }
                 // a soft glow under hubs and lit nodes, and the halo that follows the pointer
                 const glow = sprite(64, [[0, 'rgba(0, 243, 255, 0.6)'], [0.35, 'rgba(0, 243, 255, 0.18)'], [1, 'rgba(0, 243, 255, 0)']]);
-                const halo = sprite(256, [[0, 'rgba(0, 243, 255, 0.09)'], [0.45, 'rgba(130, 90, 210, 0.035)'], [1, 'rgba(0, 0, 0, 0)']]);
+                const halo = sprite(256, [[0, 'rgba(0, 243, 255, 0.08)'], [0.5, 'rgba(144, 78, 149, 0.03)'], [1, 'rgba(0, 0, 0, 0)']]);
+                // nebula clouds: cyan, violet and deep blue
+                const nebula = [
+                    sprite(256, [[0, 'rgba(0, 243, 255, 0.5)'], [0.45, 'rgba(0, 140, 190, 0.16)'], [1, 'rgba(0, 0, 0, 0)']]),
+                    sprite(256, [[0, 'rgba(160, 80, 240, 0.5)'], [0.45, 'rgba(100, 40, 170, 0.16)'], [1, 'rgba(0, 0, 0, 0)']]),
+                    sprite(256, [[0, 'rgba(50, 90, 230, 0.45)'], [0.5, 'rgba(25, 45, 130, 0.14)'], [1, 'rgba(0, 0, 0, 0)']])
+                ];
 
                 const rand = (n) => Math.floor(Math.random() * n);
                 const mod = (a, n) => ((a % n) + n) % n;
                 const address = (i) => '0x' + ((Math.imul(i + 11, 2654435761) >>> 0) & 0xffff).toString(16).padStart(4, '0');
 
                 function build() {
-                    baseCount = Math.max(36, Math.min(120, Math.round(W * H / 15000)));
+                    baseCount = Math.max(40, Math.min(140, Math.round(W * H / 11000)));
                     const hubs = Math.round(baseCount * 0.12);
                     nodes = [];
                     for (let i = 0; i < baseCount; i++) {
@@ -1666,7 +1706,27 @@
                     place(0);
                     relink();
                     packets = [];
-                    for (let i = 0; i < Math.round(baseCount * 0.22); i++) spawn(rand(nodes.length), false);
+                    for (let i = 0; i < Math.round(baseCount * 0.18); i++) spawn(rand(nodes.length), false);
+                    // the starfield: mostly faint white-blue points, a few tinted, a few bright ones with a glint
+                    stars = [];
+                    const starCount = Math.max(140, Math.min(480, Math.round(W * H / 3400)));
+                    for (let i = 0; i < starCount; i++) {
+                        const bright = Math.random() < 0.035, tint = Math.random();
+                        stars.push({
+                            x: Math.random() * W, y: Math.random() * H, z: Math.random(),
+                            r: bright ? 1.1 + Math.random() * 0.6 : 0.3 + Math.random() * 0.7,
+                            a: bright ? 0.95 : 0.24 + Math.random() * 0.52,
+                            tw: 0.0005 + Math.random() * 0.002, ph: Math.random() * TAU,
+                            col: tint < 0.1 ? '190, 150, 255' : tint < 0.42 ? '90, 235, 255' : '230, 242, 255',
+                            bright: bright
+                        });
+                    }
+                    clouds = [
+                        { k: 0, x: 0.2, y: 0.28, s: 0.95, a: 0.16, ph: 0 },
+                        { k: 1, x: 0.82, y: 0.6, s: 1.1, a: 0.15, ph: 2 },
+                        { k: 2, x: 0.52, y: 0.05, s: 0.85, a: 0.14, ph: 4 },
+                        { k: 1, x: 0.12, y: 0.92, s: 0.75, a: 0.1, ph: 1 }
+                    ];
                 }
 
                 // screen position = drift position + scroll and pointer parallax (deeper nodes move less),
@@ -1707,7 +1767,7 @@
                     }
                 }
 
-                // k nearest neighbours on a spatial grid: 2 for ordinary nodes, 4 for hubs
+                // k nearest neighbours on a spatial grid: 3 for ordinary nodes, 4 for hubs
                 function relink() {
                     const cell = 180;
                     const cols = Math.ceil((W + 120) / cell) + 1;
@@ -1722,7 +1782,7 @@
                     adj = nodes.map(() => []);
                     nodes.forEach((n, i) => {
                         const cx = Math.floor((n.sx + 60) / cell), cy = Math.floor((n.sy + 60) / cell);
-                        const maxD = n.hub ? 250 : 175, k = n.hub ? 4 : 2;
+                        const maxD = n.hub ? 250 : 165, k = n.hub ? 4 : 3;
                         const near = [];
                         for (let gx = cx - 1; gx <= cx + 1; gx++) {
                             for (let gy = cy - 1; gy <= cy + 1; gy++) {
@@ -1810,6 +1870,21 @@
                         n.lit *= fade;
                     });
                     if (frame % 6 === 0) relink();
+                    // now and then a shooting star
+                    if (now > nextMeteor) {
+                        nextMeteor = now + 4500 + Math.random() * 7000;
+                        const dir = Math.random() < 0.5 ? 1 : -1, ang = 0.3 + Math.random() * 0.35;
+                        meteors.push({
+                            x: W * (0.15 + Math.random() * 0.7), y: H * Math.random() * 0.45,
+                            dx: Math.cos(ang) * dir, dy: Math.sin(ang),
+                            v: 0.55 + Math.random() * 0.35, len: 110 + Math.random() * 110,
+                            t: 0, life: 700 + Math.random() * 450
+                        });
+                    }
+                    for (let i = meteors.length - 1; i >= 0; i--) {
+                        meteors[i].t += dt;
+                        if (meteors[i].t > meteors[i].life) meteors.splice(i, 1);
+                    }
                     // while the pointer moves, the node closest to it sends packets out
                     if (pointer.active && now - pointer.movedAt < 400 && now - lastEmit > 260) {
                         lastEmit = now;
@@ -1865,8 +1940,66 @@
                     ctx.clearRect(0, 0, W, H);
                     const now = performance.now();
 
+                    // nebula clouds drift slowly and scroll a little (they repeat down the page)
+                    const big = Math.max(W, H);
+                    for (const c of clouds) {
+                        const size = big * c.s;
+                        const cx = c.x * W + Math.sin(now * 0.00005 + c.ph) * 70 - px * 0.01;
+                        const cy = mod(c.y * H - scrollY * 0.03 + Math.cos(now * 0.00004 + c.ph) * 40 + size / 2, H + size) - size / 2;
+                        ctx.globalAlpha = c.a;
+                        ctx.drawImage(nebula[c.k], cx - size / 2, cy - size / 2, size, size);
+                    }
+                    ctx.globalAlpha = 1;
+
+                    // stars twinkle, drift a touch with scroll, and brighten near the pointer
+                    for (const st of stars) {
+                        const x = mod(st.x - px * 0.006 * st.z, W + 20) - 10;
+                        const y = mod(st.y - scrollY * (0.01 + st.z * 0.025) - py * 0.006 * st.z, H + 20) - 10;
+                        let a = st.a * (0.6 + 0.4 * Math.sin(now * st.tw + st.ph));
+                        if (pointer.glow > 0.01) {
+                            const d2 = (x - pointer.x) * (x - pointer.x) + (y - pointer.y) * (y - pointer.y);
+                            if (d2 < 40000) a = Math.min(1, a + (1 - Math.sqrt(d2) / 200) * 0.55 * pointer.glow);
+                        }
+                        ctx.fillStyle = 'rgba(' + st.col + ', ' + a.toFixed(3) + ')';
+                        if (st.bright) {
+                            ctx.globalAlpha = a * 0.55;
+                            ctx.drawImage(glow, x - 7, y - 7, 14, 14);
+                            ctx.globalAlpha = 1;
+                            ctx.beginPath();
+                            ctx.arc(x, y, st.r, 0, TAU);
+                            ctx.fill();
+                            const g = 3 + 5 * a;
+                            ctx.fillRect(x - g, y - 0.35, g * 2, 0.7);
+                            ctx.fillRect(x - 0.35, y - g, 0.7, g * 2);
+                        } else {
+                            ctx.fillRect(x - st.r, y - st.r, st.r * 2, st.r * 2);
+                        }
+                    }
+
+                    // shooting stars
+                    ctx.lineCap = 'round';
+                    for (const m of meteors) {
+                        const env = Math.sin(Math.PI * m.t / m.life);
+                        const hx = m.x + m.dx * m.v * m.t, hy = m.y + m.dy * m.v * m.t;
+                        const tl = m.len * Math.min(1, m.t / 180);
+                        const tx = hx - m.dx * tl, ty = hy - m.dy * tl;
+                        const gr = ctx.createLinearGradient(tx, ty, hx, hy);
+                        gr.addColorStop(0, 'rgba(' + CYAN + ', 0)');
+                        gr.addColorStop(0.7, 'rgba(160, 245, 255, ' + (0.35 * env) + ')');
+                        gr.addColorStop(1, 'rgba(255, 255, 255, ' + (0.9 * env) + ')');
+                        ctx.strokeStyle = gr;
+                        ctx.lineWidth = 1.3;
+                        ctx.beginPath();
+                        ctx.moveTo(tx, ty);
+                        ctx.lineTo(hx, hy);
+                        ctx.stroke();
+                        ctx.globalAlpha = env * 0.8;
+                        ctx.drawImage(glow, hx - 8, hy - 8, 16, 16);
+                        ctx.globalAlpha = 1;
+                    }
+
                     if (pointer.glow > 0.01) {
-                        const s = 840;
+                        const s = 1200;
                         ctx.globalAlpha = pointer.glow;
                         ctx.drawImage(halo, pointer.gx - s / 2, pointer.gy - s / 2, s, s);
                         ctx.globalAlpha = 1;
@@ -1893,7 +2026,7 @@
                         const al = (1 - d / reach) * (0.35 + 0.65 * (a.z + b.z) / 2) + Math.max(a.lit, b.lit) * 0.9;
                         bands[Math.min(4, Math.floor(al * 3.2))].push(a, b);
                     }
-                    strokeBands(bands, 0.04, 0.055, 0.75);
+                    strokeBands(bands, 0.045, 0.06, 0.75);
 
                     // around the pointer every pair of close nodes links up, with a pulse running along strong links
                     const hot = nodes.filter((n) => n.f > 0.02);
@@ -1956,7 +2089,7 @@
                             ctx.drawImage(glow, n.sx - s / 2, n.sy - s / 2, s, s);
                             ctx.globalAlpha = 1;
                         }
-                        const alpha = Math.min(1, 0.28 + n.z * 0.4 + heat * 0.6);
+                        const alpha = Math.min(1, (0.3 + n.z * 0.42) * (0.82 + 0.18 * Math.sin(now * 0.0021 + n.seed)) + heat * 0.6);
                         ctx.fillStyle = heat > 0.55 ? 'rgba(235, 255, 255, ' + alpha + ')' : 'rgba(' + CYAN + ', ' + alpha + ')';
                         ctx.beginPath();
                         ctx.arc(n.sx, n.sy, n.r * (1 + n.lit * 0.6) + n.f * 1.6, 0, TAU);
@@ -2053,18 +2186,31 @@
                     pointer.active = true;
                     pointer.movedAt = performance.now();
                 }
+                // A mouse keeps the pull for as long as it is over the page, clicks included. A finger
+                // holds it while it touches or drags, and for a moment after it lifts.
                 window.addEventListener('pointermove', (e) => {
                     if (e.pointerType === 'touch') return;
                     aim(e.clientX, e.clientY);
                     pointer.touchUntil = 0;
                 }, { passive: true });
-                document.addEventListener('mouseleave', () => { pointer.active = false; });
-                window.addEventListener('blur', () => { pointer.active = false; });
+                window.addEventListener('pointerdown', (e) => {
+                    lastType = e.pointerType || 'mouse';
+                    if (lastType !== 'touch') aim(e.clientX, e.clientY);
+                }, { passive: true });
+                function hold(e) {
+                    const t = e.touches && e.touches[0];
+                    if (!t) return;
+                    lastType = 'touch';
+                    aim(t.clientX, t.clientY);
+                    pointer.touchUntil = performance.now() + 1300;
+                }
+                window.addEventListener('touchstart', hold, { passive: true });
+                window.addEventListener('touchmove', hold, { passive: true });
+                document.addEventListener('mouseleave', () => { if (lastType !== 'touch') pointer.active = false; });
                 // click rather than pointerdown, so a finger that scrolls the page does not fire it
                 window.addEventListener('click', (e) => {
                     if (e.detail === 0) return;   // a keyboard "click" has no position
-                    if (e.pointerType === 'touch' || !window.matchMedia('(hover: hover)').matches) {
-                        // a tap holds the pull for a moment, so phones get the same mesh
+                    if (lastType === 'touch') {
                         aim(e.clientX, e.clientY);
                         pointer.touchUntil = performance.now() + 1300;
                     }
@@ -2088,11 +2234,12 @@
             }
 
             // --- Text that decodes: the hero line and the section titles ---
-            // The line starts as dim glyphs; a bright scan head sweeps left to right and each character
-            // locks in with a short flash, over a brief RGB-split glitch. Every span keeps its real
-            // character (made transparent), so the line wraps exactly like the final text; the random
-            // glyph is drawn on top of it from data-g.
-            // (the sets live inside the function: init() runs before constants further down the script exist)
+            // Glyphs blink in along the line, then a light beam sweeps across: glyphs near it flicker fast
+            // and bright, further ones slowly and dim. Each character locks in with a white flash, and a few
+            // slip back to a glyph for an instant before they hold. A short RGB-split glitch opens and closes
+            // it. Every span keeps its real character (made transparent), so the line wraps exactly like the
+            // final text; the random glyph is drawn on top of it from data-g.
+            // (the glyph sets live inside the function: init() runs before constants further down exist)
             function glyph(ch) {
                 const set = /[iljtfrI1]/.test(ch) ? 'ilj1!|:;tf'
                     : /[0-9]/.test(ch) ? '0123456789'
@@ -2111,35 +2258,57 @@
                 const spans = chars.map((ch) => {
                     const s = document.createElement('span');
                     s.textContent = ch;
-                    if (ch.trim()) s.className = 'dc-dim';
-                    if (/[A-Za-z0-9]/.test(ch)) s.dataset.g = glyph(ch);
+                    if (ch.trim()) s.className = 'dc-off';
                     el.appendChild(s);
                     return s;
                 });
                 el.classList.add('decoding');
-                const sweep = duration * 0.8, FLASH = 170;
-                const at = chars.map((ch, i) => (n > 1 ? i / (n - 1) : 0) * sweep + Math.random() * duration * 0.2);
-                const end = Math.max.apply(null, at) + FLASH;
+                const lead = duration * 0.14, sweep = duration * 0.7, FLASH = 230;
+                const alnum = chars.map((ch) => /[A-Za-z0-9]/.test(ch));
+                const appear = chars.map(() => Math.random() * lead);
+                const at = chars.map((ch, i) => lead + (n > 1 ? i / (n - 1) : 0) * sweep + Math.random() * duration * 0.14);
+                const slip = chars.map((ch, i) => alnum[i] && Math.random() < 0.22 ? at[i] + 50 + Math.random() * 90 : -1);
+                const last = Math.max.apply(null, at);
+                const end = last + FLASH;
                 const start = performance.now() + (delay || 0);
-                let glitched = false;
+                let opened = false, closed = false;
                 (function tick(now) {
                     const e = now - start;
-                    if (!glitched && e >= 0) {
-                        glitched = true;
+                    if (!opened && e >= 0) {
+                        opened = true;
                         el.classList.add('dc-glitch');
                     }
-                    const head = e / sweep * (n - 1);
+                    if (!closed && e >= last) {
+                        closed = true;
+                        el.classList.remove('dc-glitch');
+                        void el.offsetWidth;          // restart the animation for the closing flick
+                        el.classList.add('dc-glitch-out');
+                    }
+                    const head = (e - lead) / sweep * (n - 1);
+                    const k = Math.max(0, Math.min(1, n > 1 ? head / (n - 1) : 1));
+                    el.style.setProperty('--scan', k.toFixed(4));
+                    el.style.setProperty('--beam', e < lead - 60 ? 0 : head > n - 1 ? Math.max(0, 1 - (e - lead - sweep) / 160).toFixed(3) : Math.min(1, (e - lead + 60) / 60).toFixed(3));
                     for (let i = 0; i < n; i++) {
                         const ch = chars[i], s = spans[i];
-                        let cls = '';
+                        let cls = '', g = null;
                         if (ch.trim() && e < at[i] + FLASH) {
-                            if (e >= at[i]) {
-                                cls = 'dc-hit';
-                                if (s.dataset.g) delete s.dataset.g;
+                            if (e < appear[i]) {
+                                cls = 'dc-off';
+                            } else if (e < at[i]) {
+                                const near = i - head < 3 && i - head > -1;
+                                cls = near ? 'dc-hot' : 'dc-dim';
+                                if (alnum[i]) g = !s.dataset.g || Math.random() < (near ? 0.85 : 0.3) ? glyph(ch) : s.dataset.g;
+                            } else if (slip[i] > 0 && e >= slip[i] && e < slip[i] + 60) {
+                                cls = 'dc-hot';
+                                g = !s.dataset.g || Math.random() < 0.7 ? glyph(ch) : s.dataset.g;
                             } else {
-                                cls = i - head < 3 ? 'dc-hot' : 'dc-dim';
-                                if (s.dataset.g && Math.random() < 0.6) s.dataset.g = glyph(ch);
+                                cls = 'dc-hit';
                             }
+                        }
+                        if (g === null) {
+                            if (s.dataset.g !== undefined) delete s.dataset.g;
+                        } else if (s.dataset.g !== g) {
+                            s.dataset.g = g;
                         }
                         if (s.className !== cls) s.className = cls;
                     }
@@ -2150,9 +2319,11 @@
                     // let the last flashes fade before handing the plain text back
                     setTimeout(() => {
                         el.textContent = target;
-                        el.classList.remove('decoding', 'dc-glitch');
+                        el.classList.remove('decoding', 'dc-glitch', 'dc-glitch-out');
+                        el.style.removeProperty('--scan');
+                        el.style.removeProperty('--beam');
                         delete el.dataset.scrambling;
-                    }, 380);
+                    }, 420);
                 })(performance.now());
             }
 
@@ -2166,7 +2337,7 @@
                     h.appendChild(span);
                 });
                 // starts as glyphs straight away, and sweeps once the kicker has begun to rise in
-                decode(document.querySelector('.hero-kicker .st-text'), 650, 250);
+                decode(document.querySelector('.hero-kicker .st-text'), 1050, 250);
             }
 
             // --- Staggered reveal as elements enter the viewport ---
@@ -2187,7 +2358,7 @@
                         el.style.setProperty('--d', delay + 'ms');
                         el.classList.add('in');
                         if (el.classList.contains('section-title')) {
-                            setTimeout(() => decode(el.querySelector('.st-text'), 480), delay + 60);
+                            decode(el.querySelector('.st-text'), 820, delay + 60);   // hidden at once, sweeps after the delay
                         }
                         // Once settled, hand the element back to its normal styles so hover transitions are not slowed down.
                         setTimeout(() => {

@@ -2,7 +2,7 @@
 
 <img src="assets/banner.svg" alt="Hi there, I'm Lucas Yan (闫智尧)" width="100%" />
 
-<img src="https://readme-typing-svg.demolab.com?font=Inter&weight=500&size=22&duration=3200&pause=1200&color=00F3FF&center=true&vCenter=true&width=760&height=48&lines=College+Student+%40+Rutgers;Finance+%2B+Computer+Science;Tinkering+with+Arduino+%26+AI+tools;%E7%BD%97%E6%A0%BC%E6%96%AF%E5%9C%A8%E8%AF%BB+%C2%B7+%E9%87%91%E8%9E%8D+%2B+%E8%AE%A1%E7%AE%97%E6%9C%BA" alt="College Student @ Rutgers · Finance + Computer Science · Tinkering with Arduino & AI tools" />
+<img src="assets/typing.svg" alt="College Student @ Rutgers · Finance + Computer Science · Tinkering with Arduino & AI tools" />
 
 <a href="https://lucasyanzy.github.io/Lucasyanzy/?ref=github"><img src="assets/btn-portfolio.svg" height="38" alt="Portfolio" /></a>
 <a href="https://www.linkedin.com/in/lucasyanzy/"><img src="assets/btn-linkedin.svg" height="38" alt="LinkedIn" /></a>
@@ -29,11 +29,11 @@
 
 **Languages**
 
-<img src="https://skillicons.dev/icons?i=py,java,cpp,js,html,css&theme=dark&perline=6" alt="Python, Java, C++, JavaScript, HTML5, CSS3" />
+<img src="assets/skills-languages.svg" alt="Python, Java, C++, JavaScript, HTML5, CSS3" />
 
 **Tools & Technologies**
 
-<img src="https://skillicons.dev/icons?i=arduino,git,github&theme=dark&perline=3" alt="Arduino, Git, GitHub" />
+<img src="assets/skills-tools.svg" alt="Arduino, Git, GitHub" />
 
 <sub>Finance: three-statement modeling, DCF valuation, comparable company analysis, equity research. Also: AI tools and prompt engineering, Office 365 (Excel, PowerPoint, Word). English (fluent), Mandarin (native). C++, JavaScript, HTML and CSS are written in a Vibe Coding workflow.</sub>
 
@@ -65,12 +65,12 @@
 ## GitHub Stats / 动态
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api?username=LucasYanzy&show_icons=true&bg_color=0a0a0f&title_color=00f3ff&text_color=c9d1d9&icon_color=00f3ff&ring_color=bd00ff&border_color=0b3a40&border_radius=12" alt="LucasYanzy's GitHub stats" width="49%" />
-  <img src="https://streak-stats.demolab.com/?user=LucasYanzy&background=0a0a0f&border=0b3a40&stroke=0b3a40&ring=00f3ff&fire=bd00ff&currStreakNum=ffffff&sideNums=ffffff&currStreakLabel=00f3ff&sideLabels=8a8f98&dates=6b7280&border_radius=12" alt="LucasYanzy's GitHub streak" width="49%" />
+  <img src="https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/stats/github-stats.svg" alt="LucasYanzy's GitHub stats" width="49%" />
+  <img src="https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/stats/github-streak.svg" alt="LucasYanzy's GitHub streak" width="49%" />
 </p>
 
 <p align="center">
-  <img src="https://github-readme-stats.vercel.app/api/top-langs/?username=LucasYanzy&layout=compact&langs_count=8&bg_color=0a0a0f&title_color=00f3ff&text_color=c9d1d9&border_color=0b3a40&border_radius=12&card_width=495" alt="Top languages" width="49%" />
+  <img src="https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/stats/top-langs.svg" alt="Top languages" width="49%" />
 </p>
 
 ## Contributions / 贡献
@@ -87,4 +87,4 @@
   <img src="assets/footer.svg" alt="Thanks for visiting" width="100%" />
 </p>
 
-<p align="center"><sub>Special thanks to the developers of these widgets: <a href="https://github.com/anuraghazra">@anuraghazra</a> (github-readme-stats), <a href="https://github.com/DenverCoder1">@DenverCoder1</a> (streak-stats &amp; typing-svg)</sub></p>
+<p align="center"><sub>Special thanks to the developers of these projects: <a href="https://github.com/anuraghazra">@anuraghazra</a> (github-readme-stats, whose card design and rank formula the stats cards follow), <a href="https://github.com/DenverCoder1">@DenverCoder1</a> (streak-stats &amp; typing-svg, the models for the streak card and typing line), <a href="https://github.com/tandpfun">@tandpfun</a> (skill-icons) and <a href="https://github.com/Platane">@Platane</a> (snk)</sub></p>
