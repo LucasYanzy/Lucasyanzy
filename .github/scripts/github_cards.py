@@ -118,7 +118,8 @@ def fetch(now):
     for alias, _, _ in windows:
         for week in cal[alias]["contributionCalendar"]["weeks"]:
             for d in week["contributionDays"]:
-                days[d["date"]] = days.get(d["date"], 0) + d["contributionCount"]
+                # windows do not overlap, but a calendar may pad its edge weeks: never count a day twice
+                days[d["date"]] = max(days.get(d["date"], 0), d["contributionCount"])
 
     cc = profile["contributionsCollection"]
     return {
