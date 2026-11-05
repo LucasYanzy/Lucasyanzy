@@ -1,0 +1,52 @@
+name: Update GitHub stats cards
+
+on:
+  schedule:
+    - cron: "29 */6 * * *"
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/github-cards.yml"
+      - ".github/scripts/github_cards.py"
+  # On a pull request the cards are only rendered, as a check; nothing is published.
+  pull_request:
+    paths:
+      - ".github/workflows/github-cards.yml"
+      - ".github/scripts/github_cards.py"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-cards-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      # An API hiccup must not turn the scheduled run red or replace the last good cards:
+      # on failure we warn and simply skip publishing. On a pull request a failure should show.
+      - name: Render the cards from the GitHub API
+        id: render
+        continue-on-error: ${{ github.event_name != 'pull_request' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CARD_LOGIN: ${{ github.repository_owner }}
+        run: python3 .github/scripts/github_cards.py
+
+      - name: Publish to the stats branch
+        if: steps.render.outcome == 'success' && github.event_name != 'pull_request'
+        run: |
+          cd dist
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -q -b stats
+          git add .
+          git commit -q -m "Update GitHub stats cards $(date -u '+%F %H:%M UTC')"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" stats
