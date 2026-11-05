@@ -94,11 +94,36 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            opacity: 0.8;
+            opacity: 0.6;
             pointer-events: none;
         }
 
+        /* --- Decoding text: dim glyphs, a bright scan head, a flash as each character locks in --- */
         .st-text { display: inline-block; }
+        .dc-glitch { animation: dc-glitch 0.36s steps(1, end) 1; }
+        .decoding span { position: relative; transition: none; }
+        .decoding span[class=""] { transition: color 0.35s ease, text-shadow 0.35s ease; }
+        .dc-dim { color: rgba(0, 243, 255, 0.38); }
+        .dc-hot { color: #e9ffff; text-shadow: 0 0 6px rgba(0, 243, 255, 0.95), 0 0 16px rgba(0, 243, 255, 0.6); }
+        .dc-hit { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.9), 0 0 22px rgba(0, 243, 255, 0.75); }
+        .decoding span[data-g] { color: transparent; text-shadow: none; }
+        .decoding span[data-g]::after {
+            content: attr(data-g);
+            position: absolute;
+            left: 50%;
+            top: 0;
+            transform: translateX(-50%);
+            line-height: normal;
+            color: rgba(0, 243, 255, 0.38);
+        }
+        .decoding span.dc-hot[data-g]::after { color: #e9ffff; text-shadow: 0 0 6px rgba(0, 243, 255, 0.95), 0 0 16px rgba(0, 243, 255, 0.6); }
+        @keyframes dc-glitch {
+            0%   { transform: translateX(-3px) skewX(-8deg); text-shadow: -2px 0 rgba(255, 40, 200, 0.75), 2px 0 rgba(0, 243, 255, 0.75); }
+            25%  { transform: translateX(2px); text-shadow: 2px 0 rgba(255, 40, 200, 0.7), -2px 0 rgba(0, 243, 255, 0.7); clip-path: inset(8% 0 45% 0); }
+            50%  { transform: translateX(-1px) skewX(4deg); text-shadow: -1px 0 rgba(255, 40, 200, 0.6), 1px 0 rgba(0, 243, 255, 0.6); clip-path: inset(52% 0 4% 0); }
+            75%  { transform: translateX(1px); text-shadow: 1px 0 rgba(255, 40, 200, 0.4), -1px 0 rgba(0, 243, 255, 0.4); clip-path: none; }
+            100% { transform: none; text-shadow: none; clip-path: none; }
+        }
 
         /* --- Bilingual Text Classes --- */
         .bilingual {
@@ -280,7 +305,7 @@
         .js .section-title[data-reveal]::after {
             transform: scaleX(0);
             transform-origin: left center;
-            transition: transform 1.3s var(--ease) 0.25s;
+            transition: transform 0.9s var(--ease) 0.3s;
         }
         .js .section-title[data-reveal].in::after { transform: scaleX(1); }
 
@@ -1583,33 +1608,39 @@
             }
 
             // --- Background: a living data network ---
-            // Nodes drift on a slow flow field and are wired to their nearest neighbours (hubs reach further).
-            // Packets travel edge to edge with short trails and light the node they reach. The pointer joins
-            // as a query node: nearby nodes link to it and show an address and a latency. A click broadcasts
-            // a wave that wakes the graph hop by hop. Scrolling adds parallax and speeds the traffic up.
+            // At rest it stays quiet: nodes drift on a slow flow field, wired to their nearest neighbours,
+            // with a few packets travelling edge to edge. The pointer is where it comes alive: nearby nodes
+            // are pulled towards it on springs and wire up to each other, a soft glow follows it, and the
+            // closest node sends packets out. A click or tap broadcasts a wave that wakes the graph hop by hop.
             function initBackground() {
                 const canvas = document.getElementById('bg-canvas');
                 const ctx = canvas.getContext('2d');
                 const TAU = Math.PI * 2;
                 const CYAN = '0, 243, 255';
                 const VIOLET = '188, 130, 255';
+                const PULL_R = 260;     // nodes inside this radius are pulled towards the pointer
+                const PULL_MAX = 50;    // the furthest a node is pulled, in px
+                const MESH_D = 165;     // near the pointer, nodes closer than this link up with each other
                 const QUERY_R = 220;
                 let W = 0, H = 0, dpr = 1;
                 let nodes = [], edges = [], adj = [], packets = [], waves = [];
-                let baseCount = 0, frame = 0, last = performance.now(), lastJitter = 0;
+                let baseCount = 0, frame = 0, last = performance.now(), lastJitter = 0, lastEmit = 0;
                 let scrollY = window.scrollY, scrollVel = 0, px = 0, py = 0;
-                const pointer = { x: 0, y: 0, active: false };
+                const pointer = { x: 0, y: 0, gx: 0, gy: 0, glow: 0, active: false, touchUntil: 0, movedAt: 0 };
 
-                // soft glow, drawn once and stamped under hubs and lit nodes
-                const glow = document.createElement('canvas');
-                glow.width = glow.height = 64;
-                const gctx = glow.getContext('2d');
-                const grad = gctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-                grad.addColorStop(0, 'rgba(0, 243, 255, 0.6)');
-                grad.addColorStop(0.35, 'rgba(0, 243, 255, 0.18)');
-                grad.addColorStop(1, 'rgba(0, 243, 255, 0)');
-                gctx.fillStyle = grad;
-                gctx.fillRect(0, 0, 64, 64);
+                function sprite(size, stops) {
+                    const c = document.createElement('canvas');
+                    c.width = c.height = size;
+                    const g = c.getContext('2d');
+                    const gr = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+                    stops.forEach((s) => gr.addColorStop(s[0], s[1]));
+                    g.fillStyle = gr;
+                    g.fillRect(0, 0, size, size);
+                    return c;
+                }
+                // a soft glow under hubs and lit nodes, and the halo that follows the pointer
+                const glow = sprite(64, [[0, 'rgba(0, 243, 255, 0.6)'], [0.35, 'rgba(0, 243, 255, 0.18)'], [1, 'rgba(0, 243, 255, 0)']]);
+                const halo = sprite(256, [[0, 'rgba(0, 243, 255, 0.09)'], [0.45, 'rgba(130, 90, 210, 0.035)'], [1, 'rgba(0, 0, 0, 0)']]);
 
                 const rand = (n) => Math.floor(Math.random() * n);
                 const mod = (a, n) => ((a % n) + n) % n;
@@ -1624,6 +1655,7 @@
                         const z = hub ? 0.7 + Math.random() * 0.3 : Math.random();
                         nodes.push({
                             x: Math.random() * W, y: Math.random() * H, sx: 0, sy: 0,
+                            ox: 0, oy: 0, vx: 0, vy: 0, f: 0,
                             z: z, hub: hub,
                             r: hub ? 2.3 + Math.random() * 0.9 : 0.8 + z * 1.1,
                             seed: Math.random() * 1000,
@@ -1634,12 +1666,15 @@
                     place(0);
                     relink();
                     packets = [];
-                    for (let i = 0; i < Math.round(baseCount * 0.55); i++) spawn(rand(nodes.length), false);
+                    for (let i = 0; i < Math.round(baseCount * 0.22); i++) spawn(rand(nodes.length), false);
                 }
 
-                // screen position = drift position + scroll and pointer parallax (deeper nodes move less)
+                // screen position = drift position + scroll and pointer parallax (deeper nodes move less),
+                // plus a spring offset that pulls nodes near the pointer towards it
                 function place(dt) {
                     const t = performance.now();
+                    const s = dt / 16.7;
+                    const damp = Math.pow(0.8, s);
                     for (const n of nodes) {
                         if (dt) {
                             const sp = (0.010 + n.z * 0.016) * dt;
@@ -1648,8 +1683,27 @@
                             if (n.x < -60) n.x += W + 120; else if (n.x > W + 60) n.x -= W + 120;
                             if (n.y < -60) n.y += H + 120; else if (n.y > H + 60) n.y -= H + 120;
                         }
-                        n.sx = n.x - px * 0.014 * n.z;
-                        n.sy = mod(n.y - scrollY * 0.05 * (0.4 + n.z) - py * 0.014 * n.z + 60, H + 120) - 60;
+                        const bx = n.x - px * 0.014 * n.z;
+                        const by = mod(n.y - scrollY * 0.05 * (0.4 + n.z) - py * 0.014 * n.z + 60, H + 120) - 60;
+                        let tx = 0, ty = 0;
+                        if (pointer.active) {
+                            const dx = pointer.x - bx, dy = pointer.y - by;
+                            const d = Math.hypot(dx, dy);
+                            if (d < PULL_R && d > 1) {
+                                const f = 1 - d / PULL_R;
+                                const m = Math.min(PULL_MAX * Math.pow(f, 1.2) * (0.6 + n.z * 0.4), Math.max(0, d - 40));
+                                tx = dx / d * m;
+                                ty = dy / d * m;
+                            }
+                        }
+                        if (dt) {
+                            n.vx = (n.vx + (tx - n.ox) * 0.07 * s) * damp;
+                            n.vy = (n.vy + (ty - n.oy) * 0.07 * s) * damp;
+                            n.ox += n.vx * s;
+                            n.oy += n.vy * s;
+                        }
+                        n.sx = bx + n.ox;
+                        n.sy = by + n.oy;
                     }
                 }
 
@@ -1696,7 +1750,7 @@
 
                 function spawn(from, burst) {
                     if (!adj[from] || !adj[from].length) return;
-                    if (packets.length > baseCount * 1.6) return;
+                    if (packets.length > baseCount * (burst ? 1.2 : 0.6)) return;
                     packets.push({
                         a: from, b: adj[from][rand(adj[from].length)], t: 0,
                         v: 0.05 + Math.random() * 0.07,           // px per ms
@@ -1706,12 +1760,17 @@
                     });
                 }
 
-                function broadcast(x, y) {
-                    let best = -1, bd = Infinity;
+                function nearest(x, y, maxD) {
+                    let best = -1, bd = maxD * maxD;
                     nodes.forEach((n, i) => {
                         const d = (n.sx - x) * (n.sx - x) + (n.sy - y) * (n.sy - y);
                         if (d < bd) { bd = d; best = i; }
                     });
+                    return best;
+                }
+
+                function broadcast(x, y) {
+                    const best = nearest(x, y, Infinity);
                     if (best < 0) return;
                     waves.push({ x: x, y: y, t: 0 });
                     const hop = new Array(nodes.length).fill(-1);
@@ -1727,10 +1786,19 @@
                 }
 
                 function update(now, dt) {
+                    if (pointer.touchUntil && now > pointer.touchUntil) {
+                        pointer.active = false;
+                        pointer.touchUntil = 0;
+                    }
                     const boost = 1 + Math.min(2.5, scrollVel / 40);
                     scrollVel *= Math.pow(0.9, dt / 16.7);
                     px += ((pointer.active ? pointer.x - W / 2 : 0) - px) * 0.04;
                     py += ((pointer.active ? pointer.y - H / 2 : 0) - py) * 0.04;
+                    // the halo trails the pointer a little and fades in and out
+                    const follow = 1 - Math.pow(0.82, dt / 16.7);
+                    pointer.gx += (pointer.x - pointer.gx) * follow;
+                    pointer.gy += (pointer.y - pointer.gy) * follow;
+                    pointer.glow += ((pointer.active ? 1 : 0) - pointer.glow) * (1 - Math.pow(0.92, dt / 16.7));
                     place(dt);
                     const fade = Math.pow(0.94, dt / 16.7);
                     nodes.forEach((n, i) => {
@@ -1742,6 +1810,15 @@
                         n.lit *= fade;
                     });
                     if (frame % 6 === 0) relink();
+                    // while the pointer moves, the node closest to it sends packets out
+                    if (pointer.active && now - pointer.movedAt < 400 && now - lastEmit > 260) {
+                        lastEmit = now;
+                        const best = nearest(pointer.x, pointer.y, 160);
+                        if (best >= 0) {
+                            spawn(best, true);
+                            nodes[best].lit = Math.max(nodes[best].lit, 0.8);
+                        }
+                    }
                     if (now - lastJitter > 700) {
                         lastJitter = now;
                         for (let k = 0; k < 8; k++) {
@@ -1757,7 +1834,7 @@
                         if (p.t < 1) continue;
                         const prev = p.a;
                         p.a = p.b;
-                        nodes[p.a].lit = Math.max(nodes[p.a].lit, 0.55);
+                        nodes[p.a].lit = Math.max(nodes[p.a].lit, 0.35);
                         const next = adj[p.a].filter((v) => v !== prev);
                         if (--p.life <= 0 || !next.length) {
                             packets.splice(i, 1);
@@ -1769,11 +1846,44 @@
                     }
                 }
 
+                function strokeBands(bands, base, step, width) {
+                    ctx.lineWidth = width;
+                    bands.forEach((list, k) => {
+                        if (!list.length) return;
+                        ctx.strokeStyle = 'rgba(' + CYAN + ', ' + (base + k * step) + ')';
+                        ctx.beginPath();
+                        for (let i = 0; i < list.length; i += 2) {
+                            ctx.moveTo(list[i].sx, list[i].sy);
+                            ctx.lineTo(list[i + 1].sx, list[i + 1].sy);
+                        }
+                        ctx.stroke();
+                    });
+                }
+
                 function draw(dt) {
                     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
                     ctx.clearRect(0, 0, W, H);
+                    const now = performance.now();
 
-                    // edges, batched by brightness so each band is one stroke
+                    if (pointer.glow > 0.01) {
+                        const s = 840;
+                        ctx.globalAlpha = pointer.glow;
+                        ctx.drawImage(halo, pointer.gx - s / 2, pointer.gy - s / 2, s, s);
+                        ctx.globalAlpha = 1;
+                    }
+
+                    // closeness to the pointer (0..1); it eases out once the pointer leaves
+                    const ease = Math.pow(0.9, dt / 16.7);
+                    for (const n of nodes) {
+                        if (pointer.active) {
+                            const d = Math.hypot(n.sx - pointer.x, n.sy - pointer.y);
+                            n.f = d < PULL_R ? 1 - d / PULL_R : 0;
+                        } else {
+                            n.f *= ease;
+                        }
+                    }
+
+                    // the resting graph, batched by brightness so each band is one stroke
                     const bands = [[], [], [], [], []];
                     for (const e of edges) {
                         const a = nodes[e[0]], b = nodes[e[1]];
@@ -1783,17 +1893,33 @@
                         const al = (1 - d / reach) * (0.35 + 0.65 * (a.z + b.z) / 2) + Math.max(a.lit, b.lit) * 0.9;
                         bands[Math.min(4, Math.floor(al * 3.2))].push(a, b);
                     }
-                    ctx.lineWidth = 0.75;
-                    bands.forEach((list, k) => {
-                        if (!list.length) return;
-                        ctx.strokeStyle = 'rgba(' + CYAN + ', ' + (0.06 + k * 0.075) + ')';
-                        ctx.beginPath();
-                        for (let i = 0; i < list.length; i += 2) {
-                            ctx.moveTo(list[i].sx, list[i].sy);
-                            ctx.lineTo(list[i + 1].sx, list[i + 1].sy);
+                    strokeBands(bands, 0.04, 0.055, 0.75);
+
+                    // around the pointer every pair of close nodes links up, with a pulse running along strong links
+                    const hot = nodes.filter((n) => n.f > 0.02);
+                    const pulses = [];
+                    if (hot.length > 1) {
+                        const mesh = [[], [], [], [], []];
+                        for (let i = 0; i < hot.length; i++) {
+                            for (let j = i + 1; j < hot.length; j++) {
+                                const a = hot[i], b = hot[j];
+                                const d = Math.hypot(a.sx - b.sx, a.sy - b.sy);
+                                if (d >= MESH_D) continue;
+                                const al = (1 - d / MESH_D) * Math.sqrt(Math.min(a.f, b.f));
+                                mesh[Math.min(4, Math.floor(al * 6))].push(a, b);
+                                if (al > 0.3) pulses.push([a, b, al]);
+                            }
                         }
-                        ctx.stroke();
-                    });
+                        strokeBands(mesh, 0.1, 0.11, 0.8);
+                    }
+                    for (const q of pulses) {
+                        const a = q[0], b = q[1];
+                        const k = (now * 0.0006 + a.seed + b.seed) % 1;
+                        ctx.fillStyle = 'rgba(255, 255, 255, ' + Math.min(0.9, q[2] * 1.3) + ')';
+                        ctx.beginPath();
+                        ctx.arc(a.sx + (b.sx - a.sx) * k, a.sy + (b.sy - a.sy) * k, 1.1, 0, TAU);
+                        ctx.fill();
+                    }
 
                     // packets with a short fading trail
                     ctx.lineCap = 'round';
@@ -1803,42 +1929,41 @@
                         const len = Math.hypot(dx, dy) || 1;
                         if (len > 330) continue;
                         const x = a.sx + dx * p.t, y = a.sy + dy * p.t;
-                        const t0 = Math.max(0, p.t - 28 / len);
+                        const t0 = Math.max(0, p.t - 26 / len);
                         const x0 = a.sx + dx * t0, y0 = a.sy + dy * t0;
                         const col = p.violet ? VIOLET : CYAN;
                         const tr = ctx.createLinearGradient(x0, y0, x, y);
                         tr.addColorStop(0, 'rgba(' + col + ', 0)');
-                        tr.addColorStop(1, 'rgba(' + col + ', 0.95)');
+                        tr.addColorStop(1, 'rgba(' + col + ', ' + (p.burst ? 0.9 : 0.65) + ')');
                         ctx.strokeStyle = tr;
-                        ctx.lineWidth = 1.5;
+                        ctx.lineWidth = 1.4;
                         ctx.beginPath();
                         ctx.moveTo(x0, y0);
                         ctx.lineTo(x, y);
                         ctx.stroke();
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                        ctx.fillStyle = 'rgba(255, 255, 255, ' + (p.burst ? 0.95 : 0.75) + ')';
                         ctx.beginPath();
-                        ctx.arc(x, y, 1.35, 0, TAU);
+                        ctx.arc(x, y, 1.2, 0, TAU);
                         ctx.fill();
                     }
 
-                    // nodes: hubs carry a glow and a slow pulse ring; lit nodes flare
-                    const now = performance.now();
+                    // nodes: hubs carry a faint glow and pulse ring; lit nodes and nodes near the pointer flare
                     for (const n of nodes) {
-                        const lit = n.lit;
-                        if (n.hub || lit > 0.12) {
-                            const s = (n.hub ? 28 : 16) * (1 + lit * 0.9);
-                            ctx.globalAlpha = Math.min(1, (n.hub ? 0.5 : 0.3) + lit * 0.6);
+                        const heat = Math.max(n.lit, n.f * 0.9);
+                        if (n.hub || heat > 0.15) {
+                            const s = (n.hub ? 22 : 14) * (1 + heat * 1.1);
+                            ctx.globalAlpha = Math.min(1, (n.hub ? 0.3 : 0.15) + heat * 0.6);
                             ctx.drawImage(glow, n.sx - s / 2, n.sy - s / 2, s, s);
                             ctx.globalAlpha = 1;
                         }
-                        const alpha = Math.min(1, 0.35 + n.z * 0.45 + lit * 0.5);
-                        ctx.fillStyle = lit > 0.5 ? 'rgba(235, 255, 255, ' + alpha + ')' : 'rgba(' + CYAN + ', ' + alpha + ')';
+                        const alpha = Math.min(1, 0.28 + n.z * 0.4 + heat * 0.6);
+                        ctx.fillStyle = heat > 0.55 ? 'rgba(235, 255, 255, ' + alpha + ')' : 'rgba(' + CYAN + ', ' + alpha + ')';
                         ctx.beginPath();
-                        ctx.arc(n.sx, n.sy, n.r * (1 + lit * 0.7), 0, TAU);
+                        ctx.arc(n.sx, n.sy, n.r * (1 + n.lit * 0.6) + n.f * 1.6, 0, TAU);
                         ctx.fill();
                         if (n.hub) {
                             const ph = (now * 0.00032 + n.seed) % 1;
-                            ctx.strokeStyle = 'rgba(' + CYAN + ', ' + (0.3 * (1 - ph)) + ')';
+                            ctx.strokeStyle = 'rgba(' + CYAN + ', ' + (0.16 * (1 - ph)) + ')';
                             ctx.lineWidth = 1;
                             ctx.beginPath();
                             ctx.arc(n.sx, n.sy, n.r + 3 + ph * 15, 0, TAU);
@@ -1846,7 +1971,7 @@
                         }
                     }
 
-                    // the pointer as a query node: dashed links, and an address + latency on the closest nodes
+                    // the pointer joins the graph: links to the closest nodes, with an address + latency on three
                     if (pointer.active) {
                         const near = [];
                         for (const n of nodes) {
@@ -1854,20 +1979,18 @@
                             if (d < QUERY_R) near.push([d, n]);
                         }
                         near.sort((a, b) => a[0] - b[0]);
-                        ctx.setLineDash([3, 4]);
                         ctx.lineWidth = 0.8;
                         ctx.font = '500 10px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
                         const placed = [];
-                        near.slice(0, 6).forEach((item, i) => {
-                            const d = item[0], n = item[1], f = 1 - d / QUERY_R;
-                            ctx.strokeStyle = 'rgba(' + CYAN + ', ' + (0.5 * f) + ')';
+                        near.slice(0, 5).forEach((item, i) => {
+                            const n = item[1], f = 1 - item[0] / QUERY_R;
+                            ctx.strokeStyle = 'rgba(' + CYAN + ', ' + (0.4 * f) + ')';
                             ctx.beginPath();
                             ctx.moveTo(pointer.x, pointer.y);
                             ctx.lineTo(n.sx, n.sy);
                             ctx.stroke();
-                            n.lit = Math.max(n.lit, 0.65 * f);
-                            if (i < 4) {
-                                ctx.fillStyle = 'rgba(170, 238, 255, ' + (0.9 * f) + ')';
+                            if (i < 3) {
+                                ctx.fillStyle = 'rgba(170, 238, 255, ' + (0.75 * f) + ')';
                                 const label = n.id + '  ' + n.lat + 'ms';
                                 const lw = ctx.measureText(label).width;
                                 let lx = n.sx + 9, ly = n.sy - 8;
@@ -1875,19 +1998,18 @@
                                 lx = Math.max(6, Math.min(lx, W - 6 - lw));
                                 if (ly < 14) ly = n.sy + 18;
                                 ly = Math.max(14, Math.min(ly, H - 6));
-                                for (let tries = 0; tries < 4 && placed.some(r => lx < r[0] + r[2] + 6 && r[0] < lx + lw + 6 && Math.abs(ly - r[1]) < 13); tries++) {
+                                for (let tries = 0; tries < 4 && placed.some((r) => lx < r[0] + r[2] + 6 && r[0] < lx + lw + 6 && Math.abs(ly - r[1]) < 13); tries++) {
                                     ly = ly + 13 > H - 6 ? ly - 26 : ly + 13;
                                 }
                                 placed.push([lx, ly, lw]);
                                 ctx.fillText(label, lx, ly);
                             }
                         });
-                        ctx.setLineDash([]);
                         ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
                         ctx.beginPath();
                         ctx.arc(pointer.x, pointer.y, 1.8, 0, TAU);
                         ctx.fill();
-                        ctx.strokeStyle = 'rgba(' + CYAN + ', 0.45)';
+                        ctx.strokeStyle = 'rgba(' + CYAN + ', 0.4)';
                         ctx.beginPath();
                         ctx.arc(pointer.x, pointer.y, 7, 0, TAU);
                         ctx.stroke();
@@ -1899,10 +2021,10 @@
                         w.t += dt;
                         const k = w.t / 1400;
                         if (k >= 1) { waves.splice(i, 1); continue; }
-                        ctx.strokeStyle = 'rgba(' + CYAN + ', ' + (0.55 * (1 - k) * (1 - k)) + ')';
-                        ctx.lineWidth = 1.3;
+                        ctx.strokeStyle = 'rgba(' + CYAN + ', ' + (0.42 * (1 - k) * (1 - k)) + ')';
+                        ctx.lineWidth = 1.2;
                         ctx.beginPath();
-                        ctx.arc(w.x, w.y, 16 + k * 540, 0, TAU);
+                        ctx.arc(w.x, w.y, 16 + k * 460, 0, TAU);
                         ctx.stroke();
                     }
                 }
@@ -1924,15 +2046,30 @@
                 resize();
                 if (reduceMotion) return;
 
+                function aim(x, y) {
+                    if (!pointer.active) { pointer.gx = x; pointer.gy = y; }
+                    pointer.x = x;
+                    pointer.y = y;
+                    pointer.active = true;
+                    pointer.movedAt = performance.now();
+                }
                 window.addEventListener('pointermove', (e) => {
                     if (e.pointerType === 'touch') return;
-                    pointer.x = e.clientX;
-                    pointer.y = e.clientY;
-                    pointer.active = true;
+                    aim(e.clientX, e.clientY);
+                    pointer.touchUntil = 0;
                 }, { passive: true });
                 document.addEventListener('mouseleave', () => { pointer.active = false; });
                 window.addEventListener('blur', () => { pointer.active = false; });
-                window.addEventListener('pointerdown', (e) => broadcast(e.clientX, e.clientY), { passive: true });
+                // click rather than pointerdown, so a finger that scrolls the page does not fire it
+                window.addEventListener('click', (e) => {
+                    if (e.detail === 0) return;   // a keyboard "click" has no position
+                    if (e.pointerType === 'touch' || !window.matchMedia('(hover: hover)').matches) {
+                        // a tap holds the pull for a moment, so phones get the same mesh
+                        aim(e.clientX, e.clientY);
+                        pointer.touchUntil = performance.now() + 1300;
+                    }
+                    broadcast(e.clientX, e.clientY);
+                }, { passive: true });
                 window.addEventListener('scroll', () => {
                     const y = window.scrollY;
                     scrollVel += Math.abs(y - scrollY);
@@ -1950,49 +2087,86 @@
                 requestAnimationFrame(loop);
             }
 
-            // --- Text that decodes from random glyphs: the hero line and the section titles ---
-            const GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&*+=<>';
-            function scramble(el, duration) {
+            // --- Text that decodes: the hero line and the section titles ---
+            // The line starts as dim glyphs; a bright scan head sweeps left to right and each character
+            // locks in with a short flash, over a brief RGB-split glitch. Every span keeps its real
+            // character (made transparent), so the line wraps exactly like the final text; the random
+            // glyph is drawn on top of it from data-g.
+            // (the sets live inside the function: init() runs before constants further down the script exist)
+            function glyph(ch) {
+                const set = /[iljtfrI1]/.test(ch) ? 'ilj1!|:;tf'
+                    : /[0-9]/.test(ch) ? '0123456789'
+                    : /[a-z]/.test(ch) ? 'abcdeghkmnopqrsuvwxyz<>/=+*'
+                    : 'ABCDEFGHJKLMNPQRSTUVWXYZ#$%&@*';
+                return set[Math.floor(Math.random() * set.length)];
+            }
+            function decode(el, duration, delay) {
                 if (reduceMotion || !el || el.dataset.scrambling) return;
                 const target = el.textContent;
-                const box = el.getBoundingClientRect();
+                const chars = Array.from(target);
+                const n = chars.length;
+                if (!n) return;
                 el.dataset.scrambling = '1';
-                el.style.width = box.width + 'px';       // keep the line still while glyphs change
-                el.style.height = box.height + 'px';
-                const start = performance.now();
+                el.textContent = '';
+                const spans = chars.map((ch) => {
+                    const s = document.createElement('span');
+                    s.textContent = ch;
+                    if (ch.trim()) s.className = 'dc-dim';
+                    if (/[A-Za-z0-9]/.test(ch)) s.dataset.g = glyph(ch);
+                    el.appendChild(s);
+                    return s;
+                });
+                el.classList.add('decoding');
+                const sweep = duration * 0.8, FLASH = 170;
+                const at = chars.map((ch, i) => (n > 1 ? i / (n - 1) : 0) * sweep + Math.random() * duration * 0.2);
+                const end = Math.max.apply(null, at) + FLASH;
+                const start = performance.now() + (delay || 0);
+                let glitched = false;
                 (function tick(now) {
-                    const k = Math.min(1, (now - start) / duration);
-                    const settled = Math.floor(k * k * target.length * 1.05);
-                    let out = '';
-                    for (let i = 0; i < target.length; i++) {
-                        const ch = target[i];
-                        out += (i < settled || !/[A-Za-z0-9]/.test(ch)) ? ch : GLYPHS[rand(GLYPHS.length)];
+                    const e = now - start;
+                    if (!glitched && e >= 0) {
+                        glitched = true;
+                        el.classList.add('dc-glitch');
                     }
-                    el.textContent = out;
-                    if (k < 1) {
+                    const head = e / sweep * (n - 1);
+                    for (let i = 0; i < n; i++) {
+                        const ch = chars[i], s = spans[i];
+                        let cls = '';
+                        if (ch.trim() && e < at[i] + FLASH) {
+                            if (e >= at[i]) {
+                                cls = 'dc-hit';
+                                if (s.dataset.g) delete s.dataset.g;
+                            } else {
+                                cls = i - head < 3 ? 'dc-hot' : 'dc-dim';
+                                if (s.dataset.g && Math.random() < 0.6) s.dataset.g = glyph(ch);
+                            }
+                        }
+                        if (s.className !== cls) s.className = cls;
+                    }
+                    if (e < end) {
                         requestAnimationFrame(tick);
-                    } else {
-                        el.textContent = target;
-                        el.style.width = '';
-                        el.style.height = '';
-                        delete el.dataset.scrambling;
+                        return;
                     }
-                })(start);
-
-                function rand(n) { return Math.floor(Math.random() * n); }
+                    // let the last flashes fade before handing the plain text back
+                    setTimeout(() => {
+                        el.textContent = target;
+                        el.classList.remove('decoding', 'dc-glitch');
+                        delete el.dataset.scrambling;
+                    }, 380);
+                })(performance.now());
             }
 
             function initDecode() {
                 if (reduceMotion) return;
-                document.querySelectorAll('.section-title').forEach((h) => {
+                document.querySelectorAll('.section-title, .hero-kicker').forEach((h) => {
                     const span = document.createElement('span');
                     span.className = 'st-text';
-                    span.textContent = h.textContent;
+                    span.textContent = h.textContent.trim();
                     h.textContent = '';
                     h.appendChild(span);
                 });
-                const kicker = document.querySelector('.hero-kicker');
-                if (kicker) setTimeout(() => scramble(kicker, 1100), 350);
+                // starts as glyphs straight away, and sweeps once the kicker has begun to rise in
+                decode(document.querySelector('.hero-kicker .st-text'), 650, 250);
             }
 
             // --- Staggered reveal as elements enter the viewport ---
@@ -2013,7 +2187,7 @@
                         el.style.setProperty('--d', delay + 'ms');
                         el.classList.add('in');
                         if (el.classList.contains('section-title')) {
-                            setTimeout(() => scramble(el.querySelector('.st-text'), 750), delay + 120);
+                            setTimeout(() => decode(el.querySelector('.st-text'), 480), delay + 60);
                         }
                         // Once settled, hand the element back to its normal styles so hover transitions are not slowed down.
                         setTimeout(() => {
