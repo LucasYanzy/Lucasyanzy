@@ -866,19 +866,94 @@
         }
 
         /* --- AI Usage Section --- */
-        .card.ai-usage-card {
-            display: block;
-            padding: 0;
-            text-decoration: none;
+        .usage-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 28px;
         }
-        .ai-usage-card img {
-            display: block;
-            width: 100%;
-            height: auto;
+        .usage-stat { padding: 32px 34px; }
+        .usage-label {
+            margin-bottom: 14px;
+            font-size: 0.72rem;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--primary);
         }
-        .ai-usage-note {
-            margin-top: 20px;
-            text-align: center;
+        .usage-label .cn {
+            margin-left: 8px;
+            color: var(--text-cn);
+            letter-spacing: 1px;
+        }
+        .usage-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.9rem;
+            font-weight: 700;
+            line-height: 1.1;
+            color: var(--text-main);
+            font-variant-numeric: tabular-nums;
+        }
+        .usage-value.accent {
+            background: linear-gradient(90deg, var(--primary), var(--violet));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .usage-sub { margin: 12px 0 0; gap: 2px; }
+        .usage-sub .en { font-size: 0.88rem; }
+        .usage-sub .cn { font-size: 0.82rem; }
+
+        .usage-providers {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: minmax(200px, 26%) minmax(0, 1fr);
+            column-gap: 44px;
+            align-items: center;
+            padding: 32px 34px;
+        }
+        .usage-providers .usage-sub { margin-top: 0; }
+        .usage-bar {
+            display: flex;
+            gap: 4px;
+            height: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .usage-bar span { display: block; height: 100%; border-radius: 10px; }
+        .usage-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+        .usage-legend .tag { display: inline-flex; align-items: center; gap: 8px; }
+        .usage-legend i {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--c);
+            box-shadow: 0 0 8px var(--c);
+        }
+        .usage-legend b { font-weight: 400; color: var(--text-en); }
+
+        .usage-foot {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px 24px;
+            margin-top: 24px;
+            font-size: 0.85rem;
+            color: var(--text-cn);
+        }
+        .usage-foot .project-link { margin-top: 0; text-decoration: none; }
+        .usage-foot .project-link:hover svg { transform: translate(3px, -3px); }
+
+        @media (max-width: 900px) {
+            .usage-grid { grid-template-columns: 1fr; gap: 20px; }
+            .usage-stat, .usage-providers { padding: 26px; }
+            .usage-providers { grid-template-columns: 1fr; row-gap: 18px; }
+            .usage-value { font-size: 2.4rem; }
         }
 
         /* --- Contact Section --- */
@@ -1543,15 +1618,62 @@
                 </div>
             </section>
 
-            <!-- AI Coding Usage / AI 编程用量 -->
+            <!-- AI Coding Usage / AI 编程用量 (numbers refreshed by the ai-usage workflow; the values below are the fallback) -->
             <section id="ai-usage">
                 <h2 class="section-title" data-reveal>AI Coding Usage / AI 编程用量</h2>
-                <a href="https://github.com/xiufengsun/TokenTracker" target="_blank" rel="noopener" class="card ai-usage-card" data-reveal>
-                    <img src="https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/usage/ai-usage.svg" alt="AI coding usage on TokenTracker: tokens, cost and leaderboard rank" width="1100" height="310" loading="lazy" />
-                </a>
-                <div class="bilingual ai-usage-note" data-reveal>
-                    <span class="en">Tokens, cost and leaderboard rank from TokenTracker, refreshed automatically every 6 hours.</span>
-                    <span class="cn">数据来自 TokenTracker（Token 用量、花费与排行榜名次），每 6 小时自动更新。</span>
+                <div class="usage-grid">
+                    <div class="card usage-stat" data-reveal>
+                        <div class="usage-label">Tokens<span class="cn">用量</span></div>
+                        <div class="usage-value" data-usage="tokens">23.57B</div>
+                        <div class="bilingual usage-sub">
+                            <span class="en"><span data-usage="tokens_month">331.68M</span> this month</span>
+                            <span class="cn">本月 <span data-usage="tokens_month">331.68M</span></span>
+                        </div>
+                    </div>
+                    <div class="card usage-stat" data-reveal>
+                        <div class="usage-label">Cost<span class="cn">花费</span></div>
+                        <div class="usage-value" data-usage="cost">$8,972</div>
+                        <div class="bilingual usage-sub">
+                            <span class="en"><span data-usage="cost_month">$60.26</span> this month</span>
+                            <span class="cn">本月 <span data-usage="cost_month">$60.26</span></span>
+                        </div>
+                    </div>
+                    <div class="card usage-stat" data-reveal>
+                        <div class="usage-label">Rank<span class="cn">排名</span></div>
+                        <div class="usage-value accent" data-usage="rank">#429</div>
+                        <div class="bilingual usage-sub">
+                            <span class="en">on the TokenTracker leaderboard</span>
+                            <span class="cn">TokenTracker 排行榜</span>
+                        </div>
+                    </div>
+                    <div class="card usage-providers" data-reveal>
+                        <div>
+                            <div class="usage-label">Top Providers<span class="cn">常用工具</span></div>
+                            <div class="bilingual usage-sub">
+                                <span class="en">Share of all-time tokens</span>
+                                <span class="cn">累计 Token 占比</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="usage-bar" id="usageBar">
+                                <span style="width: 42.6%; background: var(--primary);"></span>
+                                <span style="width: 36%; background: var(--violet);"></span>
+                                <span style="width: 21.3%; background: rgba(255, 255, 255, 0.4);"></span>
+                            </div>
+                            <div class="usage-legend" id="usageLegend">
+                                <span class="tag"><i style="--c: var(--primary);"></i>Codex <b>42.6%</b></span>
+                                <span class="tag"><i style="--c: var(--violet);"></i>Other <b>36%</b></span>
+                                <span class="tag"><i style="--c: rgba(255, 255, 255, 0.4);"></i>Claude <b>21.3%</b></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="usage-foot" data-reveal>
+                    <span>Updated <span data-usage="updated">5 Nov 2026</span> · 每 6 小时自动更新</span>
+                    <a href="https://github.com/xiufengsun/TokenTracker" target="_blank" rel="noopener" class="project-link">
+                        <span>Tracked with TokenTracker / 数据来源</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    </a>
                 </div>
             </section>
 
@@ -2416,6 +2538,47 @@
                     }, 800);
                 }, { passive: true });
             }
+        })();
+    </script>
+    <script>
+        // Live AI usage numbers, published every 6 hours by the ai-usage workflow to the usage branch.
+        // On any failure the values already in the page stay as they are.
+        (function () {
+            const COLORS = ['var(--primary)', 'var(--violet)', 'rgba(255, 255, 255, 0.4)', 'var(--secondary)'];
+            const pct = (n) => (Math.round(n * 10) / 10) + '%';
+            fetch('https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/usage/ai-usage.json', { cache: 'no-cache' })
+                .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+                .then((d) => {
+                    if (d.updated) {
+                        d.updated = new Date(d.updated).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+                    }
+                    document.querySelectorAll('[data-usage]').forEach((el) => {
+                        const v = d[el.dataset.usage];
+                        if (v) el.textContent = v;
+                    });
+                    const rows = (d.providers || []).slice(0, COLORS.length);
+                    if (!rows.length) return;
+                    const bar = document.getElementById('usageBar');
+                    const legend = document.getElementById('usageLegend');
+                    bar.textContent = '';
+                    legend.textContent = '';
+                    rows.forEach((p, i) => {
+                        const seg = document.createElement('span');
+                        seg.style.width = p.pct + '%';
+                        seg.style.background = COLORS[i];
+                        bar.appendChild(seg);
+
+                        const tag = document.createElement('span');
+                        tag.className = 'tag';
+                        const dot = document.createElement('i');
+                        dot.style.setProperty('--c', COLORS[i]);
+                        const val = document.createElement('b');
+                        val.textContent = pct(p.pct);
+                        tag.append(dot, p.name + ' ', val);
+                        legend.appendChild(tag);
+                    });
+                })
+                .catch(() => {});
         })();
     </script>
     <!-- Anonymous, cookie-free visit statistics (GoatCounter) -->
