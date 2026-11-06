@@ -897,92 +897,6 @@
             color: #fff;
         }
 
-        /* --- AI Usage Section: a small planetary system, one orbit per AI tool --- */
-        .usage-card {
-            display: grid;
-            grid-template-columns: minmax(260px, 40%) minmax(0, 1fr);
-            column-gap: 56px;
-            align-items: center;
-            padding: 44px 52px;
-        }
-        .usage-orbits { position: relative; width: 100%; max-width: 340px; margin: 0 auto; aspect-ratio: 1; }
-        .usage-orbits svg { display: block; width: 100%; height: 100%; overflow: visible; }
-        .usage-orbits .ring { fill: none; stroke: rgba(255, 255, 255, 0.07); stroke-width: 1; stroke-dasharray: 2 5; }
-        .usage-orbits .arc { fill: none; stroke-width: 2.5; stroke-linecap: round; filter: drop-shadow(0 0 5px currentColor); }
-        .usage-orbits .moon { filter: drop-shadow(0 0 6px currentColor); }
-        .usage-orbits .orbit { transform-box: view-box; transform-origin: 50% 50%; animation: usage-spin var(--t, 90s) linear infinite; }
-        .usage-orbits .star { fill: #fff; animation: usage-twinkle var(--t, 4s) ease-in-out var(--d, 0s) infinite; }
-        .usage-orbits .planet-ring { fill: none; stroke: rgba(0, 243, 255, 0.45); stroke-width: 1.2; }
-        @keyframes usage-spin { to { transform: rotate(360deg); } }
-        @keyframes usage-twinkle { 0%, 100% { opacity: 0.15; } 50% { opacity: 0.9; } }
-
-        .usage-kicker {
-            font-size: 0.72rem;
-            letter-spacing: 2.5px;
-            text-transform: uppercase;
-            color: var(--primary);
-        }
-        .usage-kicker .cn { margin-left: 8px; color: var(--text-cn); letter-spacing: 1px; }
-        .usage-total {
-            margin: 6px 0 4px;
-            font-family: 'Outfit', sans-serif;
-            font-size: clamp(3rem, 6vw, 4.6rem);
-            font-weight: 800;
-            line-height: 1.05;
-            letter-spacing: -1px;
-            background: linear-gradient(90deg, var(--primary), #ffffff 70%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-variant-numeric: tabular-nums;
-        }
-        .usage-month { font-size: 0.9rem; color: var(--text-cn); }
-        .usage-month span { color: var(--text-en); }
-
-        .usage-facts {
-            display: flex;
-            gap: 44px;
-            margin: 28px 0 26px;
-            padding-top: 24px;
-            border-top: 1px solid var(--border);
-        }
-        .usage-fact .usage-kicker { color: var(--text-cn); }
-        .usage-fact-value {
-            margin-top: 4px;
-            font-family: 'Outfit', sans-serif;
-            font-size: 1.7rem;
-            font-weight: 700;
-            line-height: 1.2;
-            color: var(--text-main);
-        }
-        .usage-fact small { display: block; font-size: 0.8rem; color: var(--text-cn); }
-
-        .usage-legend { display: flex; flex-wrap: wrap; gap: 8px 26px; font-size: 0.92rem; color: var(--text-en); }
-        .usage-legend span { display: inline-flex; align-items: center; gap: 9px; }
-        .usage-legend i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 8px var(--c); }
-        .usage-legend b { font-weight: 400; color: var(--text-cn); font-variant-numeric: tabular-nums; }
-
-        .usage-foot {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 8px 22px;
-            margin-top: 26px;
-            font-size: 0.82rem;
-            color: var(--text-cn);
-        }
-        .usage-foot .project-link { margin-top: 0; text-decoration: none; }
-        .usage-foot .project-link:hover svg { transform: translate(3px, -3px); }
-
-        @media (max-width: 900px) {
-            .usage-card { grid-template-columns: 1fr; row-gap: 30px; padding: 32px 26px; }
-            .usage-orbits { max-width: 260px; }
-            .usage-facts { gap: 32px; }
-        }
-        @media (prefers-reduced-motion: reduce) {
-            .usage-orbits .orbit, .usage-orbits .star { animation: none; }
-        }
-
         /* --- Contact Section --- */
         .contact-content {
             display: flex;
@@ -1165,7 +1079,6 @@
                 <li><a href="#experience">Experience</a></li>
                 <li><a href="#skills">Skills</a></li>
                 <li><a href="#projects">Projects</a></li>
-                <li><a href="#ai-usage">AI Usage</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
@@ -1642,62 +1555,6 @@
                             </div>
                         </div>
                     </a>
-                </div>
-            </section>
-
-            <!-- AI Coding Usage / AI 编程用量 (numbers refreshed by the ai-usage workflow; the values below are the fallback) -->
-            <section id="ai-usage">
-                <h2 class="section-title" data-reveal>AI Coding Usage / AI 编程用量</h2>
-                <div class="card usage-card" data-reveal>
-                    <div class="usage-orbits" aria-hidden="true">
-                        <svg viewBox="0 0 320 320">
-                            <defs>
-                                <radialGradient id="usagePlanet" cx="35%" cy="30%" r="75%">
-                                    <stop offset="0%" stop-color="#e9feff"/>
-                                    <stop offset="35%" stop-color="#00f3ff"/>
-                                    <stop offset="100%" stop-color="#3b0a5c"/>
-                                </radialGradient>
-                                <radialGradient id="usageGlow">
-                                    <stop offset="0%" stop-color="rgba(0, 243, 255, 0.35)"/>
-                                    <stop offset="100%" stop-color="rgba(0, 243, 255, 0)"/>
-                                </radialGradient>
-                            </defs>
-                            <g><circle class="star" cx="105" cy="51" r="0.6" style="--t: 2.8s; --d: -3.2s;"/><circle class="star" cx="118" cy="22" r="1.2" style="--t: 3.3s; --d: -0.5s;"/><circle class="star" cx="134" cy="79" r="1.2" style="--t: 4.0s; --d: -5.0s;"/><circle class="star" cx="43" cy="74" r="1.2" style="--t: 5.8s; --d: -3.5s;"/><circle class="star" cx="128" cy="309" r="0.6" style="--t: 4.4s; --d: -0.8s;"/><circle class="star" cx="217" cy="36" r="1.2" style="--t: 4.7s; --d: -2.2s;"/><circle class="star" cx="175" cy="24" r="0.6" style="--t: 4.7s; --d: -3.0s;"/><circle class="star" cx="170" cy="246" r="1" style="--t: 4.5s; --d: -2.7s;"/><circle class="star" cx="98" cy="252" r="0.8" style="--t: 2.8s; --d: -1.8s;"/><circle class="star" cx="158" cy="111" r="1" style="--t: 3.5s; --d: -5.9s;"/><circle class="star" cx="41" cy="134" r="0.8" style="--t: 3.0s; --d: -2.9s;"/><circle class="star" cx="16" cy="212" r="1.2" style="--t: 4.5s; --d: -5.3s;"/><circle class="star" cx="102" cy="221" r="1.2" style="--t: 4.2s; --d: -4.8s;"/><circle class="star" cx="25" cy="33" r="0.8" style="--t: 4.2s; --d: -4.0s;"/><circle class="star" cx="23" cy="223" r="1.2" style="--t: 6.0s; --d: -4.9s;"/><circle class="star" cx="93" cy="124" r="0.8" style="--t: 2.6s; --d: -2.8s;"/><circle class="star" cx="56" cy="41" r="0.6" style="--t: 3.3s; --d: -1.7s;"/><circle class="star" cx="234" cy="128" r="1" style="--t: 2.8s; --d: -2.7s;"/><circle class="star" cx="175" cy="280" r="1" style="--t: 5.5s; --d: -1.7s;"/><circle class="star" cx="134" cy="116" r="1" style="--t: 5.9s; --d: -0.9s;"/><circle class="star" cx="59" cy="76" r="0.8" style="--t: 2.5s; --d: -5.0s;"/><circle class="star" cx="61" cy="92" r="0.8" style="--t: 4.0s; --d: -2.2s;"/><circle class="star" cx="181" cy="301" r="1.2" style="--t: 5.8s; --d: -3.9s;"/><circle class="star" cx="235" cy="146" r="1.2" style="--t: 3.9s; --d: -2.4s;"/><circle class="star" cx="36" cy="202" r="0.6" style="--t: 3.2s; --d: -5.9s;"/><circle class="star" cx="141" cy="38" r="1.2" style="--t: 2.7s; --d: -0.0s;"/><circle class="star" cx="51" cy="36" r="0.8" style="--t: 4.6s; --d: -0.4s;"/><circle class="star" cx="69" cy="121" r="0.8" style="--t: 5.8s; --d: -3.6s;"/><circle class="star" cx="152" cy="40" r="1" style="--t: 6.0s; --d: -2.8s;"/><circle class="star" cx="155" cy="31" r="0.6" style="--t: 5.1s; --d: -4.4s;"/><circle class="star" cx="153" cy="220" r="1.2" style="--t: 2.6s; --d: -5.7s;"/><circle class="star" cx="169" cy="50" r="1.2" style="--t: 5.7s; --d: -4.5s;"/><circle class="star" cx="97" cy="205" r="0.6" style="--t: 4.9s; --d: -1.6s;"/><circle class="star" cx="118" cy="56" r="0.8" style="--t: 4.4s; --d: -4.7s;"/></g>
-                            <g id="usageOrbits"></g>
-                            <circle cx="160" cy="160" r="48" fill="url(#usageGlow)"/>
-                            <ellipse class="planet-ring" cx="160" cy="160" rx="34" ry="9" transform="rotate(-18 160 160)"/>
-                            <circle cx="160" cy="160" r="19" fill="url(#usagePlanet)"/>
-                            <path class="planet-ring" d="M127.7 170.5 A34 9 -18 0 0 192.3 149.5"/>
-                        </svg>
-                    </div>
-                    <div class="usage-info">
-                        <div class="usage-kicker">Tokens in orbit<span class="cn">累计 Token</span></div>
-                        <div class="usage-total" data-usage="tokens">23.57B</div>
-                        <div class="usage-month"><span data-usage="tokens_month">331.68M</span> this month · 本月</div>
-
-                        <div class="usage-facts">
-                            <div class="usage-fact">
-                                <div class="usage-kicker">Cost<span class="cn">花费</span></div>
-                                <div class="usage-fact-value" data-usage="cost">$8,972</div>
-                                <small><span data-usage="cost_month">$60.26</span> this month · 本月</small>
-                            </div>
-                            <div class="usage-fact">
-                                <div class="usage-kicker">Rank<span class="cn">排名</span></div>
-                                <div class="usage-fact-value" data-usage="rank">#429</div>
-                                <small>TokenTracker leaderboard · 排行榜</small>
-                            </div>
-                        </div>
-
-                        <div class="usage-legend" id="usageLegend"></div>
-
-                        <div class="usage-foot">
-                            <span>Updated <span data-usage="updated">5 Nov 2026</span> · 每 6 小时自动更新</span>
-                            <a href="https://github.com/xiufengsun/TokenTracker" target="_blank" rel="noopener" class="project-link">
-                                <span>TokenTracker / 数据来源</span>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </section>
 
@@ -2701,78 +2558,6 @@
                     }, 800);
                 }, { passive: true });
             }
-        })();
-    </script>
-    <script>
-        // Live AI usage numbers, published every 6 hours by the ai-usage workflow to the usage branch.
-        // The page first draws the fallback below; on any fetch failure it simply stays that way.
-        (function () {
-            const NS = 'http://www.w3.org/2000/svg';
-            const COLORS = ['#00f3ff', '#bc00ff', '#e8e8f0', '#904e95'];
-            const RADII = [64, 98, 132, 150];
-            const SPEEDS = [48, 80, 120, 160];
-            const FALLBACK = [
-                { name: 'Codex', pct: 42.6 },
-                { name: 'Other', pct: 36 },
-                { name: 'Claude', pct: 21.3 }
-            ];
-            const orbits = document.getElementById('usageOrbits');
-            const legend = document.getElementById('usageLegend');
-
-            function svg(tag, attrs) {
-                const el = document.createElementNS(NS, tag);
-                Object.keys(attrs).forEach((k) => el.setAttribute(k, attrs[k]));
-                return el;
-            }
-
-            function draw(rows) {
-                rows = rows.slice(0, COLORS.length);
-                orbits.textContent = '';
-                legend.textContent = '';
-                rows.forEach((p, i) => {
-                    const r = RADII[i];
-                    const circ = 2 * Math.PI * r;
-                    const len = Math.max(p.pct, 1) / 100 * circ;
-                    const angle = (-90 + p.pct * 3.6) * Math.PI / 180;
-                    orbits.appendChild(svg('circle', { class: 'ring', cx: 160, cy: 160, r: r }));
-                    const g = svg('g', { class: 'orbit', style: '--t: ' + SPEEDS[i] + 's; color: ' + COLORS[i] + ';' });
-                    g.style.animationDelay = (-i * 17) + 's';
-                    g.appendChild(svg('circle', {
-                        class: 'arc', cx: 160, cy: 160, r: r, stroke: COLORS[i],
-                        'stroke-dasharray': len.toFixed(1) + ' ' + circ.toFixed(1),
-                        transform: 'rotate(-90 160 160)'
-                    }));
-                    g.appendChild(svg('circle', {
-                        class: 'moon', fill: COLORS[i], r: 4.5 - i * 0.6,
-                        cx: (160 + r * Math.cos(angle)).toFixed(1),
-                        cy: (160 + r * Math.sin(angle)).toFixed(1)
-                    }));
-                    orbits.appendChild(g);
-
-                    const item = document.createElement('span');
-                    const dot = document.createElement('i');
-                    dot.style.setProperty('--c', COLORS[i]);
-                    const val = document.createElement('b');
-                    val.textContent = (Math.round(p.pct * 10) / 10) + '%';
-                    item.append(dot, p.name, val);
-                    legend.appendChild(item);
-                });
-            }
-
-            draw(FALLBACK);
-            fetch('https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/usage/ai-usage.json', { cache: 'no-cache' })
-                .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-                .then((d) => {
-                    if (d.updated) {
-                        d.updated = new Date(d.updated).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-                    }
-                    document.querySelectorAll('[data-usage]').forEach((el) => {
-                        const v = d[el.dataset.usage];
-                        if (v) el.textContent = v;
-                    });
-                    if (d.providers && d.providers.length) draw(d.providers);
-                })
-                .catch(() => {});
         })();
     </script>
     <!-- Anonymous, cookie-free visit statistics (GoatCounter) -->
