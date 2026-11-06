@@ -129,8 +129,8 @@
         .decoding span { position: relative; transition: none; }
         .decoding span[class=""] { transition: color 0.45s ease, text-shadow 0.45s ease; }
         .dc-off { color: transparent; text-shadow: none; }
-        .dc-dim { color: rgba(0, 243, 255, 0.34); }
-        .dc-hot { color: #e9ffff; text-shadow: 0 0 6px rgba(0, 243, 255, 0.95), 0 0 16px rgba(0, 243, 255, 0.6); }
+        .dc-dim { color: rgba(0, 243, 255, 0.55); }
+        .dc-hot { color: #ffffff; text-shadow: 0 0 6px rgba(0, 243, 255, 1), 0 0 18px rgba(0, 243, 255, 0.75), 0 0 30px rgba(0, 243, 255, 0.35); }
         .dc-hit { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.9), 0 0 22px rgba(0, 243, 255, 0.75), 0 0 36px rgba(189, 0, 255, 0.3); }
         .decoding span[data-g] { color: transparent; text-shadow: none; }
         .decoding span[data-g]::after {
@@ -140,9 +140,10 @@
             top: 0;
             transform: translateX(-50%);
             line-height: normal;
-            color: rgba(0, 243, 255, 0.34);
+            color: rgba(0, 243, 255, 0.6);
         }
-        .decoding span.dc-hot[data-g]::after { color: #e9ffff; text-shadow: 0 0 6px rgba(0, 243, 255, 0.95), 0 0 16px rgba(0, 243, 255, 0.6); }
+        .decoding span[data-v][data-g]::after { color: rgba(196, 150, 255, 0.85); }
+        .decoding span.dc-hot[data-g]::after { color: #ffffff; text-shadow: 0 0 6px rgba(0, 243, 255, 1), 0 0 18px rgba(0, 243, 255, 0.75), 0 0 30px rgba(0, 243, 255, 0.35); }
         @keyframes dc-glitch {
             0%   { transform: translateX(-3px) skewX(-8deg); text-shadow: -2px 0 rgba(255, 40, 200, 0.75), 2px 0 rgba(0, 243, 255, 0.75); }
             20%  { transform: translateX(2px); text-shadow: 2px 0 rgba(255, 40, 200, 0.7), -2px 0 rgba(0, 243, 255, 0.7); clip-path: inset(8% 0 45% 0); }
@@ -523,10 +524,15 @@
             opacity: 1;
         }
 
+        /* cards lift on hover and tilt a little towards the pointer (--rx/--ry are set from script) */
+        .card, .skill-card {
+            transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
+        }
+
         .card:hover {
             background: var(--card-hover-bg);
             box-shadow: 0 18px 44px rgba(0, 0, 0, 0.35);
-            transform: translateY(-3px);
+            --lift: -3px;
         }
 
         /* --- Education/Experience Timeline --- */
@@ -723,7 +729,7 @@
         .skill-card:hover {
             border-color: var(--primary);
             background: var(--card-hover-bg);
-            transform: translateY(-5px);
+            --lift: -5px;
             box-shadow: 0 10px 25px var(--primary-glow);
         }
 
@@ -1675,7 +1681,10 @@
                 // a soft glow under hubs and lit nodes, and the halo that follows the pointer
                 const glow = sprite(64, [[0, 'rgba(0, 243, 255, 0.6)'], [0.35, 'rgba(0, 243, 255, 0.18)'], [1, 'rgba(0, 243, 255, 0)']]);
                 const halo = sprite(256, [[0, 'rgba(0, 243, 255, 0.08)'], [0.5, 'rgba(144, 78, 149, 0.03)'], [1, 'rgba(0, 0, 0, 0)']]);
-                // nebula clouds: cyan, violet and deep blue
+                // nebula clouds: cyan, violet and deep blue, composed at a quarter of the resolution (they are
+                // soft anyway) and scaled up in one draw
+                const sky = document.createElement('canvas');
+                const skyCtx = sky.getContext('2d');
                 const nebula = [
                     sprite(256, [[0, 'rgba(0, 243, 255, 0.5)'], [0.45, 'rgba(0, 140, 190, 0.16)'], [1, 'rgba(0, 0, 0, 0)']]),
                     sprite(256, [[0, 'rgba(160, 80, 240, 0.5)'], [0.45, 'rgba(100, 40, 170, 0.16)'], [1, 'rgba(0, 0, 0, 0)']]),
@@ -1942,14 +1951,16 @@
 
                     // nebula clouds drift slowly and scroll a little (they repeat down the page)
                     const big = Math.max(W, H);
+                    skyCtx.setTransform(sky.width / W, 0, 0, sky.height / H, 0, 0);
+                    skyCtx.clearRect(0, 0, W, H);
                     for (const c of clouds) {
                         const size = big * c.s;
                         const cx = c.x * W + Math.sin(now * 0.00005 + c.ph) * 70 - px * 0.01;
                         const cy = mod(c.y * H - scrollY * 0.03 + Math.cos(now * 0.00004 + c.ph) * 40 + size / 2, H + size) - size / 2;
-                        ctx.globalAlpha = c.a;
-                        ctx.drawImage(nebula[c.k], cx - size / 2, cy - size / 2, size, size);
+                        skyCtx.globalAlpha = c.a;
+                        skyCtx.drawImage(nebula[c.k], cx - size / 2, cy - size / 2, size, size);
                     }
-                    ctx.globalAlpha = 1;
+                    ctx.drawImage(sky, 0, 0, W, H);
 
                     // stars twinkle, drift a touch with scroll, and brighten near the pointer
                     for (const st of stars) {
@@ -2167,6 +2178,8 @@
                     dpr = Math.min(2, window.devicePixelRatio || 1);
                     canvas.width = Math.round(w * dpr);
                     canvas.height = Math.round(h * dpr);
+                    sky.width = Math.max(1, Math.ceil(w / 4));
+                    sky.height = Math.max(1, Math.ceil(h / 4));
                     // Phones resize the height while the address bar slides: keep the network then.
                     const rebuild = !nodes.length || Math.abs(w - W) > 40;
                     W = w;
@@ -2233,41 +2246,67 @@
                 requestAnimationFrame(loop);
             }
 
-            // --- Text that decodes: the hero line and the section titles ---
-            // Glyphs blink in along the line, then a light beam sweeps across: glyphs near it flicker fast
-            // and bright, further ones slowly and dim. Each character locks in with a white flash, and a few
-            // slip back to a glyph for an instant before they hold. A short RGB-split glitch opens and closes
-            // it. Every span keeps its real character (made transparent), so the line wraps exactly like the
+            // --- Text that decodes: the hero lines and section titles as they appear; nav links, titles and
+            // card headings again on hover ---
+            // Glyphs blink in along the line (Latin and Chinese alike), then a light beam with a soft trail
+            // sweeps across. Glyphs near the beam cycle fast and bright, further ones slowly and dim, some in
+            // violet. Each character locks in with a white flash, and a few slip back to a glyph for an
+            // instant before they hold. A short RGB-split glitch opens it and a lighter one closes it.
+            // Every span keeps its real character (made transparent), so the line wraps exactly like the
             // final text; the random glyph is drawn on top of it from data-g.
-            // (the glyph sets live inside the function: init() runs before constants further down exist)
+            // (the glyph sets live inside the functions: init() runs before constants further down exist)
             function glyph(ch) {
-                const set = /[iljtfrI1]/.test(ch) ? 'ilj1!|:;tf'
+                const set = /[\u3400-\u9fff]/.test(ch) ? '数据节点网络算法金融模型量化资本系统信号矩阵协议计算市场估值收益风险链路通道向量参数架构引擎智能编码解析加密密钥终端'
+                    : /[iljtfrI1]/.test(ch) ? 'ilj1!|:;tf'
                     : /[0-9]/.test(ch) ? '0123456789'
                     : /[a-z]/.test(ch) ? 'abcdeghkmnopqrsuvwxyz<>/=+*'
                     : 'ABCDEFGHJKLMNPQRSTUVWXYZ#$%&@*';
                 return set[Math.floor(Math.random() * set.length)];
             }
-            function decode(el, duration, delay) {
+            // instant: the text is already on screen (a hover), so it scrambles in place instead of blinking in
+            function decode(el, duration, delay, instant) {
                 if (reduceMotion || !el || el.dataset.scrambling) return;
                 const target = el.textContent;
                 const chars = Array.from(target);
                 const n = chars.length;
                 if (!n) return;
+                const scr = chars.map((ch) => /[A-Za-z0-9\u3400-\u9fff]/.test(ch));
+                // Note where the lines break now, then hold those breaks with <br> under nowrap, so the glyphs
+                // drawn on top can never push a character onto another line.
+                const breaks = new Set();
+                const tn = el.firstChild;
+                if (tn && tn.nodeType === 3 && el.childNodes.length === 1) {
+                    const r = document.createRange();
+                    let prev = null, off = 0;
+                    chars.forEach((ch, i) => {
+                        r.setStart(tn, off);
+                        r.setEnd(tn, off + ch.length);
+                        const box = ch.trim() ? r.getClientRects()[0] : null;
+                        if (box) {
+                            if (prev && box.top > prev.top + prev.height * 0.5) breaks.add(i);
+                            prev = box;
+                        }
+                        off += ch.length;
+                    });
+                }
                 el.dataset.scrambling = '1';
+                el.style.whiteSpace = 'nowrap';
                 el.textContent = '';
-                const spans = chars.map((ch) => {
+                const spans = chars.map((ch, i) => {
+                    if (breaks.has(i)) el.appendChild(document.createElement('br'));
                     const s = document.createElement('span');
                     s.textContent = ch;
-                    if (ch.trim()) s.className = 'dc-off';
+                    if (ch.trim()) s.className = instant ? 'dc-dim' : 'dc-off';
+                    if (instant && scr[i]) s.dataset.g = glyph(ch);
                     el.appendChild(s);
                     return s;
                 });
                 el.classList.add('decoding');
-                const lead = duration * 0.14, sweep = duration * 0.7, FLASH = 230;
-                const alnum = chars.map((ch) => /[A-Za-z0-9]/.test(ch));
-                const appear = chars.map(() => Math.random() * lead);
+                const lead = duration * (instant ? 0.06 : 0.14), sweep = duration * 0.7, FLASH = instant ? 180 : 230;
+                const appear = chars.map(() => instant ? 0 : Math.random() * lead);
                 const at = chars.map((ch, i) => lead + (n > 1 ? i / (n - 1) : 0) * sweep + Math.random() * duration * 0.14);
-                const slip = chars.map((ch, i) => alnum[i] && Math.random() < 0.22 ? at[i] + 50 + Math.random() * 90 : -1);
+                const slip = chars.map((ch, i) => scr[i] && Math.random() < 0.22 ? at[i] + 50 + Math.random() * 90 : -1);
+                const next = new Array(n).fill(0), violet = new Array(n).fill(false);
                 const last = Math.max.apply(null, at);
                 const end = last + FLASH;
                 const start = performance.now() + (delay || 0);
@@ -2297,10 +2336,19 @@
                             } else if (e < at[i]) {
                                 const near = i - head < 3 && i - head > -1;
                                 cls = near ? 'dc-hot' : 'dc-dim';
-                                if (alnum[i]) g = !s.dataset.g || Math.random() < (near ? 0.85 : 0.3) ? glyph(ch) : s.dataset.g;
+                                if (scr[i]) {
+                                    // glyphs change on a beat, fast near the beam and slow further off, so each one can be read
+                                    if (!s.dataset.g || now >= next[i]) {
+                                        g = glyph(ch);
+                                        next[i] = now + (near ? 40 + Math.random() * 30 : 90 + Math.random() * 90);
+                                        violet[i] = Math.random() < 0.22;
+                                    } else {
+                                        g = s.dataset.g;
+                                    }
+                                }
                             } else if (slip[i] > 0 && e >= slip[i] && e < slip[i] + 60) {
                                 cls = 'dc-hot';
-                                g = !s.dataset.g || Math.random() < 0.7 ? glyph(ch) : s.dataset.g;
+                                g = glyph(ch);
                             } else {
                                 cls = 'dc-hit';
                             }
@@ -2309,6 +2357,11 @@
                             if (s.dataset.g !== undefined) delete s.dataset.g;
                         } else if (s.dataset.g !== g) {
                             s.dataset.g = g;
+                        }
+                        const v = cls === 'dc-dim' && violet[i];
+                        if (v !== ('v' in s.dataset)) {
+                            if (v) s.dataset.v = '';
+                            else delete s.dataset.v;
                         }
                         if (s.className !== cls) s.className = cls;
                     }
@@ -2319,9 +2372,11 @@
                     // let the last flashes fade before handing the plain text back
                     setTimeout(() => {
                         el.textContent = target;
+                        el.style.whiteSpace = '';
                         el.classList.remove('decoding', 'dc-glitch', 'dc-glitch-out');
                         el.style.removeProperty('--scan');
                         el.style.removeProperty('--beam');
+                        el._decodedAt = performance.now();
                         delete el.dataset.scrambling;
                     }, 420);
                 })(performance.now());
@@ -2329,15 +2384,32 @@
 
             function initDecode() {
                 if (reduceMotion) return;
-                document.querySelectorAll('.section-title, .hero-kicker').forEach((h) => {
+                // wrap the text so the beam spans the words rather than the whole box
+                const wrap = (el) => {
+                    if (!el) return null;
                     const span = document.createElement('span');
                     span.className = 'st-text';
-                    span.textContent = h.textContent.trim();
-                    h.textContent = '';
-                    h.appendChild(span);
-                });
-                // starts as glyphs straight away, and sweeps once the kicker has begun to rise in
-                decode(document.querySelector('.hero-kicker .st-text'), 1050, 250);
+                    span.textContent = el.textContent.trim();
+                    el.textContent = '';
+                    el.appendChild(span);
+                    return span;
+                };
+                document.querySelectorAll('.section-title').forEach(wrap);
+                // the hero lines decode one after another as they rise in
+                decode(wrap(document.querySelector('.hero-kicker')), 1300, 250);
+                decode(wrap(document.querySelector('.hero-content h2')), 1000, 600);
+                decode(wrap(document.querySelector('.hero-tag .en')), 1400, 850);
+                decode(wrap(document.querySelector('.hero-tag .cn')), 1100, 1150);
+
+                // on hover, nav links, section titles and card headings scramble again
+                const onHover = (el, ms) => (e) => {
+                    if (!el || e.pointerType === 'touch' || el.dataset.scrambling) return;
+                    if (performance.now() - (el._decodedAt || 0) < 600) return;
+                    decode(el, ms, 0, true);
+                };
+                document.querySelectorAll('.nav-links a').forEach((a) => a.addEventListener('pointerenter', onHover(a, 480)));
+                document.querySelectorAll('.section-title').forEach((h) => h.addEventListener('pointerenter', onHover(h.querySelector('.st-text'), 800)));
+                document.querySelectorAll('.card h3').forEach((h3) => h3.closest('.card').addEventListener('pointerenter', onHover(h3, 650)));
             }
 
             // --- Staggered reveal as elements enter the viewport ---
@@ -2358,7 +2430,7 @@
                         el.style.setProperty('--d', delay + 'ms');
                         el.classList.add('in');
                         if (el.classList.contains('section-title')) {
-                            decode(el.querySelector('.st-text'), 820, delay + 60);   // hidden at once, sweeps after the delay
+                            decode(el.querySelector('.st-text'), 1100, delay + 60);   // hidden at once, sweeps after the delay
                         }
                         // Once settled, hand the element back to its normal styles so hover transitions are not slowed down.
                         setTimeout(() => {
@@ -2427,11 +2499,25 @@
             function initPointerLight() {
                 document.addEventListener('pointermove', (e) => {
                     if (e.pointerType === 'touch') return;
-                    const card = e.target.closest ? e.target.closest('.card') : null;
+                    const card = e.target.closest ? e.target.closest('.card, .skill-card') : null;
                     if (!card) return;
                     const r = card.getBoundingClientRect();
-                    card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-                    card.style.setProperty('--my', (e.clientY - r.top) + 'px');
+                    const x = e.clientX - r.left, y = e.clientY - r.top;
+                    card.style.setProperty('--mx', x + 'px');
+                    card.style.setProperty('--my', y + 'px');
+                    // tilt towards the pointer; wide cards tilt less so their far edge does not swing
+                    if (!reduceMotion && !card.hasAttribute('data-reveal')) {
+                        const max = Math.max(1.5, Math.min(6, 1400 / r.width));
+                        card.style.setProperty('--rx', ((0.5 - y / r.height) * max).toFixed(2) + 'deg');
+                        card.style.setProperty('--ry', ((x / r.width - 0.5) * max).toFixed(2) + 'deg');
+                    }
+                }, { passive: true });
+                document.addEventListener('pointerout', (e) => {
+                    const card = e.target.closest ? e.target.closest('.card, .skill-card') : null;
+                    if (card && !card.contains(e.relatedTarget)) {
+                        card.style.removeProperty('--rx');
+                        card.style.removeProperty('--ry');
+                    }
                 }, { passive: true });
             }
 
