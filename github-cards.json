@@ -1,0 +1,60 @@
+{
+  "login": "LucasYanzy",
+  "name": "LucasYanzy",
+  "stars": 4,
+  "commits": 713,
+  "prs": 125,
+  "issues": 31,
+  "reviews": 0,
+  "contributed_to": 14,
+  "followers": 2,
+  "rank": "B",
+  "percentile": 56.4,
+  "total_contributions": 878,
+  "first_contribution": "2023-06-27",
+  "current_streak": [
+    3,
+    "2026-11-04",
+    "2026-11-06"
+  ],
+  "longest_streak": [
+    4,
+    "2026-10-13",
+    "2026-10-16"
+  ],
+  "languages": [
+    {
+      "name": "TypeScript",
+      "pct": 46.17
+    },
+    {
+      "name": "JavaScript",
+      "pct": 16.78
+    },
+    {
+      "name": "Python",
+      "pct": 13.18
+    },
+    {
+      "name": "CSS",
+      "pct": 12.01
+    },
+    {
+      "name": "HTML",
+      "pct": 9.41
+    },
+    {
+      "name": "Vue",
+      "pct": 1.37
+    },
+    {
+      "name": "C++",
+      "pct": 1.01
+    },
+    {
+      "name": "Dockerfile",
+      "pct": 0.08
+    }
+  ],
+  "rendered_at": "2026-11-07T13:28:25Z"
+}

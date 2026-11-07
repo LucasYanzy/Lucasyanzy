@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="495" height="195" viewBox="0 0 495 195" fill="none" role="img" aria-labelledby="t d">
+<title id="t">LucasYanzy&#x27;s GitHub streak</title>
+<desc id="d">878 total contributions (Jun 27, 2023 - Present). Current streak 3 days (Nov 4 - Nov 6). Longest streak 4 days (Oct 13 - Oct 16).</desc>
+<style>
+  .num { font: 700 28px 'Segoe UI', Ubuntu, 'Helvetica Neue', Sans-Serif; fill: #ffffff }
+  .label { font: 400 14px 'Segoe UI', Ubuntu, 'Helvetica Neue', Sans-Serif; fill: #8a8f98 }
+  .label-hot { font: 700 14px 'Segoe UI', Ubuntu, 'Helvetica Neue', Sans-Serif; fill: #00f3ff }
+  .dates { font: 400 12px 'Segoe UI', Ubuntu, 'Helvetica Neue', Sans-Serif; fill: #6b7280 }
+  .col { opacity: 0; animation: rise .5s ease-out forwards }
+  .ring { stroke: #00f3ff; stroke-width: 5 }
+  .flame { fill: #bd00ff; opacity: 0; transform-box: fill-box; transform-origin: center bottom;
+           animation: pop .45s 1s ease-out forwards }
+  @keyframes fade { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+  @keyframes pop { from { opacity: 0; transform: scale(.6) } to { opacity: 1; transform: scale(1) } }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 0s !important; animation-delay: 0s !important } }
+</style>
+<rect x="0.5" y="0.5" width="494" height="194" rx="11.5" fill="#0a0a0f" stroke="#0b3a40"/>
+<line x1="165" y1="28" x2="165" y2="170" stroke="#0b3a40"/>
+<line x1="330" y1="28" x2="330" y2="170" stroke="#0b3a40"/>
+<g class="col" style="animation-delay: 300ms">
+  <text class="num" x="82.5" y="79" text-anchor="middle">878</text>
+  <text class="label" x="82.5" y="114" text-anchor="middle">Total Contributions</text>
+  <text class="dates" x="82.5" y="140" text-anchor="middle">Jun 27, 2023 - Present</text>
+</g>
+<mask id="gap"><rect width="495" height="195" fill="white"/><circle cx="247.5" cy="32" r="13" fill="black"/></mask>
+<g class="col" style="animation-delay: 600ms">
+  <circle class="ring" cx="247.5" cy="71" r="40" mask="url(#gap)"/>
+  <text class="num" x="247.5" y="81" text-anchor="middle">3</text>
+  <text class="label-hot" x="247.5" y="140" text-anchor="middle">Current Streak</text>
+  <text class="dates" x="247.5" y="165" text-anchor="middle">Nov 4 - Nov 6</text>
+</g>
+<svg x="236.5" y="20" width="22" height="22" viewBox="0 0 24 24"><path class="flame" fill-rule="evenodd" d="M12 1.5c.7 3.4-1.1 5.3-2.9 7.2C7.4 10.5 5.8 12.3 5.8 15.2c0 3.8 2.8 6.8 6.2 6.8s6.2-3 6.2-6.9c0-2.5-1.1-4.3-2.5-5.7.2 1.7-.5 3-1.8 3.6.5-3.7-.6-7.6-1.9-11.5Zm0 13c-1.2 1.2-2 2.2-2 3.6 0 1.3 1 2.4 2 2.4s2-1.1 2-2.4c0-1.4-.8-2.4-2-3.6Z"/></svg>
+<g class="col" style="animation-delay: 900ms">
+  <text class="num" x="412.5" y="79" text-anchor="middle">4</text>
+  <text class="label" x="412.5" y="114" text-anchor="middle">Longest Streak</text>
+  <text class="dates" x="412.5" y="140" text-anchor="middle">Oct 13 - Oct 16</text>
+</g>
+</svg>
