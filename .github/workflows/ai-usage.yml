@@ -9,12 +9,19 @@ on:
     paths:
       - ".github/workflows/ai-usage.yml"
       - ".github/scripts/ai_usage_card.py"
+      - "assets/provider-icons/**"
+  # On a pull request the card is only rendered, as a check; nothing is published.
+  pull_request:
+    paths:
+      - ".github/workflows/ai-usage.yml"
+      - ".github/scripts/ai_usage_card.py"
+      - "assets/provider-icons/**"
 
 permissions:
   contents: write
 
 concurrency:
-  group: ai-usage
+  group: ai-usage-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -24,15 +31,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # A TokenTracker hiccup must not turn the run red or replace the last good card:
-      # on failure we warn and simply skip publishing.
+      # A TokenTracker hiccup must not turn the scheduled run red or replace the last good card:
+      # on failure we warn and simply skip publishing. On a pull request a failure should show.
       - name: Render the card from TokenTracker
         id: render
-        continue-on-error: true
+        continue-on-error: ${{ github.event_name != 'pull_request' }}
         run: python3 .github/scripts/ai_usage_card.py
 
+      # Only main publishes. A run on a pull request or on another branch is a dry run: the card and the
+      # numbers the page would read are kept with the run instead, so they can be looked at before merging.
+      - name: Show the numbers (dry run)
+        if: steps.render.outcome == 'success' && github.ref != 'refs/heads/main'
+        run: cat dist/ai-usage.json
+
+      - name: Keep the rendered card with the run (dry run)
+        if: steps.render.outcome == 'success' && github.ref != 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-usage
+          path: dist/
+          retention-days: 7
+
       - name: Publish to the usage branch
-        if: steps.render.outcome == 'success'
+        if: steps.render.outcome == 'success' && github.ref == 'refs/heads/main'
         run: |
           cd dist
           git init -q
