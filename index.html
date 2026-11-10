@@ -335,6 +335,7 @@
             align-items: center;
             gap: 20px;
             color: var(--primary);
+            text-wrap: balance;          /* a title that needs two lines breaks evenly, not one character short */
         }
 
         .section-title::after {
@@ -922,6 +923,226 @@
             color: #fff;
         }
 
+        /* --- AI Usage Section: one panel of figures, daily activity, months, tools and models --- */
+        .card.usage-card {
+            padding: 0;                                 /* the bands inside carry the padding, at every width */
+            --rule: rgba(255, 255, 255, 0.07);
+            /* activity scale: one hue, brighter means more */
+            --heat-0: rgba(255, 255, 255, 0.055);
+            --heat-1: #0e5a68;
+            --heat-2: #0b8796;
+            --heat-3: #07bccc;
+            --heat-4: #00f3ff;
+        }
+        .usage-card:hover { transform: none; }          /* a panel to read, not a link: it stays put */
+        .usage-band { padding: 30px 40px; border-top: 1px solid var(--rule); }
+        .usage-band:first-child { border-top: 0; }
+        .usage-card [hidden] { display: none; }
+        .usage-cn { margin-left: 8px; letter-spacing: 1px; font-weight: 400; white-space: nowrap; color: var(--text-cn); }
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
+        /* figures: label, value and note of every tile share three rows, so they line up when a label wraps */
+        .usage-kpis, .usage-facts {
+            display: grid;
+            grid-template-columns: minmax(0, 1.35fr) repeat(4, minmax(0, 1fr));
+        }
+        .usage-kpi {
+            display: grid;
+            grid-row: span 3;
+            grid-template-rows: subgrid;
+            row-gap: 6px;
+            min-width: 0;
+            padding-left: 24px;
+            border-left: 1px solid var(--rule);
+        }
+        .usage-kpi:first-child, .usage-fact:first-child { padding-left: 0; border-left: 0; }
+        .usage-label {
+            display: flex;
+            flex-wrap: wrap;
+            column-gap: 8px;
+            font-size: 0.72rem;
+            letter-spacing: 2px;
+            line-height: 1.5;
+            text-transform: uppercase;
+            color: var(--text-cn);
+        }
+        .usage-label .usage-cn { margin-left: 0; }   /* the Chinese half wraps as a whole */
+        .usage-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.15rem;
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.5px;
+            color: var(--text-main);
+            white-space: nowrap;
+        }
+        .usage-value small { margin-left: 6px; font-size: 0.95rem; font-weight: 400; letter-spacing: 0; color: var(--text-cn); }
+        .usage-kpi.lead .usage-value {
+            font-size: clamp(2.7rem, 4.4vw, 3.5rem);
+            font-weight: 800;
+            letter-spacing: -1px;
+            background: linear-gradient(90deg, var(--primary), #ffffff 80%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .usage-kpi:not(.lead) .usage-value { align-self: end; padding-bottom: 5px; }
+        .usage-note { font-size: 0.82rem; line-height: 1.5; color: var(--text-cn); }
+        .usage-note b { font-weight: 500; color: var(--text-en); }
+        .usage-note .up { color: #4ade80; }
+
+        /* block headings */
+        .usage-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin-bottom: 18px; }
+        .usage-head h3 {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: var(--primary);
+        }
+        .usage-head-note { font-size: 0.78rem; color: var(--text-cn); }
+
+        /* daily activity: one cell per day, weeks left to right, Monday at the top */
+        /* the grid is as wide as its weeks need (--heat, set from script) and the months take the rest */
+        .usage-activity { display: grid; grid-template-columns: minmax(0, var(--heat, 9999px)) minmax(300px, 1fr); column-gap: 44px; }
+        .usage-activity > div { display: flex; flex-direction: column; min-width: 0; }
+        .usage-key { display: inline-flex; align-items: center; gap: 4px; margin-left: auto; font-size: 0.72rem; color: var(--text-cn); }
+        .usage-key i { width: 10px; height: 10px; border-radius: 2.5px; }
+        .usage-key span:first-child { margin-right: 3px; }
+        .usage-key span:last-child { margin-left: 3px; }
+        .usage-heat { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 6px 10px; --gap: 3px; }
+        .usage-months, .usage-grid { display: grid; grid-template-columns: repeat(var(--weeks, 26), minmax(0, 1fr)); column-gap: var(--gap); }
+        .usage-months { grid-column: 2; grid-row: 1; height: 1rem; font-size: 0.7rem; line-height: 1rem; color: var(--text-cn); }
+        .usage-months span { grid-row: 1; white-space: nowrap; }
+        .usage-days { grid-column: 1; grid-row: 2; display: grid; grid-template-rows: repeat(7, minmax(0, 1fr)); row-gap: var(--gap); font-size: 0.66rem; line-height: 1; color: var(--text-cn); }
+        .usage-days span { align-self: center; }
+        .usage-days span:nth-child(2) { grid-row: 3; }
+        .usage-days span:nth-child(3) { grid-row: 5; }
+        .usage-grid { grid-column: 2; grid-row: 2; grid-template-rows: repeat(7, auto); grid-auto-flow: column; row-gap: var(--gap); border-radius: 4px; }
+        .usage-grid:focus { outline: none; }
+        .usage-grid:focus-visible { outline: 2px solid var(--primary); outline-offset: 6px; }
+        .usage-grid i { aspect-ratio: 1; border-radius: 22%; background: var(--heat-0); }
+        .usage-grid i.on { outline: 1.5px solid #ffffff; outline-offset: 1px; }
+        .usage-card [data-l="0"] { background: var(--heat-0); }
+        .usage-card [data-l="1"] { background: var(--heat-1); }
+        .usage-card [data-l="2"] { background: var(--heat-2); }
+        .usage-card [data-l="3"] { background: var(--heat-3); }
+        .usage-card [data-l="4"] { background: var(--heat-4); }
+
+        /* by month: columns on one baseline */
+        .usage-cols { flex: 1; display: grid; grid-template-columns: repeat(var(--n, 6), minmax(0, 1fr)); grid-template-rows: minmax(110px, 1fr) auto; }
+        .usage-col { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 6px; border-bottom: 1px solid rgba(255, 255, 255, 0.14); font-size: 0.7rem; line-height: 1; color: var(--text-en); }
+        .usage-col i { width: min(24px, 58%); height: calc((100% - 22px) * var(--h, 0)); min-height: 2px; border-radius: 4px 4px 0 0; background: var(--heat-3); transform-origin: bottom; }
+        .usage-col.now i { opacity: 0.45; }                 /* the month still running */
+        .usage-col.on i { background: var(--heat-4); opacity: 1; }
+        .usage-colname { padding-top: 8px; text-align: center; font-size: 0.72rem; line-height: 1; color: var(--text-cn); }
+
+        /* facts: one line each */
+        .usage-facts { padding-top: 22px; padding-bottom: 22px; }
+        .usage-fact { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 4px; min-width: 0; padding-left: 24px; border-left: 1px solid var(--rule); }
+        .usage-fact .usage-label { font-size: 0.66rem; letter-spacing: 1.5px; }
+        .usage-fact-value { font-size: 0.98rem; font-weight: 500; color: var(--text-main); }
+        .usage-fact-value b { font-weight: 500; }
+        .usage-fact-value span { font-size: 0.85rem; font-weight: 400; color: var(--text-cn); }
+
+        /* tools and models */
+        .usage-split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding-top: 0; padding-bottom: 0; }
+        .usage-split > div { min-width: 0; padding: 30px 0; }
+        .usage-split > div + div { padding-left: 40px; border-left: 1px solid var(--rule); }
+        .usage-split > div:first-child { padding-right: 40px; }
+        .usage-split.solo > div { grid-column: 1 / -1; padding-left: 0; padding-right: 0; border-left: 0; }
+        .usage-seg { display: flex; gap: 2px; height: 8px; margin-bottom: 18px; border-radius: 4px; overflow: hidden; transform-origin: left center; }
+        .usage-seg i { min-width: 3px; background: var(--c); }
+        .usage-seg i.on, .usage-rows li.on .usage-bar i { filter: brightness(1.25); }
+        .usage-rows { list-style: none; display: grid; row-gap: 12px; font-size: 0.92rem; color: var(--text-en); }
+        .usage-rows li { display: grid; grid-template-columns: minmax(0, 1fr) auto 3.4rem; align-items: center; column-gap: 14px; }
+        .usage-rows.models li { grid-template-columns: minmax(0, 10.5rem) minmax(40px, 1fr) auto 3.4rem; }
+        .usage-name { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .usage-name span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .usage-name i { flex: none; width: 8px; height: 8px; border-radius: 2px; background: var(--c); }
+        .usage-name img { flex: none; width: 18px; height: 18px; }
+        .usage-name img.mono { filter: invert(1); }
+        .usage-amt, .usage-pct { text-align: right; font-variant-numeric: tabular-nums; }
+        .usage-amt { font-size: 0.82rem; color: var(--text-cn); }
+        .usage-bar { height: 6px; }
+        .usage-bar i { display: block; height: 100%; min-width: 3px; border-radius: 0 3px 3px 0; background: var(--heat-3); transform-origin: left center; }
+
+        .usage-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 22px; padding-top: 18px; padding-bottom: 18px; font-size: 0.8rem; color: var(--text-cn); }
+        .usage-foot .project-link { margin-top: 0; text-decoration: none; }
+        .usage-foot .project-link:hover svg { transform: translate(3px, -3px); }
+
+        /* one tooltip for every mark; the same text is reachable from the keyboard */
+        .usage-tip {
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 3;
+            padding: 7px 11px;
+            border: 1px solid var(--border-hover);
+            border-radius: 9px;
+            background: rgba(6, 8, 14, 0.97);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            font-size: 0.78rem;
+            line-height: 1.45;
+            white-space: nowrap;
+            color: var(--text-cn);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.15s ease;
+        }
+        .usage-tip.show { opacity: 1; }
+        .usage-tip b { display: block; font-weight: 600; color: var(--text-main); }
+
+        /* drawn in once when the panel is first seen */
+        .usage-card.play .usage-grid i { animation: usage-cell 0.5s var(--ease) backwards; animation-delay: calc(var(--w, 0) * 14ms); }
+        .usage-card.play .usage-col i { animation: usage-rise 0.9s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 70ms + 150ms); }
+        .usage-card.play .usage-col span { animation: usage-fade 0.5s ease backwards; animation-delay: calc(var(--i, 0) * 70ms + 650ms); }
+        .usage-card.play .usage-seg, .usage-card.play .usage-bar i { animation: usage-wipe 1s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 80ms + 100ms); }
+        @keyframes usage-cell { from { opacity: 0; transform: scale(0.4); } }
+        @keyframes usage-rise { from { transform: scaleY(0); } }
+        @keyframes usage-wipe { from { transform: scaleX(0); } }
+        @keyframes usage-fade { from { opacity: 0; } }
+
+        @media (max-width: 1040px) {
+            .usage-activity { grid-template-columns: minmax(0, var(--heat, 9999px)) minmax(240px, 1fr); column-gap: 32px; }
+            .usage-kpi, .usage-fact { padding-left: 18px; }
+        }
+        /* tablets: the lead figure gets a row to itself, tools and models stack */
+        @media (max-width: 900px) {
+            .usage-band { padding: 26px; }
+            .usage-kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .usage-kpi.lead { grid-column: 1 / -1; }
+            .usage-kpi:not(.lead) { margin-top: 20px; }
+            .usage-kpi:nth-child(2) { padding-left: 0; border-left: 0; }
+            .usage-kpi:not(.lead) .usage-value { font-size: 1.8rem; }
+            .usage-split { grid-template-columns: minmax(0, 1fr); padding-top: 0; padding-bottom: 0; }
+            .usage-split > div, .usage-split > div:first-child { padding: 26px 0; }
+            .usage-split > div + div { padding-left: 0; border-left: 0; border-top: 1px solid var(--rule); }
+            .usage-rows.models li { grid-template-columns: minmax(0, 1fr) auto 3.4rem; row-gap: 7px; }
+            .usage-rows.models .usage-bar { grid-column: 1 / -1; grid-row: 2; }
+        }
+        /* phones: everything in one column, the grid shows as many weeks as fit */
+        @media (max-width: 700px) {
+            .usage-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 20px; }
+            .usage-kpi { padding-left: 0; border-left: 0; }
+            .usage-activity { grid-template-columns: minmax(0, 1fr); row-gap: 30px; }
+            .usage-days { display: none; }
+            .usage-heat { grid-template-columns: minmax(0, 1fr); --gap: 2px; }
+            .usage-months, .usage-grid { grid-column: 1; }
+            .usage-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 20px; }
+            .usage-fact { padding-left: 0; border-left: 0; }
+            .usage-fact:first-child { grid-column: 1 / -1; }
+        }
+
         /* --- Contact Section --- */
         .contact-content {
             display: flex;
@@ -1104,6 +1325,7 @@
                 <li><a href="#experience">Experience</a></li>
                 <li><a href="#skills">Skills</a></li>
                 <li><a href="#projects">Projects</a></li>
+                <li><a href="#ai-usage">AI Usage</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
         </div>
@@ -1583,6 +1805,118 @@
                 </div>
             </section>
 
+            <!-- AI Coding Usage / AI 编程用量
+                 The numbers are published every 6 hours by the ai-usage workflow. What is written here, and in the
+                 snapshot below, is the last known state: it is what shows without JavaScript or without the live file. -->
+            <section id="ai-usage">
+                <h2 class="section-title" data-reveal>AI Coding Usage / AI 编程用量</h2>
+                <div class="card usage-card" id="usageCard" data-reveal>
+                    <div class="usage-band usage-kpis">
+                        <div class="usage-kpi lead">
+                            <div class="usage-label">Tokens<span class="usage-cn">累计用量</span></div>
+                            <div class="usage-value" data-usage="tokens">24.97B</div>
+                            <div class="usage-note" data-usage-if="tokens_month"><b class="up">+<span data-usage="tokens_month">1.59B</span></b> this month · 本月</div>
+                        </div>
+                        <div class="usage-kpi">
+                            <div class="usage-label">Est. cost<span class="usage-cn">估算花费</span></div>
+                            <div class="usage-value" data-usage="cost">$9,325</div>
+                            <div class="usage-note" data-usage-if="cost_month"><b class="up">+<span data-usage="cost_month">$384</span></b> this month · 本月</div>
+                        </div>
+                        <div class="usage-kpi">
+                            <div class="usage-label">Rank<span class="usage-cn">排名</span></div>
+                            <div class="usage-value" data-usage="rank">#405</div>
+                            <div class="usage-note">leaderboard · 排行榜</div>
+                        </div>
+                        <div class="usage-kpi" data-usage-if="active_days">
+                            <div class="usage-label">Active days<span class="usage-cn">活跃天数</span></div>
+                            <div class="usage-value" data-usage="active_days">164</div>
+                            <div class="usage-note" data-usage="since">of 172 since 22 May 2026</div>
+                        </div>
+                        <div class="usage-kpi" data-usage-if="streak">
+                            <div class="usage-label">Streak<span class="usage-cn">连续天数</span></div>
+                            <div class="usage-value"><span data-usage="streak">70</span><small>days</small></div>
+                            <div class="usage-note">longest <span data-usage="longest">70</span> · 最长连续</div>
+                        </div>
+                    </div>
+
+                    <div class="usage-band usage-activity" hidden>
+                        <div>
+                            <div class="usage-head">
+                                <h3>Daily activity<span class="usage-cn">每日用量</span></h3>
+                                <span class="usage-head-note" id="usageSpan"></span>
+                                <span class="usage-key" aria-hidden="true"><span>Less</span><i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i><span>More</span></span>
+                            </div>
+                            <div class="usage-heat">
+                                <div class="usage-months" aria-hidden="true"></div>
+                                <div class="usage-days" aria-hidden="true"><span>Mon</span><span>Wed</span><span>Fri</span></div>
+                                <div class="usage-grid" id="usageGrid" role="img" tabindex="0"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="usage-head">
+                                <h3>By month<span class="usage-cn">每月用量</span></h3>
+                                <span class="usage-head-note" id="usageMonthNote"></span>
+                            </div>
+                            <div class="usage-cols" id="usageCols" role="img"></div>
+                        </div>
+                    </div>
+
+                    <div class="usage-band usage-facts" hidden>
+                        <div class="usage-fact">
+                            <div class="usage-label">Busiest day<span class="usage-cn">最高单日</span></div>
+                            <div class="usage-fact-value"><b data-usage="best_tokens"></b> <span data-usage="best_date"></span></div>
+                        </div>
+                        <div class="usage-fact">
+                            <div class="usage-label">Avg. active day<span class="usage-cn">活跃日均</span></div>
+                            <div class="usage-fact-value" data-usage="average"></div>
+                        </div>
+                        <div class="usage-fact">
+                            <div class="usage-label">Last 7 days<span class="usage-cn">近 7 天</span></div>
+                            <div class="usage-fact-value" data-usage="last7"></div>
+                        </div>
+                        <div class="usage-fact">
+                            <div class="usage-label">Last 30 days<span class="usage-cn">近 30 天</span></div>
+                            <div class="usage-fact-value" data-usage="last30"></div>
+                        </div>
+                        <div class="usage-fact" data-usage-if="models_count">
+                            <div class="usage-label">Models used<span class="usage-cn">使用模型</span></div>
+                            <div class="usage-fact-value" data-usage="models_count"></div>
+                        </div>
+                    </div>
+
+                    <div class="usage-band usage-split" hidden>
+                        <div id="usageTools">
+                            <div class="usage-head">
+                                <h3>Tools<span class="usage-cn">工具占比</span></h3>
+                                <span class="usage-head-note">share of tokens, last 12 months · 近一年</span>
+                            </div>
+                            <div class="usage-seg" role="img"></div>
+                            <ul class="usage-rows"></ul>
+                        </div>
+                        <div id="usageModels">
+                            <div class="usage-head">
+                                <h3>Top models<span class="usage-cn">常用模型</span></h3>
+                                <span class="usage-head-note">share of tokens, last 12 months · 近一年</span>
+                            </div>
+                            <ol class="usage-rows models"></ol>
+                        </div>
+                    </div>
+
+                    <div class="usage-band usage-foot">
+                        <span>Updated <span data-usage="updated">9 Nov 2026</span> · refreshed every 6 hours · 每 6 小时自动更新</span>
+                        <a href="https://github.com/xiufengsun/TokenTracker" target="_blank" rel="noopener" class="project-link">
+                            <span>Data: TokenTracker / 数据来源</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                        </a>
+                    </div>
+
+                    <div class="usage-tip" id="usageTip" aria-hidden="true"></div>
+                    <div class="sr-only" id="usageLive" aria-live="polite"></div>
+                    <div class="sr-only" id="usageTable"></div>
+                </div>
+                <script type="application/json" id="usageSnapshot">{"schema":2,"tokens":"24.97B","cost":"$9,325","rank":"#405","tokens_month":"1.59B","cost_month":"$384","providers":[{"key":"codex","name":"Codex","pct":43.13728068121239,"tokens":10859966059},{"key":"other","name":"Other","pct":34.94548610941996,"tokens":8797652218},{"key":"claude","name":"Claude","pct":21.902448706270516,"tokens":5514020490}],"models":[{"name":"gpt-6.1-sol","tokens":4497397474,"pct":17.86428209047072},{"name":"gpt-5.6-sol","tokens":4149694458,"pct":16.483157829730885},{"name":"claude-opus-5-5","tokens":2084302300,"pct":8.279135758908227},{"name":"main-auto","tokens":1724009627,"pct":6.848003646878734},{"name":"gpt-5.5","tokens":1690746569,"pct":6.715878199942156}],"models_count":63,"daily":{"start":"2025-11-10","tokens":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,56495722,74486427,26612408,39887753,35011917,8535385,13136891,7115138,932399,52571024,103256571,73569607,50000474,83007762,142055717,8046201,23544956,11700477,0,0,27012035,52063605,1470631,1170347,7738172,15019436,145825577,60972771,186368081,46834394,4184777,145130323,142890555,187825321,82775683,181080370,101010833,110486437,93286669,53924546,79103845,113323889,81021783,116497155,50536526,2413309,63487625,451991261,892767522,215325932,86243901,553506626,1533996723,1400369154,333299366,184517308,174173162,461649542,16219270,105451020,52303093,16598174,1415214,16225143,3405338,180708730,36431550,19172996,10976295,113152533,150401151,14897183,81113003,38199684,12051318,609688551,329941344,139603685,132463220,162674365,134881619,191979534,15845785,12574549,43490250,329858,0,84866619,13334499,90699671,7989567,0,0,775978,2818363,0,46813663,59066865,10356938,0,11172051,0,111631003,146563747,122325172,15322554,34180089,8600373,1459320,8158812,9894819,20709123,14679714,21623598,25950912,18204361,2167432,1678550,45628601,26775491,3603365,286462,69041774,14556700,4143455,4543213,21259110,118118200,61323835,309200864,86989403,39824274,377913174,82730674,71235798,282666097,244492634,27899836,12678793,37327199,14959098,470086504,365887002,151822091,279289486,179576574,215370253,478893959,146188405,316544182,390525357,207093713,170360517,424500784,361004986,369666650,195222834,388344060,480658207,319593308,1150857338,1462705533,147240007,34007470,351541174,117428792,108583078,531631915,152354354,150928584,282544549,33210834]},"active_days":164,"window_days":365,"streak":{"current":70,"longest":70},"best_day":{"date":"2026-07-13","tokens":1533996723},"tokens_7d":1376682106,"tokens_raw":24967839765,"cost_raw":9325.2,"first_day":"2026-05-22","updated":"2026-11-09T23:58:01+00:00"}</script>
+            </section>
+
             <!-- Contact / 联系方式 -->
             <section id="contact">
                 <h2 class="section-title" data-reveal>Get In Touch / 联系我</h2>
@@ -1661,6 +1995,7 @@
                 initCarousel();
                 initMobileNav();
                 initScrollbar();
+                initUsageLoader();
                 // The background is not needed for the first paint: build it once the page is on screen, so
                 // the first frame and the hero text are not held up by it. It fades in (see #bg-canvas).
                 requestAnimationFrame(() => setTimeout(initBackground, 0));
@@ -2395,6 +2730,29 @@
                 nav.querySelectorAll('.nav-links a').forEach((a) => a.addEventListener('click', close));
                 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
                 document.addEventListener('click', (e) => { if (!nav.contains(e.target)) close(); });
+            }
+
+            // --- AI usage panel: it sits far down the page, so its script (assets/ai-usage.js) is a file of its
+            // own, fetched only when the visitor gets near the section. Until then, and if it never arrives,
+            // the figures written in the page are what shows.
+            function initUsageLoader() {
+                const section = document.getElementById('ai-usage');
+                if (!section) return;
+                const load = () => {
+                    const script = document.createElement('script');
+                    script.src = 'assets/ai-usage.js';
+                    document.body.appendChild(script);
+                };
+                if (!('IntersectionObserver' in window)) {
+                    load();
+                    return;
+                }
+                const near = new IntersectionObserver((entries) => {
+                    if (!entries.some((e) => e.isIntersecting)) return;
+                    near.disconnect();
+                    load();
+                }, { rootMargin: '1800px 0px' });
+                near.observe(section);
             }
 
             // --- Scrollbar thumb that fades in while scrolling and shifts from cyan to violet ---

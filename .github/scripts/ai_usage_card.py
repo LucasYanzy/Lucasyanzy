@@ -148,7 +148,7 @@ def parse_daily(profile):
 
 
 def activity(daily):
-    """Active days, streaks and the busiest day, all read off the same days the grid shows.
+    """Active days, the first one, streaks and the busiest day, all read off the same days the grid shows.
     The current streak may end yesterday: a day that has only just begun does not break it."""
     tokens = daily["tokens"]
     start = datetime.date.fromisoformat(daily["start"])
@@ -162,9 +162,11 @@ def activity(daily):
     while i >= 0 and tokens[i] > 0:
         current, i = current + 1, i - 1
     best = max(range(len(tokens)), key=lambda k: tokens[k])
+    first = next(k for k, v in enumerate(tokens) if v > 0)
     return {
         "active_days": sum(1 for v in tokens if v > 0),
         "window_days": len(tokens),
+        "first_day": (start + datetime.timedelta(days=first)).isoformat(),
         "streak": {"current": current, "longest": longest},
         "best_day": {"date": (start + datetime.timedelta(days=best)).isoformat(), "tokens": tokens[best]},
         "tokens_7d": sum(tokens[-7:]),
@@ -341,6 +343,28 @@ def heat_levels(tokens):
     return [0 if v <= 0 else 1 + sum(v > c for c in cuts) for v in tokens]
 
 
+def since_note(data):
+    """What the active days are out of: the days since the first one when usage began inside the year the
+    profile covers, otherwise the whole year."""
+    start = datetime.date.fromisoformat(data["daily"]["start"])
+    first = datetime.date.fromisoformat(data["first_day"])
+    if first > start:
+        days = data["window_days"] - (first - start).days
+        return f"of {days} since {first.day} {first.strftime('%b')} {first.year}"
+    return f'of the last {data["window_days"]} days'
+
+
+def month_totals(daily):
+    """[(first day of the month, tokens)] for every month the days touch, oldest first."""
+    start = datetime.date.fromisoformat(daily["start"])
+    totals = {}
+    for i, v in enumerate(daily["tokens"]):
+        day = start + datetime.timedelta(days=i)
+        key = day.replace(day=1)
+        totals[key] = totals.get(key, 0) + v
+    return sorted(totals.items())
+
+
 def numeral(value, x, y, fs, fill=INK):
     """A large figure whose prefix and unit glyphs are dimmed."""
     spans = "".join(html.escape(ch) if ch.isdigit() or ch in ".," else f'<tspan fill="{DIM}">{html.escape(ch)}</tspan>'
@@ -419,16 +443,45 @@ def render(data, now, avatar=None):
     LX2 = RX - 40                     # left column ends here
     LW = LX2 - PAD
     lower = bool(daily or prov or models)
-    cols = 53
-    pitch = LW / cols
+    # The grid starts in the week before the first active day, so a profile a few months old is not drawn as
+    # a year of empty cells. While it is short, the months sit beside it as columns; once it has grown past
+    # 40 weeks it takes the whole column.
+    weeks, months, heat_w, pitch = 0, [], LW, 13.0
+    if daily:
+        d_start = datetime.date.fromisoformat(daily["start"])
+        d_end = d_start + datetime.timedelta(days=len(daily["tokens"]) - 1)
+        d_first = datetime.date.fromisoformat(data["first_day"])
+        monday = lambda d: d - datetime.timedelta(days=d.weekday())
+        weeks = (monday(d_end) - monday(d_first)).days // 7 + 1
+        if weeks <= 40:
+            weeks = max(weeks, 26)
+            months = month_totals(daily)[-6:]
+            heat_w = LW - 250
+        weeks = min(weeks, 53)
+        pitch = min(17.0, heat_w / weeks)
+        heat_w = pitch * weeks
     cell = pitch * 0.8
     grid_top = Y0 + 62
-    row_a = max((62 + 7 * pitch + 6) if daily else 0, (60 + (len(prov) - 1) * 28 + 22) if prov else 0)
-    row_b = bool(models or daily)
-    YB = Y0 + row_a + (8 if row_a else 0)   # second row of the lower band
+    grid_h = 7 * pitch - (pitch - cell)
+    # Each column runs top to bottom on its own: activity then models on the left, tools then highlights on
+    # the right. The card is as tall as the longer one.
+    ROW, FACT = 28, 24
+    left_y = Y0 + (62 + grid_h + 44 if daily else 34)                       # heading line of the models
+    left_end = left_y + (26 + (len(models) - 1) * FACT if models else -44)
+    right_y = Y0 + (60 + (len(prov) - 1) * ROW + 48 if prov else 34)        # heading line of the highlights
+    facts = []
+    if daily:
+        best = data["best_day"]
+        facts = [("Busiest day", f'{short(best["tokens"])} · {day_label(best["date"])}'),
+                 ("Average active day", short(sum(daily["tokens"]) / max(1, data["active_days"]))),
+                 ("Last 7 days", short(data["tokens_7d"])),
+                 ("Last 30 days", short(sum(daily["tokens"][-30:])))]
+        if data.get("models_count"):
+            facts.append(("Models used", str(data["models_count"])))
+    right_end = right_y + (26 + (len(facts) - 1) * FACT if facts else -48)
     H = HEAD_H + 124
     if lower:
-        H = int(YB + (22 + 26 + 2 * 24 + 30 if row_b else 14))
+        H = int(max(left_end, right_end) + 34)
 
     defs = [f"""
   <clipPath id="clip"><rect width="{W}" height="{H}" rx="24"/></clipPath>
@@ -474,7 +527,7 @@ def render(data, now, avatar=None):
             ("COST", data["cost"], data.get("cost_month"), None),
             ("RANK", data["rank"], None, "TokenTracker leaderboard")]
     if daily:
-        kpis += [("ACTIVE DAYS", str(data["active_days"]), None, f'of the last {data["window_days"]} days'),
+        kpis += [("ACTIVE DAYS", str(data["active_days"]), None, since_note(data)),
                  ("CURRENT STREAK", str(data["streak"]["current"]), None, f'days · longest {data["streak"]["longest"]}')]
     col_w = (W - 2 * PAD) / 5
     fs = 40.0
@@ -497,39 +550,64 @@ def render(data, now, avatar=None):
         rule(Y0)
         b(f'<rect x="{RX-20}" y="{Y0+18}" width="1" height="{H-Y0-42}" fill="#fff" fill-opacity=".07"/>')
 
-    # --- a year of daily activity
+    # --- daily activity: one cell per day, weeks left to right, Monday at the top
     if daily:
         tokens = daily["tokens"]
-        start = datetime.date.fromisoformat(daily["start"])
         levels = heat_levels(tokens)
-        offset = start.weekday()                       # weeks run Monday to Sunday, top to bottom
-        skip = max(0, (offset + len(tokens) + 6) // 7 - cols) * 7 - offset
-        if skip > 0:                                   # more than 53 weeks: drop the oldest
-            tokens, levels, start, offset = tokens[skip:], levels[skip:], start + datetime.timedelta(days=skip), 0
-        b(f'<text x="{PAD}" y="{Y0+34}" {label_css}>DAILY ACTIVITY · LAST 12 MONTHS</text>')
+        end = datetime.date.fromisoformat(daily["start"]) + datetime.timedelta(days=len(tokens) - 1)
+        first_shown = end - datetime.timedelta(days=end.weekday() + (weeks - 1) * 7)   # Monday of the first column
+        skip = len(tokens) - ((end - first_shown).days + 1)                           # negative: days before the data
+        span = "LAST 12 MONTHS" if weeks >= 52 else f"LAST {weeks} WEEKS"
+        b(f'<text x="{PAD}" y="{Y0+34}" {label_css}>DAILY ACTIVITY · {span}</text>')
         r = cell * 0.2
         side = cell - 2 * r
         paths = [[] for _ in HEAT]
         last_label = -9
-        for i, level in enumerate(levels):
-            c, row = divmod(offset + i, 7)
+        for n in range(weeks * 7):
+            i = skip + n
+            day = first_shown + datetime.timedelta(days=n)
+            if day > end:
+                break
+            c, row = divmod(n, 7)
             x, y = PAD + c * pitch, grid_top + row * pitch
-            paths[level].append(f"M{x+r:.1f} {y+r:.1f}h{side:.1f}v{side:.1f}h{-side:.1f}z")
-            day = start + datetime.timedelta(days=i)
-            if (day.day == 1 or i == 0) and c - last_label >= 3 and c <= cols - 2:
-                if i == 0 and day.day > 20:
-                    continue                           # a sliver of a month at the left edge gets no name
+            paths[levels[i] if i >= 0 else 0].append(f"M{x+r:.1f} {y+r:.1f}h{side:.1f}v{side:.1f}h{-side:.1f}z")
+            if day.day == 1 and c - last_label >= 3 and c <= weeks - 2:
                 b(f'<text x="{x:.1f}" y="{grid_top-9}" font-family="{SANS}" font-size="11.5" fill="{MUTED}">{day.strftime("%b")}</text>')
                 last_label = c
         for level, d in enumerate(paths):
             if d:
                 b(f'<path d="{"".join(d)}" fill="{HEAT[level]}" stroke="{HEAT[level]}" stroke-width="{2*r:.1f}" stroke-linejoin="round"/>')
         # scale key, right-aligned on the heading line
-        kx = LX2 - 34
-        b(f'<text x="{LX2}" y="{Y0+34}" text-anchor="end" font-family="{SANS}" font-size="11.5" fill="{MUTED}">More</text>')
+        key_r = PAD + heat_w - (pitch - cell)
+        kx = key_r - 34
+        b(f'<text x="{key_r:.1f}" y="{Y0+34}" text-anchor="end" font-family="{SANS}" font-size="11.5" fill="{MUTED}">More</text>')
         for j, colour in enumerate(reversed(HEAT)):
             b(f'<rect x="{kx - (j+1)*13:.1f}" y="{Y0+24.5}" width="10" height="10" rx="2.2" fill="{colour}"/>')
         b(f'<text x="{kx - 5*13 - 7:.1f}" y="{Y0+34}" text-anchor="end" font-family="{SANS}" font-size="11.5" fill="{MUTED}">Less</text>')
+
+    # --- by month: columns on one baseline, the month still running drawn lighter
+    if months:
+        mx = PAD + heat_w + 36
+        mw = LX2 - mx
+        b(f'<text x="{mx:.1f}" y="{Y0+34}" {label_css}>BY MONTH</text>')
+        base = grid_top + grid_h - 18
+        room = base - grid_top - 16
+        top = max(v for _, v in months) or 1
+        step = mw / len(months)
+        bar = min(22.0, step * 0.56)
+        this_month = now.date().replace(day=1)
+        for i, (month, value) in enumerate(months):
+            cx = mx + step * (i + 0.5)
+            h = max(room * value / top, 2.0) if value > 0 else 0
+            if h:
+                rr = min(3.0, h / 2)
+                x0, y0 = cx - bar / 2, base - h
+                tint = ' fill-opacity=".45"' if month == this_month else ""
+                b(f'<path d="M{x0:.1f} {base}V{y0+rr:.1f}q0 {-rr:.1f} {rr:.1f} {-rr:.1f}h{bar-2*rr:.1f}q{rr:.1f} 0 {rr:.1f} {rr:.1f}V{base}z" '
+                  f'fill="{HEAT[3]}"{tint}/>')
+            b(f'<text x="{cx:.1f}" y="{base-h-6:.1f}" text-anchor="middle" font-family="{SANS}" font-size="11" fill="#c3cad9">{short(value) if value else "0"}</text>')
+            b(f'<text x="{cx:.1f}" y="{base+15}" text-anchor="middle" font-family="{SANS}" font-size="11.5" fill="{MUTED}">{month.strftime("%b")}</text>')
+        b(f'<rect x="{mx:.1f}" y="{base}" width="{mw:.1f}" height="1" fill="#fff" fill-opacity=".12"/>')
 
     # --- tools: whose tokens they were
     if prov:
@@ -542,43 +620,38 @@ def render(data, now, avatar=None):
         for i, p in enumerate(prov):
             key = str(p.get("key") or "other")
             colour = PROVIDER_COLORS.get(key, FALLBACK_COLOR)
-            cy = Y0 + 60 + i * 28
+            cy = Y0 + 60 + i * ROW
             _, icon = provider_icon(key, px + ICON_SIZE / 2, cy, f"pi{i}")
             b(icon)
             b(f'<text x="{px+30}" y="{cy+5}" font-family="{SANS}" font-size="14.5" fill="{TEXT}">{html.escape(p["name"])}</text>')
             fill_w = max(bar_w * p["pct"] / 100.0, 4.0)
-            b(f'<rect x="{bar_x:.1f}" y="{cy-3}" width="{bar_w:.1f}" height="6" rx="3" fill="#fff" fill-opacity=".07"/>')
-            b(f'<rect x="{bar_x:.1f}" y="{cy-3}" width="{fill_w:.1f}" height="6" rx="3" fill="{colour}">{grow(fill_w, i)}</rect>')
+            b(f'<rect x="{bar_x:.1f}" y="{cy-2.5}" width="{bar_w:.1f}" height="5" rx="2.5" fill="#fff" fill-opacity=".07"/>')
+            b(f'<rect x="{bar_x:.1f}" y="{cy-2.5}" width="{fill_w:.1f}" height="5" rx="2.5" fill="{colour}">{grow(fill_w, i)}</rect>')
             b(f'<text x="{pct_x}" y="{cy+5}" text-anchor="end" font-family="{SANS}" font-size="14" fill="#c3cad9" '
               f'style="font-variant-numeric:tabular-nums">{html.escape(provider_pct(p))}</text>')
 
     # --- top models: ranked bars on one baseline, one hue
     if models:
-        b(f'<text x="{PAD}" y="{YB+22}" {label_css}>TOP MODELS</text>')
+        b(f'<text x="{PAD}" y="{left_y:.1f}" {label_css}>TOP MODELS</text>')
         if data.get("models_count", 0) > len(models):
-            b(f'<text x="{PAD+118}" y="{YB+22}" font-family="{SANS}" font-size="12" fill="{MUTED}">of {data["models_count"]} used</text>')
+            b(f'<text x="{PAD+118}" y="{left_y:.1f}" font-family="{SANS}" font-size="12" fill="{MUTED}">of {data["models_count"]} used</text>')
         bar_x, pct_x = PAD + 196, LX2
         bar_w = pct_x - 58 - bar_x
         top = max(m["pct"] for m in models)
         for i, m in enumerate(models):
-            cy = YB + 48 + i * 24
+            cy = left_y + 26 + i * FACT
             name = m["name"] if len(m["name"]) <= 24 else m["name"][:23] + "…"
             fill_w = max(bar_w * m["pct"] / top, 4.0)
-            b(f'<text x="{PAD}" y="{cy+5}" font-family="{SANS}" font-size="14" fill="{TEXT}">{html.escape(name)}</text>')
-            b(f'<rect x="{bar_x}" y="{cy-3}" width="{fill_w:.1f}" height="6" rx="3" fill="{HEAT[3]}">{grow(fill_w, i)}</rect>')
-            b(f'<text x="{pct_x}" y="{cy+5}" text-anchor="end" font-family="{SANS}" font-size="14" fill="#c3cad9" '
+            b(f'<text x="{PAD}" y="{cy+5:.1f}" font-family="{SANS}" font-size="14" fill="{TEXT}">{html.escape(name)}</text>')
+            b(f'<rect x="{bar_x}" y="{cy-2.5:.1f}" width="{fill_w:.1f}" height="5" rx="2.5" fill="{HEAT[3]}">{grow(fill_w, i)}</rect>')
+            b(f'<text x="{pct_x}" y="{cy+5:.1f}" text-anchor="end" font-family="{SANS}" font-size="14" fill="#c3cad9" '
               f'style="font-variant-numeric:tabular-nums">{html.escape(provider_pct(m))}</text>')
 
     # --- highlights
-    if daily:
-        b(f'<text x="{RX+20}" y="{YB+22}" {label_css}>HIGHLIGHTS</text>')
-        best = data["best_day"]
-        facts = [("Busiest day", f'{short(best["tokens"])} · {day_label(best["date"])}'),
-                 ("Last 7 days", short(data["tokens_7d"]))]
-        if data.get("models_count"):
-            facts.append(("Models used", str(data["models_count"])))
+    if facts:
+        b(f'<text x="{RX+20}" y="{right_y}" {label_css}>HIGHLIGHTS</text>')
         for i, (label, value) in enumerate(facts):
-            cy = YB + 48 + i * 24
+            cy = right_y + 26 + i * FACT
             b(f'<text x="{RX+20}" y="{cy+5}" font-family="{SANS}" font-size="14" fill="{SOFT}">{label}</text>')
             b(f'<text x="{W-PAD}" y="{cy+5}" text-anchor="end" font-family="{SANS}" font-size="14" fill="{TEXT}">{html.escape(value)}</text>')
 

@@ -58,7 +58,7 @@
 
 <p align="center">
   <a href="https://github.com/xiufengsun/TokenTracker">
-    <img src="https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/usage/ai-usage.svg" alt="AI coding usage on TokenTracker: tokens, cost and leaderboard rank" width="100%" />
+    <img src="https://raw.githubusercontent.com/LucasYanzy/Lucasyanzy/usage/ai-usage.svg" alt="AI coding usage on TokenTracker: tokens, cost, leaderboard rank, daily activity, tools and models" width="100%" />
   </a>
 </p>
 
