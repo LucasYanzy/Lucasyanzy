@@ -19,10 +19,10 @@ FONT = os.path.join(ROOT, "assets", "fonts", "inter-latin-wght-normal.woff2")
 OUT = os.path.join(ROOT, "assets", "typing.svg")
 
 LINES = [
-    "College Student @ Rutgers",
+    "College Student",
     "Finance + Computer Science",
     "Tinkering with Arduino & AI tools",
-    "罗格斯在读 · 金融 + 计算机",
+    "大学在读 · 金融 + 计算机",
 ]
 WIDTH, HEIGHT, SIZE, WEIGHT, COLOR = 760, 48, 22, 500, "#00F3FF"
 TYPE_S, PAUSE_S = 3.2, 1.2     # time to type a line, then how long it stays

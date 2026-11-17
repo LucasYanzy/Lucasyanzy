@@ -34,7 +34,7 @@ MAX_PROVIDERS = 4
 MIN_SHARE = 1.0   # providers below this share (in %) are left off the card
 MAX_MODELS = 5
 MAX_DAYS = 371    # 53 weeks: the most the activity grid can show
-NAME = os.environ.get("CARD_NAME", "Lucas Yan")
+NAME = os.environ.get("CARD_NAME", "Lucas")
 AVATAR_LOGIN = os.environ.get("CARD_AVATAR_LOGIN") or os.environ.get("GITHUB_REPOSITORY_OWNER") or "LucasYanzy"
 OUT_DIR = os.environ.get("OUT_DIR", "dist")
 

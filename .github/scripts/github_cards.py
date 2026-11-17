@@ -144,7 +144,7 @@ def sample(now):
         days[d.isoformat()] = (n * 7919 % 13) % 6 if (n * 31 % 7) < 3 else 0
         d += datetime.timedelta(days=1)
     return {
-        "login": LOGIN, "name": "Lucas Yan", "stars": 3, "commits": 214, "prs": 26, "issues": 2, "reviews": 0,
+        "login": LOGIN, "name": "Lucas", "stars": 3, "commits": 214, "prs": 26, "issues": 2, "reviews": 0,
         "contributed_to": 3, "followers": 4,
         "languages": [{"name": "HTML", "color": "#e34c26", "size": 420000}, {"name": "Python", "color": "#3572A5", "size": 160000},
                       {"name": "C++", "color": "#f34b7d", "size": 90000}, {"name": "JavaScript", "color": "#f1e05a", "size": 70000},
