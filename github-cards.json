@@ -1,0 +1,60 @@
+{
+  "login": "LucasYanzy",
+  "name": "LucasYanzy",
+  "stars": 4,
+  "commits": 790,
+  "prs": 142,
+  "issues": 37,
+  "reviews": 1,
+  "contributed_to": 21,
+  "followers": 2,
+  "rank": "B",
+  "percentile": 52.04,
+  "total_contributions": 981,
+  "first_contribution": "2023-06-27",
+  "current_streak": [
+    0,
+    "2026-11-21",
+    "2026-11-21"
+  ],
+  "longest_streak": [
+    7,
+    "2026-11-04",
+    "2026-11-10"
+  ],
+  "languages": [
+    {
+      "name": "TypeScript",
+      "pct": 45.82
+    },
+    {
+      "name": "JavaScript",
+      "pct": 18.97
+    },
+    {
+      "name": "Python",
+      "pct": 11.92
+    },
+    {
+      "name": "CSS",
+      "pct": 11.78
+    },
+    {
+      "name": "HTML",
+      "pct": 8.62
+    },
+    {
+      "name": "Vue",
+      "pct": 1.06
+    },
+    {
+      "name": "PowerShell",
+      "pct": 1.05
+    },
+    {
+      "name": "C++",
+      "pct": 0.78
+    }
+  ],
+  "rendered_at": "2026-11-21T19:40:30Z"
+}

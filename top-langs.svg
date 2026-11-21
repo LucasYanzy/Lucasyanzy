@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="495" height="190" viewBox="0 0 495 190" fill="none" role="img" aria-labelledby="t d">
+<title id="t">Most used languages</title>
+<desc id="d">TypeScript 45.8%, JavaScript 19.0%, Python 11.9%, CSS 11.8%, HTML 8.6%, Vue 1.1%, PowerShell 1.1%, C++ 0.8%</desc>
+<style>
+  .header { font: 600 18px 'Segoe UI', Ubuntu, 'Helvetica Neue', Sans-Serif; fill: #00f3ff; animation: fade .8s ease-in-out forwards }
+  .lang { font: 400 12px 'Segoe UI', Ubuntu, 'Helvetica Neue', Sans-Serif; fill: #c9d1d9 }
+  .item { opacity: 0; animation: rise .4s ease-out forwards }
+  .seg { transform-box: fill-box; transform-origin: left center; transform: scaleX(0);
+          animation: grow .7s ease-out forwards }
+  @keyframes grow { to { transform: scaleX(1) } }
+  @keyframes fade { from { opacity: 0 } to { opacity: 1 } }
+  @keyframes rise { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+  @keyframes pop { from { opacity: 0; transform: scale(.6) } to { opacity: 1; transform: scale(1) } }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: 0s !important; animation-delay: 0s !important } }
+</style>
+<rect x="0.5" y="0.5" width="494" height="189" rx="11.5" fill="#0a0a0f" stroke="#0b3a40"/>
+<text class="header" x="25" y="35">Most Used Languages</text>
+<clipPath id="bar"><rect x="25" y="52" width="445" height="8" rx="4"/></clipPath>
+<rect x="25" y="52" width="445" height="8" rx="4" fill="#0b3a40"/>
+<g clip-path="url(#bar)">
+  <rect class="seg" style="animation-delay: 200ms" x="25.00" y="52" width="204.41" height="8" fill="#3178c6"/>
+  <rect class="seg" style="animation-delay: 290ms" x="228.91" y="52" width="84.94" height="8" fill="#f1e05a"/>
+  <rect class="seg" style="animation-delay: 380ms" x="313.35" y="52" width="53.53" height="8" fill="#3572A5"/>
+  <rect class="seg" style="animation-delay: 470ms" x="366.37" y="52" width="52.93" height="8" fill="#663399"/>
+  <rect class="seg" style="animation-delay: 560ms" x="418.80" y="52" width="38.85" height="8" fill="#e34c26"/>
+  <rect class="seg" style="animation-delay: 650ms" x="457.15" y="52" width="5.21" height="8" fill="#41b883"/>
+  <rect class="seg" style="animation-delay: 740ms" x="461.86" y="52" width="5.19" height="8" fill="#012456"/>
+  <rect class="seg" style="animation-delay: 830ms" x="466.55" y="52" width="3.95" height="8" fill="#f34b7d"/>
+</g>
+<g transform="translate(25, 85)"><g class="item" style="animation-delay: 450ms"><circle cx="5" cy="-4" r="5" fill="#3178c6"/><text class="lang" x="17" y="0">TypeScript 45.82%</text></g></g>
+<g transform="translate(255, 85)"><g class="item" style="animation-delay: 530ms"><circle cx="5" cy="-4" r="5" fill="#f1e05a"/><text class="lang" x="17" y="0">JavaScript 18.97%</text></g></g>
+<g transform="translate(25, 110)"><g class="item" style="animation-delay: 610ms"><circle cx="5" cy="-4" r="5" fill="#3572A5"/><text class="lang" x="17" y="0">Python 11.92%</text></g></g>
+<g transform="translate(255, 110)"><g class="item" style="animation-delay: 690ms"><circle cx="5" cy="-4" r="5" fill="#663399"/><text class="lang" x="17" y="0">CSS 11.78%</text></g></g>
+<g transform="translate(25, 135)"><g class="item" style="animation-delay: 770ms"><circle cx="5" cy="-4" r="5" fill="#e34c26"/><text class="lang" x="17" y="0">HTML 8.62%</text></g></g>
+<g transform="translate(255, 135)"><g class="item" style="animation-delay: 850ms"><circle cx="5" cy="-4" r="5" fill="#41b883"/><text class="lang" x="17" y="0">Vue 1.06%</text></g></g>
+<g transform="translate(25, 160)"><g class="item" style="animation-delay: 930ms"><circle cx="5" cy="-4" r="5" fill="#012456"/><text class="lang" x="17" y="0">PowerShell 1.05%</text></g></g>
+<g transform="translate(255, 160)"><g class="item" style="animation-delay: 1010ms"><circle cx="5" cy="-4" r="5" fill="#f34b7d"/><text class="lang" x="17" y="0">C++ 0.78%</text></g></g>
+</svg>
