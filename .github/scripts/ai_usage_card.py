@@ -245,6 +245,141 @@ def sample_profile():
     }
 
 
+# ------------------------------------------------------------------ usage TokenTracker cannot see
+# Some tools keep no local logs for TokenTracker to read (Claude Duet runs in the cloud). Their usage is kept
+# by hand in .github/data/extra-usage.json and added on top of TokenTracker's numbers here. A day may be
+# partly estimated; the estimated share is kept with it and shown on the card and the page. The rank stays
+# TokenTracker's own: these tokens are not on its leaderboard.
+EXTRAS = os.environ.get("AI_USAGE_EXTRAS") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "data", "extra-usage.json")
+
+
+def parse_short(value):
+    """A badge figure back to a number: "29.44B" -> 29440000000, "$10,377" -> 10377. None if it is not one."""
+    m = re.fullmatch(r"\$?([\d,]+(?:\.\d+)?)\s*([KMBT]?)", str(value or "").strip(), re.I)
+    if not m:
+        return None
+    scale = {"": 1, "K": 1e3, "M": 1e6, "B": 1e9, "T": 1e12}[m.group(2).upper()]
+    return float(m.group(1).replace(",", "")) * scale
+
+
+def money(v):
+    return f"${v:,.0f}"
+
+
+def badge_tokens(n):
+    """Tokens written the way the TokenTracker badge writes them, two decimals and a unit: 29.44B, 886.93M."""
+    for div, unit in ((1e12, "T"), (1e9, "B"), (1e6, "M"), (1e3, "K")):
+        if n >= div:
+            return f"{n / div:.2f}{unit}"
+    return str(int(n))
+
+
+def load_extras(path=EXTRAS):
+    """The hand-kept sources as [{key, name, model, days: [{date, tokens, cost, est_tokens, est_cost}]}].
+    Malformed days are left out with a warning; a missing file means there is nothing to add."""
+    if not os.path.isfile(path):
+        return []
+    with open(path, encoding="utf-8") as f:
+        doc = json.load(f)
+    out = []
+    for src in doc.get("sources") or []:
+        key = str(src.get("key") or "").lower()
+        if not re.fullmatch(r"[a-z0-9_-]{1,24}", key):
+            print(f"::warning::extra usage source with a bad key left out: {key!r}")
+            continue
+        days = []
+        for d in src.get("days") or []:
+            try:
+                date = datetime.date.fromisoformat(str(d.get("date")))
+            except (ValueError, TypeError):
+                print(f"::warning::extra usage day with a bad date left out: {d!r}")
+                continue
+            tokens, cost = num(d.get("tokens")), num(d.get("cost_usd"))
+            if not tokens:
+                continue
+            est_t = min(num(d.get("estimated_tokens")) or 0, tokens)
+            est_c = min(num(d.get("estimated_cost_usd")) or 0, cost or 0)
+            days.append({"date": date, "tokens": int(tokens), "cost": cost or 0.0, "est_tokens": int(est_t), "est_cost": est_c})
+        if days:
+            out.append({"key": key, "name": str(src.get("name") or key)[:24], "model": str(src.get("model") or ""), "days": days})
+    return out
+
+
+def apply_extras(data, extras, today):
+    """Add the hand-kept sources to the TokenTracker numbers: totals, this month, the daily grid (and all the
+    facts read off it), the tool split and the models. Each source is also listed under "extras"."""
+    if not extras:
+        return data
+    listed = []
+    year_ago = today - datetime.timedelta(days=MAX_DAYS - 1)
+    for src in extras:
+        days = src["days"]
+        this_month = [d for d in days if (d["date"].year, d["date"].month) == (today.year, today.month)]
+        total, cost = sum(d["tokens"] for d in days), sum(d["cost"] for d in days)
+        month_t, month_c = sum(d["tokens"] for d in this_month), sum(d["cost"] for d in this_month)
+        year_t = sum(d["tokens"] for d in days if d["date"] >= year_ago)
+
+        base_t = data.get("tokens_raw") or parse_short(data.get("tokens"))
+        if base_t is not None:
+            data["tokens_raw"] = int(base_t + total)
+            data["tokens"] = badge_tokens(data["tokens_raw"])
+        base_c = data["cost_raw"] if data.get("cost_raw") is not None else parse_short(data.get("cost"))
+        if base_c is not None:
+            data["cost_raw"] = round(base_c + cost, 2)
+            data["cost"] = money(data["cost_raw"])
+        if month_t:
+            data["tokens_month"] = badge_tokens((parse_short(data.get("tokens_month")) or 0) + month_t)
+        if month_c:
+            data["cost_month"] = money((parse_short(data.get("cost_month")) or 0) + month_c)
+
+        by_day = {}
+        daily = data.get("daily")
+        if daily:
+            d0 = datetime.date.fromisoformat(daily["start"])
+            by_day = {d0 + datetime.timedelta(days=i): v for i, v in enumerate(daily["tokens"])}
+        for d in days:
+            if d["date"] >= year_ago:
+                by_day[d["date"]] = by_day.get(d["date"], 0) + d["tokens"]
+        if by_day:
+            last = max(by_day)
+            first = max(min(by_day), last - datetime.timedelta(days=MAX_DAYS - 1))
+            tokens = [by_day.get(first + datetime.timedelta(days=i), 0) for i in range((last - first).days + 1)]
+            if any(tokens):
+                data["daily"] = {"start": first.isoformat(), "tokens": tokens}
+                data.update(activity(data["daily"]))
+
+        # shares are of the trailing year: grow the whole by this source's year and rescale every row
+        if year_t:
+            prov = data.get("providers") or []
+            whole = next((r["tokens"] / (r["pct"] / 100.0) for r in prov if r.get("tokens") and r.get("pct")), None)
+            if whole:
+                new_whole = whole + year_t
+                for r in prov:
+                    r["pct"] = r["pct"] * whole / new_whole
+                prov.append({"key": src["key"], "name": src["name"], "pct": year_t / new_whole * 100.0, "tokens": year_t,
+                             "estimated": any(d["est_tokens"] for d in days)})
+                prov.sort(key=lambda r: r["pct"], reverse=True)
+                data["providers"] = prov
+            models = data.get("models") or []
+            name = model_name(src["model"])
+            whole = next((m["tokens"] / (m["pct"] / 100.0) for m in models if m.get("tokens") and m.get("pct")), None)
+            if whole and name:
+                new_whole = whole + year_t
+                for m in models:
+                    if m["name"] == name:
+                        m["tokens"] += year_t
+                    m["pct"] = m["tokens"] / new_whole * 100.0
+                models.sort(key=lambda m: m["pct"], reverse=True)
+
+        listed.append({"key": src["key"], "name": src["name"], "tokens": total, "cost": round(cost, 2),
+                       "estimated_tokens": sum(d["est_tokens"] for d in days),
+                       "estimated_cost": round(sum(d["est_cost"] for d in days), 2),
+                       "first_day": min(d["date"] for d in days).isoformat(),
+                       "last_day": max(d["date"] for d in days).isoformat()})
+    data["extras"] = listed
+    return data
+
+
 def fetch_avatar():
     """The GitHub avatar as a small data URI, or None (the card then draws a monogram)."""
     path = os.environ.get("CARD_AVATAR_FILE")
@@ -267,7 +402,18 @@ def fetch_avatar():
         return None
 
 
-def collect():
+def collect(today=None):
+    data = collect_tokentracker()
+    try:
+        apply_extras(data, load_extras(), today or datetime.datetime.now(datetime.timezone.utc).date())
+    except Exception as e:  # noqa: BLE001
+        # a bad hand-kept file must never cost the TokenTracker card
+        print(f"::warning::extra usage not added: {e}")
+        data.pop("extras", None)
+    return data
+
+
+def collect_tokentracker():
     if os.environ.get("AI_USAGE_SAMPLE"):
         return {"tokens": "14.36B", "cost": "$7,513", "rank": "#519", "tokens_month": "886.93M", "cost_month": "$336",
                 **parse_profile(sample_profile())}
@@ -307,6 +453,7 @@ PROVIDER_COLORS = {
     "opencode": "#008300",
     "kimi": "#9085e9",
     "deepseek": "#e66767",
+    "duet": "#f2b880",      # Claude Duet (hand-kept, see extra-usage.json): a light Claude orange
     "other": "#6b7690",
 }
 FALLBACK_COLOR = "#6b7690"   # a tool this file has no colour for is drawn like "Other"; its name still labels it
@@ -426,6 +573,8 @@ def render(data, now, avatar=None):
     label_css = f'font-family="{SANS}" font-size="12" font-weight="600" letter-spacing="2.6" fill="{SOFT}"'
 
     summary = f'{NAME}: {data["tokens"]} tokens, {data["cost"]} cost, rank {data["rank"]} on TokenTracker'
+    for x in data.get("extras") or []:
+        summary += f' (includes {x["name"]}: {short(x["tokens"])} tokens, {money(x["cost"])}' + (", partly estimated)" if x.get("estimated_tokens") else ")")
     if daily:
         summary += (f'. Active on {data["active_days"]} of the last {data["window_days"]} days, current streak '
                     f'{data["streak"]["current"]} days, longest {data["streak"]["longest"]}')
@@ -511,6 +660,11 @@ def render(data, now, avatar=None):
     b(f'<text x="{hx}" y="48" font-family="{SANS}" font-size="24" font-weight="700" letter-spacing="-.3" fill="{INK}">{html.escape(NAME)}'
       f'<tspan dx="12" font-size="15" font-weight="400" letter-spacing="0" fill="{SOFT}">AI coding usage</tspan></text>')
     stamp = f"All time · updated {now.day} {now.strftime('%b')} {now.year}"
+    extras = data.get("extras") or []
+    if extras:
+        stamp += " · incl. " + ", ".join(x["name"] for x in extras)
+        if any(x.get("estimated_tokens") for x in extras):
+            stamp += " (partly estimated)"
     b(f'<text x="{hx}" y="72" font-family="{SANS}" font-size="13.5" fill="{MUTED}">{html.escape(stamp)}</text>')
 
     tile = 36
@@ -670,8 +824,8 @@ def validate_svg(svg):
 
 
 def main():
-    data = collect()
     now = datetime.datetime.now(datetime.timezone.utc)
+    data = collect(now.date())
     os.makedirs(OUT_DIR, exist_ok=True)
     svg = render(data, now, fetch_avatar())
     validate_svg(svg)  # never publish a card the browser could not parse

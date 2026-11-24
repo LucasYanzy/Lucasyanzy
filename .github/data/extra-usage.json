@@ -1,0 +1,24 @@
+{
+  "about": "AI usage that TokenTracker cannot see, kept by hand. .github/scripts/ai_usage_card.py adds each day's tokens and cost on top of the TokenTracker numbers (totals, this month, daily grid, tools, models); the leaderboard rank is left as TokenTracker's. tokens = input + output + cache creation + cache read. estimated_tokens / estimated_cost_usd are the part of that day's figures that is an estimate, not a measurement.",
+  "sources": [
+    {
+      "key": "duet",
+      "name": "Claude Duet",
+      "model": "claude-opus-5-5",
+      "days": [
+        {
+          "date": "2026-11-24",
+          "tokens": 246947340,
+          "cost_usd": 172.17,
+          "estimated_tokens": 107873291,
+          "estimated_cost_usd": 80.09,
+          "method": {
+            "as_of": "2026-11-24T05:25Z",
+            "measured": "139,074,049 tokens / $92.08, read from the usage records of 14 sessions (the main chat, 5 channel chats and 8 task threads, this update among them) and this update's 2 helpers. Cost is each session's own running total.",
+            "estimated": "107,873,291 tokens / $80.09 for 5 task threads and 4 channel chats whose usage could not be read, 2 task turns still running, and the rest of this update. Each unread thread is the average of the 6 finished threads that were measured (11.93M tokens, $9.81), each unread chat the average of 5 measured chats (6.08M tokens, $2.95)."
+          }
+        }
+      ]
+    }
+  ]
+}

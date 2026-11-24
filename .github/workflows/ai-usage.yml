@@ -10,12 +10,14 @@ on:
       - ".github/workflows/ai-usage.yml"
       - ".github/scripts/ai_usage_card.py"
       - "assets/provider-icons/**"
+      - ".github/data/**"
   # On a pull request the card is only rendered, as a check; nothing is published.
   pull_request:
     paths:
       - ".github/workflows/ai-usage.yml"
       - ".github/scripts/ai_usage_card.py"
       - "assets/provider-icons/**"
+      - ".github/data/**"
 
 permissions:
   contents: write

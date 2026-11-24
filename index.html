@@ -1078,6 +1078,8 @@
 
         .usage-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 22px; padding-top: 18px; padding-bottom: 18px; font-size: 0.8rem; color: var(--text-cn); }
         .usage-foot .project-link { margin-top: 0; text-decoration: none; }
+        .usage-foot .usage-extra { flex-basis: 100%; order: 3; }
+        .usage-est { margin-left: 6px; font-size: 0.72em; color: var(--text-cn); letter-spacing: .02em; }
         .usage-foot .project-link:hover svg { transform: translate(3px, -3px); }
 
         /* one tooltip for every mark; the same text is reachable from the keyboard */
@@ -1904,6 +1906,7 @@
 
                     <div class="usage-band usage-foot">
                         <span>Updated <span data-usage="updated">9 Nov 2026</span> · refreshed every 6 hours · 每 6 小时自动更新</span>
+                        <span class="usage-extra" data-usage-if="extras" data-usage="extras" hidden></span>
                         <a href="https://github.com/xiufengsun/TokenTracker" target="_blank" rel="noopener" class="project-link">
                             <span>Data: TokenTracker / 数据来源</span>
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>

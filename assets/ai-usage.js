@@ -22,7 +22,7 @@
         ];
         // One fixed colour per tool (the README card uses the same map), so a tool keeps its colour
         // whatever its rank. The hues are a set checked for colour-blind separation on a dark surface.
-        const TOOL_COLORS = { codex: '#3987e5', claude: '#d95926', gemini: '#199e70', cursor: '#c98500', copilot: '#d55181', opencode: '#008300', kimi: '#9085e9', deepseek: '#e66767' };
+        const TOOL_COLORS = { codex: '#3987e5', claude: '#d95926', gemini: '#199e70', cursor: '#c98500', copilot: '#d55181', opencode: '#008300', kimi: '#9085e9', deepseek: '#e66767', duet: '#f2b880' };
         const OTHER = '#6b7690';
         // marks in assets/provider-icons; 'mono' ones are a single colour and are shown in white
         const ICONS = { claude: '', codex: '', copilot: '', deepseek: '', gemini: '', kimi: '', cursor: 'mono', opencode: 'mono' };
@@ -87,6 +87,15 @@
                 showIf(key, ok);
                 if (ok) set(key, raw[key]);
             });
+            // tools TokenTracker cannot see, kept by hand and already added to the figures above
+            const extras = (Array.isArray(raw.extras) ? raw.extras : [])
+                .filter((x) => x && typeof x.name === 'string' && typeof x.tokens === 'number' && x.tokens > 0);
+            showIf('extras', extras.length > 0);
+            if (extras.length) {
+                set('extras', 'Includes ' + extras.map((x) => x.name + ' ' + short(x.tokens) + ' tokens' +
+                    (typeof x.cost === 'number' && x.cost > 0 ? ' · $' + Math.round(x.cost).toLocaleString('en-US') : '')).join(', ') +
+                    (extras.some((x) => x.estimated_tokens > 0) ? ', partly estimated · 含部分估算' : '') + ' · not on the TokenTracker leaderboard');
+            }
             const when = new Date(raw.updated);
             if (!isNaN(when)) set('updated', dmy(when));
 
@@ -282,6 +291,7 @@
                     name.appendChild(img);
                 }
                 name.appendChild(make('span', '', p.name));
+                if (p.estimated === true) name.appendChild(make('small', 'usage-est', 'est.'));
                 const row = make('li');
                 row.appendChild(name);
                 row.appendChild(make('span', 'usage-amt', typeof p.tokens === 'number' && p.tokens > 0 ? short(p.tokens) : ''));
