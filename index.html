@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,6 +23,20 @@
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Lucas Yan (闫智尧), Finance & Computer Science at Rutgers University">
     <meta name="twitter:card" content="summary_large_image">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "Lucas Yan",
+        "alternateName": "闫智尧",
+        "url": "https://lucasyanzy.github.io/Lucasyanzy/",
+        "image": "https://lucasyanzy.github.io/Lucasyanzy/assets/og-card.jpg",
+        "description": "Finance and Computer Science student at Rutgers University.",
+        "alumniOf": { "@type": "CollegeOrUniversity", "name": "Rutgers University", "sameAs": "https://www.rutgers.edu/" },
+        "knowsAbout": ["Financial modeling", "Valuation", "Equity research", "Python", "Java", "C++", "Arduino"],
+        "sameAs": ["https://www.linkedin.com/in/lucasyanzy/", "https://github.com/LucasYanzy", "https://instagram.com/LucasYanzy"]
+    }
+    </script>
     <script>document.documentElement.classList.add('js');</script>
     
     <style>
@@ -169,6 +183,7 @@
         .decoding .dc-scr { color: transparent; text-shadow: none; }
         .decoding .dc-scr::after {
             content: attr(data-g);
+            content: attr(data-g) / "";       /* drawn, but screen readers skip it and read the real text */
             position: absolute;
             left: 50%;
             top: 0;
@@ -1077,7 +1092,7 @@
         .usage-bar i { display: block; height: 100%; min-width: 3px; border-radius: 0 3px 3px 0; background: var(--heat-3); transform-origin: left center; }
 
         .usage-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 22px; padding-top: 18px; padding-bottom: 18px; font-size: 0.8rem; color: var(--text-cn); }
-        .usage-foot .project-link { margin-top: 0; text-decoration: none; }
+        .usage-foot .project-link { margin-top: 0; text-decoration: none; padding: 11px 0; margin-bottom: -11px; margin-top: -11px; }
         .usage-foot .project-link:hover svg { transform: translate(3px, -3px); }
 
         /* one tooltip for every mark; the same text is reachable from the keyboard */
@@ -1235,10 +1250,13 @@
             gap: 8px;
             margin-top: 10px;
         }
-        .contact-phone span {
+        .contact-phone a {
+            padding: 4px 0;
             font-size: 1.05rem;
             color: var(--primary);
+            text-decoration: none;
         }
+        .contact-phone a:hover { text-decoration: underline; }
 
         /* --- Footer --- */
         footer {
@@ -1297,6 +1315,77 @@
         }
 
         /* --- Respect reduced-motion preferences --- */
+        /* --- Skip link: hidden until a keyboard user tabs to it --- */
+        .skip-link {
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 2000;
+            padding: 10px 16px;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #000;
+            font-weight: 600;
+            text-decoration: none;
+            transform: translateY(-160%);
+            transition: transform 0.2s ease;
+        }
+        .skip-link:focus { transform: none; }
+        .sr-only {                            /* read by screen readers, not shown */
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+            border: 0;
+        }
+        main:focus { outline: none; }
+
+        /* --- Print (and "save as PDF"): dark ink on white, no background or motion, every skill visible --- */
+        @media print {
+            @page { margin: 14mm 12mm; }
+            :root {
+                --primary: #006b73;
+                --text-main: #111;
+                --text-en: #222;
+                --text-cn: #555;
+                --border: #cfd8dc;
+                --card-bg: #fff;
+                --card-hover-bg: #fff;
+                --bg: #fff;
+                color-scheme: light;
+            }
+            html, body { background: #fff !important; }
+            *, *::before, *::after { animation: none !important; transition: none !important; text-shadow: none !important; box-shadow: none !important; }
+            body, body * { color: #111 !important; }
+            a, .section-title, .section-title *, .project-meta, .timeline-date, .card .company, .tag, .contact-phone a { color: #006b73 !important; }
+            #bg-canvas, #sky-canvas, #navbar, #progress, .skip-link, .explore-btn, .carousel-btn, #skillsDots, #usageTip, .section-title::after { display: none !important; }
+            .js [data-reveal] { opacity: 1 !important; transform: none !important; }
+            #home { min-height: 0 !important; padding: 0 0 10mm !important; }
+            .hero-content h1 { background: none !important; -webkit-text-fill-color: #111; color: #111 !important; }
+            .card, .skill-card { background: #fff !important; border: 1px solid #cfd8dc !important; }
+            .card { padding: 16px 20px !important; margin-bottom: 4mm; }
+            .card::before, .card::after { display: none !important; }
+            /* long cards may run onto the next page; their lines, headings and small cards are kept whole */
+            li, h2, h3, .skill-card, .usage-kpi, .contact-item { break-inside: avoid; }
+            h2, h3, .section-title { break-after: avoid; }
+            section { padding-top: 6mm !important; padding-bottom: 0 !important; }
+            .section-title { margin-bottom: 5mm !important; }
+            .timeline { padding-left: 0 !important; }
+            .timeline::before, .timeline::after, .timeline-item::before { display: none !important; }
+            .timeline-item { margin-bottom: 4mm !important; padding-left: 0 !important; }
+            /* if the page is printed while a line is still decoding, print its plain copy instead */
+            [data-scrambling] { white-space: normal !important; }
+            [data-scrambling] > [aria-hidden], .dc-beam { display: none !important; }
+            [data-scrambling] > .sr-only { position: static !important; width: auto; height: auto; margin: 0; overflow: visible; clip-path: none; white-space: normal; }
+            .skills-carousel-container, .skills-carousel-track-wrapper { overflow: visible !important; }
+            #skillsTrack { transform: none !important; flex-wrap: wrap; row-gap: 12px; }
+            .usage-card { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+        }
+
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
             *, *::before, *::after {
@@ -1311,6 +1400,7 @@
     </style>
 </head>
 <body>
+    <a class="skip-link" href="#main">Skip to content · 跳到正文</a>
 
     <!-- 动态背景 -->
     <canvas id="bg-canvas"></canvas>
@@ -1332,16 +1422,16 @@
         <div id="progress" aria-hidden="true"></div>
     </nav>
 
-    <main>
+    <main id="main" tabindex="-1">
         <!-- Home / 首页 -->
         <section id="home">
             <div class="hero-content">
                 <div class="hero-kicker">Rutgers University · Class of 2029</div>
                 <h1>Lucas Yan</h1>
-                <h2>闫智尧</h2>
+                <h2 lang="zh-CN">闫智尧</h2>
                 <div class="bilingual hero-tag">
                     <span class="en">Finance & Computer Science at Rutgers University</span>
-                    <span class="cn">罗格斯大学 · 金融与计算机科学</span>
+                    <span class="cn" lang="zh-CN">罗格斯大学 · 金融与计算机科学</span>
                 </div>
                 <a href="#education" class="explore-btn" id="explore-nav">
                     <span>View my background / 查看经历</span>
@@ -1370,19 +1460,19 @@
                             <div class="timeline-content">
                                 <div class="bilingual">
                                     <span class="en">Focusing on the intersection of Finance and Computer Science, dedicated to utilizing technology to drive efficiency and innovation in the financial sector.</span>
-                                    <span class="cn">专注于金融与计算机科学交叉领域，致力于利用技术驱动金融领域的效率提升与创新。</span>
+                                    <span class="cn" lang="zh-CN">专注于金融与计算机科学交叉领域，致力于利用技术驱动金融领域的效率提升与创新。</span>
                                 </div>
                                 <ul>
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Bender Trust Stock Analyst Project Participant</span>
-                                            <span class="cn">Bender Trust 股票分析项目参与者</span>
+                                            <span class="cn" lang="zh-CN">Bender Trust 股票分析项目参与者</span>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Rutgers Entrepreneur Society (Sharktank, Scarlet Pitch)</span>
-                                            <span class="cn">罗格斯大学创业协会（Sharktank、Scarlet Pitch）</span>
+                                            <span class="cn" lang="zh-CN">罗格斯大学创业协会（Sharktank、Scarlet Pitch）</span>
                                         </div>
                                     </li>
                                 </ul>
@@ -1405,13 +1495,13 @@
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Goldman Sachs – 2026 Possibilities Series (Apr 2026 – May 2026)</span>
-                                            <span class="cn">高盛 2026 Possibilities 系列项目（2026.04 - 2026.05）</span>
+                                            <span class="cn" lang="zh-CN">高盛 2026 Possibilities 系列项目（2026.04 - 2026.05）</span>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">EY (Ernst & Young) – EY CHARGE 2026 (May 2026 – Jul 2026)</span>
-                                            <span class="cn">安永 EY CHARGE 2026 项目（2026.05 - 2026.07）</span>
+                                            <span class="cn" lang="zh-CN">安永 EY CHARGE 2026 项目（2026.05 - 2026.07）</span>
                                         </div>
                                     </li>
                                 </ul>
@@ -1437,7 +1527,7 @@
                                         <li>
                                             <div class="bilingual">
                                                 <span class="en">Debate Star & Best Chinese Writer</span>
-                                                <span class="cn">辩论之星 & 最佳中文创作者</span>
+                                                <span class="cn" lang="zh-CN">辩论之星 & 最佳中文创作者</span>
                                             </div>
                                         </li>
                                     </ul>
@@ -1449,13 +1539,13 @@
                                         <li>
                                             <div class="bilingual">
                                                 <span class="en">Long-distance runner / Track and Field Team Member</span>
-                                                <span class="cn">长跑运动员 / 田径队成员</span>
+                                                <span class="cn" lang="zh-CN">长跑运动员 / 田径队成员</span>
                                             </div>
                                         </li>
                                         <li>
                                             <div class="bilingual">
                                                 <span class="en">Club President of Environmental Protection</span>
-                                                <span class="cn">环保社社长</span>
+                                                <span class="cn" lang="zh-CN">环保社社长</span>
                                             </div>
                                         </li>
                                     </ul>
@@ -1486,19 +1576,19 @@
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Supported AI data center (AIDC) power-demand forecasting and server BOM cost breakdowns, compiling data on liquid-cooling components, power consumption, and shipment volumes across China and U.S. supply chains.</span>
-                                            <span class="cn">协助进行 AI 数据中心（AIDC）电力需求预测与服务器 BOM 成本拆解，整理中美供应链中液冷部件、功耗及出货量数据。</span>
+                                            <span class="cn" lang="zh-CN">协助进行 AI 数据中心（AIDC）电力需求预测与服务器 BOM 成本拆解，整理中美供应链中液冷部件、功耗及出货量数据。</span>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Ran channel checks across electronics markets and e-commerce platforms to monitor spot pricing; summarized key takeaways from earnings calls and expert-network interviews.</span>
-                                            <span class="cn">在电子市场与电商平台开展渠道调研，跟踪现货价格；整理业绩电话会与专家访谈的要点。</span>
+                                            <span class="cn" lang="zh-CN">在电子市场与电商平台开展渠道调研，跟踪现货价格；整理业绩电话会与专家访谈的要点。</span>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Assisted in drafting equity research reports and valuation models, analyzing hardware market trends, AI structural drivers, and company valuations.</span>
-                                            <span class="cn">协助撰写股票研究报告与估值模型，分析硬件市场趋势、AI 结构性驱动因素及公司估值。</span>
+                                            <span class="cn" lang="zh-CN">协助撰写股票研究报告与估值模型，分析硬件市场趋势、AI 结构性驱动因素及公司估值。</span>
                                         </div>
                                     </li>
                                 </ul>
@@ -1522,7 +1612,7 @@
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Founded and lead a 50+ member student organization connecting members with finance industry knowledge, networking opportunities, and career resources.</span>
-                                            <span class="cn">创立并领导一个 50+ 成员的学生组织，为成员对接金融行业知识、人脉与职业发展资源。</span>
+                                            <span class="cn" lang="zh-CN">创立并领导一个 50+ 成员的学生组织，为成员对接金融行业知识、人脉与职业发展资源。</span>
                                         </div>
                                     </li>
                                 </ul>
@@ -1546,13 +1636,13 @@
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Directed global business operations for an early-stage startup; managed brand design and built the corporate website to align visual identity with the startup vision.</span>
-                                            <span class="cn">负责初创企业的全球业务运营及品牌设计，搭建企业级官方网站以对齐视觉形象与愿景。</span>
+                                            <span class="cn" lang="zh-CN">负责初创企业的全球业务运营及品牌设计，搭建企业级官方网站以对齐视觉形象与愿景。</span>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Pitched the business model at the Rutgers Sharktank competition, successfully securing 8th place overall among competing university teams.</span>
-                                            <span class="cn">在 Rutgers Sharktank 比赛中展示商业模式，成功从全校参赛团队中获得第 8 名。</span>
+                                            <span class="cn" lang="zh-CN">在 Rutgers Sharktank 比赛中展示商业模式，成功从全校参赛团队中获得第 8 名。</span>
                                         </div>
                                     </li>
                                 </ul>
@@ -1576,13 +1666,13 @@
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Optimized organizational efficiency and managed event logistics within the planning department.</span>
-                                            <span class="cn">在策划部主理活动推进与物流管理，优化组织效率。</span>
+                                            <span class="cn" lang="zh-CN">在策划部主理活动推进与物流管理，优化组织效率。</span>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Redesigned competition frameworks and streamlined the judging process to enhance event execution and team productivity.</span>
-                                            <span class="cn">重新设计比赛框架并简化评审流程，显著提升活动执行力和团队生产力。</span>
+                                            <span class="cn" lang="zh-CN">重新设计比赛框架并简化评审流程，显著提升活动执行力和团队生产力。</span>
                                         </div>
                                     </li>
                                 </ul>
@@ -1606,19 +1696,19 @@
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Launched a student-led conservation project in partnership with the foundation; recruited and managed 56 volunteers to run public events and TV media campaigns reaching 5,000+ community members.</span>
-                                            <span class="cn">与基金会合作发起学生主导的环保项目；招募并带领 56 名志愿者开展公众活动与电视媒体宣教，覆盖 5,000+ 社区成员。</span>
+                                            <span class="cn" lang="zh-CN">与基金会合作发起学生主导的环保项目；招募并带领 56 名志愿者开展公众活动与电视媒体宣教，覆盖 5,000+ 社区成员。</span>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Established and managed projects, building a robust network with socially-driven NGOs and foundations as strategic collaborators.</span>
-                                            <span class="cn">与多家环保 NGO 及基金会建立深度合作网络，作为战略合作伙伴统筹项目资源。</span>
+                                            <span class="cn" lang="zh-CN">与多家环保 NGO 及基金会建立深度合作网络，作为战略合作伙伴统筹项目资源。</span>
                                         </div>
                                     </li>
                                     <li>
                                         <div class="bilingual">
                                             <span class="en">Directed a longitudinal biodiversity study across 20 wetland zones, documenting 300+ plant and 50+ animal species to construct a comprehensive local ecological database.</span>
-                                            <span class="cn">主导涵盖 20 个湿地点的跨度生物多样性研究，实地记录 300+ 植物与 50+ 动物物种，成功构建完整本地生态数据库。</span>
+                                            <span class="cn" lang="zh-CN">主导涵盖 20 个湿地点的跨度生物多样性研究，实地记录 300+ 植物与 50+ 动物物种，成功构建完整本地生态数据库。</span>
                                         </div>
                                     </li>
                                 </ul>
@@ -1639,62 +1729,62 @@
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"></path><polyline points="7 15 11 11 14 14 19 8"></polyline></svg></div>
                                 <h3>Financial Modeling</h3>
-                                <div class="bilingual"><span class="en">Three-Statement Modeling</span><span class="cn">三表财务建模</span></div>
+                                <div class="bilingual"><span class="en">Three-Statement Modeling</span><span class="cn" lang="zh-CN">三表财务建模</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="5" x2="5" y2="19"></line><circle cx="6.5" cy="6.5" r="2.5"></circle><circle cx="17.5" cy="17.5" r="2.5"></circle></svg></div>
                                 <h3>Valuation</h3>
-                                <div class="bilingual"><span class="en">DCF & Comparable Companies</span><span class="cn">DCF 估值与可比公司分析</span></div>
+                                <div class="bilingual"><span class="en">DCF & Comparable Companies</span><span class="cn" lang="zh-CN">DCF 估值与可比公司分析</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="8" y1="13" x2="16" y2="13"></line><line x1="8" y1="17" x2="13" y2="17"></line></svg></div>
                                 <h3>Equity Research</h3>
-                                <div class="bilingual"><span class="en">Reports & Valuation Models</span><span class="cn">研究报告与估值模型</span></div>
+                                <div class="bilingual"><span class="en">Reports & Valuation Models</span><span class="cn" lang="zh-CN">研究报告与估值模型</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg></div>
                                 <h3>Python</h3>
-                                <div class="bilingual"><span class="en">Data & Automation</span><span class="cn">数据与自动化</span></div>
+                                <div class="bilingual"><span class="en">Data & Automation</span><span class="cn" lang="zh-CN">数据与自动化</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"></path></svg></div>
                                 <h3>Java</h3>
-                                <div class="bilingual"><span class="en">System Logic</span><span class="cn">系统逻辑</span></div>
+                                <div class="bilingual"><span class="en">System Logic</span><span class="cn" lang="zh-CN">系统逻辑</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg></div>
                                 <h3>C++ (VibeCoding)</h3>
-                                <div class="bilingual"><span class="en">Hardware Control</span><span class="cn">硬件底层控制</span></div>
+                                <div class="bilingual"><span class="en">Hardware Control</span><span class="cn" lang="zh-CN">硬件底层控制</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"></rect><path d="M7 10h4M7 14h4M13 12h4"></path></svg></div>
                                 <h3>Arduino IDE</h3>
-                                <div class="bilingual"><span class="en">System Integration</span><span class="cn">嵌入式系统集成</span></div>
+                                <div class="bilingual"><span class="en">System Integration</span><span class="cn" lang="zh-CN">嵌入式系统集成</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="6" height="6"></rect><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"></path><rect x="4" y="4" width="16" height="16" rx="2"></rect></svg></div>
                                 <h3>Hardware Integration</h3>
-                                <div class="bilingual"><span class="en">Sensors to software</span><span class="cn">硬件与软件联调</span></div>
+                                <div class="bilingual"><span class="en">Sensors to software</span><span class="cn" lang="zh-CN">硬件与软件联调</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg></div>
                                 <h3>AI Tools Proficiency</h3>
-                                <div class="bilingual"><span class="en">Prompt Engineering</span><span class="cn">AI辅助开发</span></div>
+                                <div class="bilingual"><span class="en">Prompt Engineering</span><span class="cn" lang="zh-CN">AI辅助开发</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></div>
                                 <h3>Search & Data Integration</h3>
-                                <div class="bilingual"><span class="en">Research & data gathering</span><span class="cn">信息检索与数据整合</span></div>
+                                <div class="bilingual"><span class="en">Research & data gathering</span><span class="cn" lang="zh-CN">信息检索与数据整合</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg></div>
                                 <h3>Office 365</h3>
-                                <div class="bilingual"><span class="en">PowerPoint, Excel, Word</span><span class="cn">数据处理与可视化</span></div>
+                                <div class="bilingual"><span class="en">PowerPoint, Excel, Word</span><span class="cn" lang="zh-CN">数据处理与可视化</span></div>
                             </div>
                             <div class="skill-card">
                                 <div class="skill-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>
                                 <h3>Languages</h3>
-                                <div class="bilingual"><span class="en">English (Fluent), Mandarin (Native)</span><span class="cn">英语流利 · 中文母语</span></div>
+                                <div class="bilingual"><span class="en">English (Fluent), Mandarin (Native)</span><span class="cn" lang="zh-CN">英语流利 · 中文母语</span></div>
                             </div>
                         </div>
                     </div>
@@ -1721,7 +1811,7 @@
                         <div class="project-body">
                             <div class="bilingual">
                                 <span class="en">Won the "Best Productivity/Automation Challenge Prize" among ~30 teams at Rutgers IEEE's 26-hour engineering competition. Built an Arduino-based wearable controller that translates hand movements into mouse and keyboard commands; handled the hardware integration and used AI-assisted coding for the control logic.</span>
-                                <span class="cn">在 Rutgers IEEE 26 小时工程赛中，于约 30 支队伍中荣获 "最佳生产力与自动化挑战" 奖项。基于 Arduino 打造可穿戴控制器，把手势转换为鼠标与键盘指令；负责硬件集成，并借助 AI 辅助编程完成控制逻辑。</span>
+                                <span class="cn" lang="zh-CN">在 Rutgers IEEE 26 小时工程赛中，于约 30 支队伍中荣获 "最佳生产力与自动化挑战" 奖项。基于 Arduino 打造可穿戴控制器，把手势转换为鼠标与键盘指令；负责硬件集成，并借助 AI 辅助编程完成控制逻辑。</span>
                             </div>
                             <div class="project-link">
                                 <span>Visit Repo / 点击访问仓库</span>
@@ -1743,7 +1833,7 @@
                         <div class="project-body">
                             <div class="bilingual">
                                 <span class="en">Designed, deployed, and managed a personal portfolio website hosted on GitHub Pages to showcase technical programming projects and professional background.</span>
-                                <span class="cn">自主设计、部署并维护托管于 GitHub Pages 的个人作品集网站，用于展示技术项目与职业背景。</span>
+                                <span class="cn" lang="zh-CN">自主设计、部署并维护托管于 GitHub Pages 的个人作品集网站，用于展示技术项目与职业背景。</span>
                             </div>
                             <div class="project-link">
                                 <span>View Source / 查看源码</span>
@@ -1767,11 +1857,11 @@
                         <div class="project-body">
                             <div class="project-role">
                                 <div class="project-role-label">My role / 我的职责</div>
-                                <div class="bilingual"><span class="en">Weather and map system development · Modeling and the upgrade system · Core gameplay design and planning</span><span class="cn">天气与地图系统开发 · 建模与升级系统 · 玩法核心设计与策划</span></div>
+                                <div class="bilingual"><span class="en">Weather and map system development · Modeling and the upgrade system · Core gameplay design and planning</span><span class="cn" lang="zh-CN">天气与地图系统开发 · 建模与升级系统 · 玩法核心设计与策划</span></div>
                             </div>
                             <div class="bilingual">
                                 <span class="en">A browser game you play by holding your real breath. A webcam, read through Presage's vital-signs SDK, detects the breath-hold: the diver only descends while you hold it, deeper water gives rarer fish, and breathing underwater means racing back to the surface or losing the catch. Fish can be minted as Solana NFTs.</span>
-                                <span class="cn">用真实憋气来玩的浏览器游戏。摄像头通过 Presage 检测是否在憋气：憋气时潜水员才会下潜，越深的水域鱼越稀有；水下一呼吸就得赶紧回到水面，否则网里的鱼全部丢失。收获的鱼可以铸造成 Solana NFT。</span>
+                                <span class="cn" lang="zh-CN">用真实憋气来玩的浏览器游戏。摄像头通过 Presage 检测是否在憋气：憋气时潜水员才会下潜，越深的水域鱼越稀有；水下一呼吸就得赶紧回到水面，否则网里的鱼全部丢失。收获的鱼可以铸造成 Solana NFT。</span>
                             </div>
                             <div class="project-link">
                                 <span>Visit Repo / 点击访问仓库</span>
@@ -1794,7 +1884,7 @@
                         <div class="project-body">
                             <div class="bilingual">
                                 <span class="en">A zero-dependency Python charting engine for Chinese metaphysics (BaZi, Zi Wei Dou Shu, Liu Yao, Qi Men and more) with a classical-text knowledge base, packaged as 11 skills for LLMs. Anything with one right answer, from solar terms to star placement, is computed by code and checked against 117 regression anchors; the model only interprets.</span>
-                                <span class="cn">面向大模型的中国命理工具箱：零依赖的 Python 排盘引擎（八字、紫微斗数、六爻、奇门遁甲等）加上古籍知识库，打包为 11 个技能。节气、安星等有唯一正确答案的部分由代码计算，并有 117 条回归锚点校验，模型只负责解读。</span>
+                                <span class="cn" lang="zh-CN">面向大模型的中国命理工具箱：零依赖的 Python 排盘引擎（八字、紫微斗数、六爻、奇门遁甲等）加上古籍知识库，打包为 11 个技能。节气、安星等有唯一正确答案的部分由代码计算，并有 117 条回归锚点校验，模型只负责解读。</span>
                             </div>
                             <div class="project-link">
                                 <span>Visit Repo / 点击访问仓库</span>
@@ -1813,27 +1903,27 @@
                 <div class="card usage-card" id="usageCard" data-reveal>
                     <div class="usage-band usage-kpis">
                         <div class="usage-kpi lead">
-                            <div class="usage-label">Tokens<span class="usage-cn">累计用量</span></div>
+                            <div class="usage-label">Tokens<span class="usage-cn" lang="zh-CN">累计用量</span></div>
                             <div class="usage-value" data-usage="tokens">24.97B</div>
                             <div class="usage-note" data-usage-if="tokens_month"><b class="up">+<span data-usage="tokens_month">1.59B</span></b> this month · 本月</div>
                         </div>
                         <div class="usage-kpi">
-                            <div class="usage-label">Est. cost<span class="usage-cn">估算花费</span></div>
+                            <div class="usage-label">Est. cost<span class="usage-cn" lang="zh-CN">估算花费</span></div>
                             <div class="usage-value" data-usage="cost">$9,325</div>
                             <div class="usage-note" data-usage-if="cost_month"><b class="up">+<span data-usage="cost_month">$384</span></b> this month · 本月</div>
                         </div>
                         <div class="usage-kpi">
-                            <div class="usage-label">Rank<span class="usage-cn">排名</span></div>
+                            <div class="usage-label">Rank<span class="usage-cn" lang="zh-CN">排名</span></div>
                             <div class="usage-value" data-usage="rank">#405</div>
                             <div class="usage-note">leaderboard · 排行榜</div>
                         </div>
                         <div class="usage-kpi" data-usage-if="active_days">
-                            <div class="usage-label">Active days<span class="usage-cn">活跃天数</span></div>
+                            <div class="usage-label">Active days<span class="usage-cn" lang="zh-CN">活跃天数</span></div>
                             <div class="usage-value" data-usage="active_days">164</div>
                             <div class="usage-note" data-usage="since">of 172 since 22 May 2026</div>
                         </div>
                         <div class="usage-kpi" data-usage-if="streak">
-                            <div class="usage-label">Streak<span class="usage-cn">连续天数</span></div>
+                            <div class="usage-label">Streak<span class="usage-cn" lang="zh-CN">连续天数</span></div>
                             <div class="usage-value"><span data-usage="streak">70</span><small>days</small></div>
                             <div class="usage-note">longest <span data-usage="longest">70</span> · 最长连续</div>
                         </div>
@@ -1842,7 +1932,7 @@
                     <div class="usage-band usage-activity" hidden>
                         <div>
                             <div class="usage-head">
-                                <h3>Daily activity<span class="usage-cn">每日用量</span></h3>
+                                <h3>Daily activity<span class="usage-cn" lang="zh-CN">每日用量</span></h3>
                                 <span class="usage-head-note" id="usageSpan"></span>
                                 <span class="usage-key" aria-hidden="true"><span>Less</span><i data-l="0"></i><i data-l="1"></i><i data-l="2"></i><i data-l="3"></i><i data-l="4"></i><span>More</span></span>
                             </div>
@@ -1854,7 +1944,7 @@
                         </div>
                         <div>
                             <div class="usage-head">
-                                <h3>By month<span class="usage-cn">每月用量</span></h3>
+                                <h3>By month<span class="usage-cn" lang="zh-CN">每月用量</span></h3>
                                 <span class="usage-head-note" id="usageMonthNote"></span>
                             </div>
                             <div class="usage-cols" id="usageCols" role="img"></div>
@@ -1863,23 +1953,23 @@
 
                     <div class="usage-band usage-facts" hidden>
                         <div class="usage-fact">
-                            <div class="usage-label">Busiest day<span class="usage-cn">最高单日</span></div>
+                            <div class="usage-label">Busiest day<span class="usage-cn" lang="zh-CN">最高单日</span></div>
                             <div class="usage-fact-value"><b data-usage="best_tokens"></b> <span data-usage="best_date"></span></div>
                         </div>
                         <div class="usage-fact">
-                            <div class="usage-label">Avg. active day<span class="usage-cn">活跃日均</span></div>
+                            <div class="usage-label">Avg. active day<span class="usage-cn" lang="zh-CN">活跃日均</span></div>
                             <div class="usage-fact-value" data-usage="average"></div>
                         </div>
                         <div class="usage-fact">
-                            <div class="usage-label">Last 7 days<span class="usage-cn">近 7 天</span></div>
+                            <div class="usage-label">Last 7 days<span class="usage-cn" lang="zh-CN">近 7 天</span></div>
                             <div class="usage-fact-value" data-usage="last7"></div>
                         </div>
                         <div class="usage-fact">
-                            <div class="usage-label">Last 30 days<span class="usage-cn">近 30 天</span></div>
+                            <div class="usage-label">Last 30 days<span class="usage-cn" lang="zh-CN">近 30 天</span></div>
                             <div class="usage-fact-value" data-usage="last30"></div>
                         </div>
                         <div class="usage-fact" data-usage-if="models_count">
-                            <div class="usage-label">Models used<span class="usage-cn">使用模型</span></div>
+                            <div class="usage-label">Models used<span class="usage-cn" lang="zh-CN">使用模型</span></div>
                             <div class="usage-fact-value" data-usage="models_count"></div>
                         </div>
                     </div>
@@ -1887,7 +1977,7 @@
                     <div class="usage-band usage-split" hidden>
                         <div id="usageTools">
                             <div class="usage-head">
-                                <h3>Tools<span class="usage-cn">工具占比</span></h3>
+                                <h3>Tools<span class="usage-cn" lang="zh-CN">工具占比</span></h3>
                                 <span class="usage-head-note">share of tokens, last 12 months · 近一年</span>
                             </div>
                             <div class="usage-seg" role="img"></div>
@@ -1895,7 +1985,7 @@
                         </div>
                         <div id="usageModels">
                             <div class="usage-head">
-                                <h3>Top models<span class="usage-cn">常用模型</span></h3>
+                                <h3>Top models<span class="usage-cn" lang="zh-CN">常用模型</span></h3>
                                 <span class="usage-head-note">share of tokens, last 12 months · 近一年</span>
                             </div>
                             <ol class="usage-rows models"></ol>
@@ -1923,7 +2013,7 @@
                 <div class="card contact-content" data-reveal>
                     <div class="bilingual contact-intro">
                         <span class="en">Open to conversations about finance, software, hardware projects and anything in between. Email is the quickest way to reach me.</span>
-                        <span class="cn">金融、软件、硬件项目的交流都欢迎，邮件回复最快。</span>
+                        <span class="cn" lang="zh-CN">金融、软件、硬件项目的交流都欢迎，邮件回复最快。</span>
                     </div>
                     
                     <div class="contact-links">
@@ -1957,8 +2047,8 @@
                                 <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                             </div>
                             <div class="contact-phone">
-                                <span>+1 (848) 437 0914</span>
-                                <span>+86 157 5299 5980</span>
+                                <a href="tel:+18484370914">+1 (848) 437 0914</a>
+                                <a href="tel:+8615752995980">+86 157 5299 5980</a>
                             </div>
                         </div>
                     </div>
@@ -1970,7 +2060,7 @@
     <footer>
         <div class="bilingual">
             <span class="en">© 2026 Lucas Yan</span>
-            <span class="cn">© 2026 闫智尧</span>
+            <span class="cn" lang="zh-CN">© 2026 闫智尧</span>
         </div>
     </footer>
 
@@ -2374,7 +2464,7 @@
             // only restyles the characters that change. Nav links and section titles replay it on hover.
             // (the glyph sets live inside the function: init() runs before constants further down exist)
             function glyph(ch) {
-                const set = /[㐀-鿿]/.test(ch) ? '数据节点网络算法金融模型量化资本系统信号矩阵协议计算市场估值收益风险链路通道向量参数架构引擎智能编码解析加密密钥终端'
+                const set = /[\u3400-\u9fff]/.test(ch) ? '数据节点网络算法金融模型量化资本系统信号矩阵协议计算市场估值收益风险链路通道向量参数架构引擎智能编码解析加密密钥终端'
                     : /[iljtfrI1]/.test(ch) ? 'ilj1!|:;tf'
                     : /[0-9]/.test(ch) ? '0123456789'
                     : /[a-z]/.test(ch) ? 'abcdeghkmnopqrsuvwxyz<>/=+*'
@@ -2390,45 +2480,31 @@
                 const chars = Array.from(target);
                 const n = chars.length;
                 if (!n) return none;
-                const scr = chars.map((ch) => /[A-Za-z0-9㐀-鿿]/.test(ch));
-                // Note where the lines break now, then hold those breaks with <br> under nowrap, so the glyphs
-                // drawn on top can never push a character onto another line.
-                const breaks = new Set();
-                const tn = el.firstChild;
-                if (tn && tn.nodeType === 3 && el.childNodes.length === 1) {
-                    const r = document.createRange();
-                    let prev = null, off = 0;
-                    chars.forEach((ch, i) => {
-                        r.setStart(tn, off);
-                        r.setEnd(tn, off + ch.length);
-                        const box = ch.trim() ? r.getClientRects()[0] : null;
-                        if (box) {
-                            if (prev && box.top > prev.top + prev.height * 0.5) breaks.add(i);
-                            prev = box;
-                        }
-                        off += ch.length;
-                    });
-                }
-                const width = el.getBoundingClientRect().width;
+                const scr = chars.map((ch) => /[A-Za-z0-9\u3400-\u9fff]/.test(ch));
+                // The line becomes one span per character, each keeping its real character, so it lays out exactly
+                // like the plain text. On the next frame, once the browser has laid the page out anyway, the line
+                // breaks are read from the spans and held with <br> under nowrap, so the glyphs drawn on top can
+                // never push a character onto another line. Reading them then rather than now keeps this call
+                // from forcing a layout of its own (which made the start-up a long task on phones).
                 el.dataset.scrambling = '1';
-                el.style.whiteSpace = 'nowrap';
                 el.textContent = '';
-                const spans = chars.map((ch, i) => {
-                    if (breaks.has(i)) el.appendChild(document.createElement('br'));
-                    const s = document.createElement('span');
+                // Screen readers get the real line, whole, from a visually hidden copy; the animated
+                // characters are hidden from them.
+                const said = document.createElement('span');
+                said.className = 'sr-only';
+                said.textContent = target;
+                const shown = document.createElement('span');
+                shown.setAttribute('aria-hidden', 'true');
+                el.append(said, shown);
+                const spans = chars.map((ch) => {
+                    const s = ch.trim() ? document.createElement('span') : document.createTextNode(ch);
                     s.textContent = ch;
-                    if (scr[i]) {
-                        s.className = 'dc-scr';
-                        s.dataset.g = glyph(ch);
-                    }
-                    el.appendChild(s);
+                    shown.appendChild(s);
                     return s;
                 });
                 const beam = document.createElement('i');
                 beam.className = 'dc-beam';
                 beam.setAttribute('aria-hidden', 'true');
-                el.appendChild(beam);
-                el.classList.add('decoding');
 
                 // the beam eases in and out; character i locks when the eased beam reaches its place
                 const ease = (u) => 0.5 - 0.5 * Math.cos(Math.PI * u);
@@ -2439,8 +2515,32 @@
                 });
                 const next = chars.map(() => 0);
                 const end = Math.max.apply(null, at) + FLASH;
-                let clock = 0, rate = 1, prevNow = performance.now(), beamX = -1, beamA = -1;
-                (function tick(now) {
+                let clock = 0, rate = 1, prevNow = 0, beamX = -1, beamA = -1, width = 0;
+                requestAnimationFrame((now) => {
+                    // read everything first, then write, so this is a single layout
+                    const breaks = [];
+                    let prev = null;
+                    spans.forEach((s, i) => {
+                        if (!chars[i].trim()) return;
+                        const box = s.getBoundingClientRect();
+                        if (prev && box.top > prev.top + prev.height * 0.5) breaks.push(s);
+                        prev = box;
+                    });
+                    width = el.getBoundingClientRect().width;
+                    breaks.forEach((s) => shown.insertBefore(document.createElement('br'), s));
+                    el.style.whiteSpace = 'nowrap';
+                    spans.forEach((s, i) => {
+                        if (scr[i]) {
+                            s.className = 'dc-scr';
+                            s.dataset.g = glyph(chars[i]);
+                        }
+                    });
+                    el.appendChild(beam);
+                    el.classList.add('decoding');
+                    prevNow = now;
+                    tick(now);
+                });
+                function tick(now) {
                     clock += (now - prevNow) * rate;
                     prevNow = now;
                     const e = clock;
@@ -2483,7 +2583,7 @@
                         el._decodedAt = performance.now();
                         delete el.dataset.scrambling;
                     }, 520);
-                })(prevNow);
+                }
                 return { skip() { rate = Math.max(rate, 5); } };
             }
 
