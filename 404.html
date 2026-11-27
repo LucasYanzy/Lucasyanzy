@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page not found | Lucas Yan</title>
+    <meta name="robots" content="noindex">
+    <meta name="theme-color" content="#030305">
+    <!-- GitHub Pages serves this for any missing address on the site, at any depth, so every link is absolute. -->
+    <link rel="icon" href="/Lucasyanzy/assets/favicon.svg" type="image/svg+xml">
+    <style>
+        @font-face { font-family: 'Outfit'; font-weight: 100 900; font-display: swap; src: url('/Lucasyanzy/assets/fonts/outfit-latin-wght-normal.woff2') format('woff2'); }
+        @font-face { font-family: 'Inter'; font-weight: 100 900; font-display: swap; src: url('/Lucasyanzy/assets/fonts/inter-latin-wght-normal.woff2') format('woff2'); }
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        html, body { margin: 0; min-height: 100%; }
+        body {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            color: #e6edf3;
+            font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+            text-align: center;
+            /* a still night sky drawn with gradients: no script, nothing moving */
+            background:
+                radial-gradient(1px 1px at 12% 22%, rgba(225, 238, 255, .7), transparent 60%),
+                radial-gradient(1px 1px at 78% 14%, rgba(110, 235, 255, .7), transparent 60%),
+                radial-gradient(1.5px 1.5px at 64% 72%, rgba(225, 238, 255, .8), transparent 60%),
+                radial-gradient(1px 1px at 30% 80%, rgba(225, 238, 255, .5), transparent 60%),
+                radial-gradient(1px 1px at 88% 58%, rgba(110, 235, 255, .6), transparent 60%),
+                radial-gradient(1px 1px at 45% 35%, rgba(225, 238, 255, .4), transparent 60%),
+                radial-gradient(1px 1px at 8% 64%, rgba(110, 235, 255, .5), transparent 60%),
+                radial-gradient(60vmax 60vmax at 15% 20%, rgba(0, 190, 255, .07), transparent 60%),
+                radial-gradient(60vmax 60vmax at 90% 80%, rgba(140, 80, 230, .07), transparent 60%),
+                #030305;
+        }
+        main { max-width: 560px; }
+        svg { width: 88px; height: 88px; margin-bottom: 18px; }
+        h1 {
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: clamp(4.5rem, 18vw, 7.5rem);
+            line-height: 1;
+            letter-spacing: -3px;
+            background: linear-gradient(110deg, #fff 20%, #00f3ff 60%, #a6fbff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        p { margin: 16px 0 0; color: rgba(255, 255, 255, .78); font-size: 1.05rem; }
+        p.cn { margin-top: 6px; color: rgba(200, 200, 210, .65); font-size: .95rem; }
+        a.home {
+            display: inline-flex;
+            margin-top: 34px;
+            padding: 14px 34px;
+            border: 1px solid #00f3ff;
+            border-radius: 50px;
+            background: rgba(0, 243, 255, .05);
+            color: #fff;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: background-color .3s ease, color .3s ease;
+        }
+        a.home:hover { background: #00f3ff; color: #000; }
+        a.home:focus-visible { outline: 2px solid #00f3ff; outline-offset: 4px; }
+    </style>
+</head>
+<body>
+    <main>
+        <svg viewBox="0 0 64 64" aria-hidden="true">
+            <g stroke="#00f3ff" stroke-width="2.2" stroke-linecap="round" stroke-opacity=".75" fill="none"><path d="M15 44 27 19 45 26 40 46ZM27 19 40 46"/></g>
+            <circle cx="15" cy="44" r="3.6" fill="#00f3ff"/><circle cx="27" cy="19" r="4.2" fill="#e8ffff"/>
+            <circle cx="45" cy="26" r="4.6" fill="#bd00ff"/><circle cx="40" cy="46" r="3.6" fill="#00f3ff"/>
+        </svg>
+        <h1>404</h1>
+        <p>This page drifted out of the constellation.</p>
+        <p class="cn" lang="zh-CN">这个页面不存在，可能已经移动或删除。</p>
+        <a class="home" href="/Lucasyanzy/">Back to the portfolio · 回到主页</a>
+    </main>
+</body>
+</html>
